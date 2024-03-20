@@ -1,0 +1,16 @@
+<odoo>
+    <data>
+        <record id="inherit_res_partner_form" model="ir.ui.view">
+            <field name="name">inherit.res.partner.form</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[hasclass('oe_title')]/field[@name='company_type']" position='before'>
+                    <h1>
+                        <field name="partner_reference_no" readonly="1"/>
+                    </h1>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

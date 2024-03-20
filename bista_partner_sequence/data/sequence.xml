@@ -1,0 +1,9 @@
+<data>
+   <record id="seq_res_partner" model="ir.sequence">
+       <field name="name">Partner Sequence</field>
+       <field name="code">res.partner</field>
+       <field name="prefix">PP-</field>
+       <field name="padding">7</field>
+       <field name="company_id" eval="False"/>
+   </record>
+</data>
