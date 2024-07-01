@@ -1,0 +1,32 @@
+<odoo>
+
+    <record id="commission_wizard_view_form" model="ir.ui.view">
+        <field name="name">commission_wizard_view_form</field>
+        <field name="model">commission.bill.wizard</field>
+        <field name="arch" type="xml">
+            <form string="commission_wizard_form">
+                <sheet>
+                    <group>
+                        <group string="Filters">
+                            <label for="start_date" string="Date Range"/>
+                            <div class="oe_row">
+                                <field name="start_date" class="oe_inline" placeholder="Start Date"/>
+                                <span class="fa fa-arrow-right" style="margin: 0 5px"/>
+                                <field name="end_date" class="oe_inline" placeholder="End Date"/>
+                            </div>
+                            <field name="partner_ids" widget="many2many_tags" placeholder="Select Options"/>
+                            <field name="sale_person_ids" widget="many2many_tags" placeholder="Select Options"/>
+                        </group>
+                    </group>
+                    <p>Choose the options to limit the result or leave them blank for all the lines..</p>
+                    <footer>
+                        <button type="object" name="confirm" string="Confirm" class="oe_highlight"/>
+                        <button string="Discard" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+
+</odoo>

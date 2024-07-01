@@ -1,0 +1,36 @@
+<odoo>
+
+
+    <record id="partner_view_form" model="ir.ui.view">
+        <field name="name">partner_view_form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='team_id']" position="after">
+                <field name="sale_rep_id"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_sale_rep_contacts" model="ir.actions.act_window">
+        <field name="name">Sale Representative</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">kanban,tree,form,activity</field>
+        <field name="search_view_id" ref="base.view_res_partner_filter"/>
+        <field name="context">{'default_is_company': False, 'default_is_sale_rep': True}</field>
+        <field name="domain">[('is_sale_rep','=', True)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a Contact in your address book
+            </p>
+            <p>
+                Odoo helps you track all activities related to your contacts.
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="commission_sales_rep"
+              name="Sales Representative"
+              parent="bista_sales_commission.sale_commission_root"
+              action="action_sale_rep_contacts" sequence="1000"/>
+</odoo>
