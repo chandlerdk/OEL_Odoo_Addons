@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="shipstation_delivery_carrier_form_view" model="ir.ui.view">
+            <field name="name">shipstation.delivery.carrier.form</field>
+            <field name="model">shipstation.delivery.carrier</field>
+            <field name="arch" type="xml">
+                <form string="Shipstation Carrier">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="company_id"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="shipstation_delivery_carrier_tree_view" model="ir.ui.view">
+            <field name="name">shipstation.delivery.carrier.tree</field>
+            <field name="model">shipstation.delivery.carrier</field>
+            <field name="arch" type="xml">
+                <tree string="Shipstation Carrier">
+                    <field name="name"/>
+                    <field name="company_id"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="shipstation_delivery_carrier_act_window" model="ir.actions.act_window">
+            <field name="name">Shipstation Carrier</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">shipstation.delivery.carrier</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Create Shipstation Carrier.
+                </p>
+            </field>
+        </record>
+
+        <menuitem name="Shipstation Carrier"
+                  id="shipstation_delivery_carrier_sub_menu"
+                  parent="bista_shipstation.shipstation_menu"
+                  action="shipstation_delivery_carrier_act_window"
+                  sequence="2"/>
+
+    </data>
+</odoo>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Server Action -->
+    <record id="action_run_shipstation_sync_picking" model="ir.actions.server">
+        <field name="name">Get Shipstation Tracking</field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="state">code</field>
+        <field name="binding_model_id" ref="stock.model_stock_picking"/>
+        <field name="binding_type">action</field>
+        <field name="binding_view_types">list,form</field>
+        <field name="code">
+            for record in records:
+                record.get_tracking()
+        </field>
+    </record>
+
+    <record id="view_stock_picking_form_inherit_confirm_serviceline" model="ir.ui.view">
+        <field name="name">view.stock.picking.form.inherit.confirm</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+           <xpath expr="//field[@name='origin']" position="after">
+                <field name="add_service_line"/>
+            </xpath>
+
+        </field>
+    </record>
+
+
+</odoo>
