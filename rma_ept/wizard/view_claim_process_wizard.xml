@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_claim_picking" model="ir.ui.view">
+        <field name="name">claim_picking</field>
+        <field name="model">claim.process.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="claim_line_id" invisible="1" />
+                    <field name="state" invisible="1" />
+                    <field name="product_id" required="1" readonly="state != 'process'" domain="[('type','=','product')]" options="{'no_create_edit':True}" />
+                    <field name="hide" invisible="1" />
+                    <field name="quantity" invisible="hide == 'true'" required="hide == 'false'" readonly="state != 'process'" />
+                    <field name="is_create_invoice" invisible="hide == 'true'" readonly="state != 'process'" />
+                </group>
+                <footer>
+                    <button string="Save" name="process_refund" type="object" class="oe_highlight" readonly="state != 'process'" />
+                    <button string="Close" class="oe_link" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="view_claim_reject_ept" model="ir.ui.view">
+        <field name="name">claim_picking</field>
+        <field name="model">claim.process.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="is_visible_goods_back" invisible="1" />
+                    <field name="reject_message_id" required="1" />
+                    <field name="send_goods_back" invisible="not is_visible_goods_back" required="is_visible_goods_back" />
+                </group>
+                <footer>
+                    <button string="Reject Claim" name="reject_claim" type="object" class="oe_highlight" />
+                    or
+                    <button string="Cancel" class="oe_link" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

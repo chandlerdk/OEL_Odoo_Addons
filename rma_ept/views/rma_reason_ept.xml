@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<odoo>
+    <record model="ir.ui.view" id="rma_reason_ept_tree_view">
+        <field name="name">RMA Reason Ept Tree</field>
+        <field name="model">rma.reason.ept</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" />
+                <field name="action" />
+            </tree>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="rma_reason_ept_form_view">
+        <field name="name">RMA Reason Ept Tree</field>
+        <field name="model">rma.reason.ept</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name" />
+                        <field name="action" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record model="ir.actions.act_window" id="rma_reason_ept_action">
+        <field name="name">RMA Reasons</field>
+        <field name="res_model">rma.reason.ept</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    <menuitem id="menu_rma_reason_ept" name="RMA Reasons" parent="rma_ept.menu_crm_claim_ept_after_sale" action="rma_reason_ept_action" groups="rma_ept.group_rma_user_ept" sequence="2" />
+</odoo>

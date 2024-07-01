@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!--Multi company Rule :-->
+    <record id="crm_claim_ept_comp_rule" model="ir.rule">
+        <field name="name">All Claims multi-company</field>
+        <field ref="model_crm_claim_ept" name="model_id"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">['|',('company_id','=',False),('company_id','in',company_ids)]</field>
+    </record>
+    <!--end-->
+
+    <record model="ir.module.category" id="module_category_rma_ept">
+        <field name="name">RMA</field>
+        <field name="sequence" eval="17"/>
+    </record>
+
+    <record model="res.groups" id="group_rma_user_ept">
+        <field name="name">User</field>
+        <field name="category_id" ref="module_category_rma_ept"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <record model="res.groups" id="group_rma_manager_ept">
+        <field name="name">Manager</field>
+        <field name="category_id" ref="module_category_rma_ept"/>
+        <field name="implied_ids" eval="[(4, ref('group_rma_user_ept'))]"/>
+        <field name="users" eval="[(4, ref('base.user_root')),(4, ref('base.user_admin'))]"/>
+    </record>
+<!-- commenting the code due to not reading the line-->
+    <!--record id="crm_claim_ept_responsible_rule" model="ir.rule">
+        <field name="name">Responsible Claims</field>
+        <field ref="model_crm_claim_ept" name="model_id"/>
+        <field name="domain_force">['|',('user_id','=',user.id),('user_id','=',False)]</field>
+        <field name="groups" eval="[(4, ref('rma_ept.group_rma_user_ept'))]"/>
+    </record-->
+
+    <record id="crm_claim_ept_personal_rule" model="ir.rule">
+        <field name="name">Personal Claims</field>
+        <field ref="model_crm_claim_ept" name="model_id"/>
+        <field name="domain_force">[('message_partner_ids','child_of',[user.commercial_partner_id.id])]</field>
+        <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        <field name="perm_unlink">False</field>
+    </record>
+
+    <record id="crm_claim_line_ept_responsible_rule" model="ir.rule">
+        <field name="name">Responsible Claim Lines</field>
+        <field ref="model_claim_line_ept" name="model_id"/>
+        <field name="domain_force">['|',('claim_id.user_id','=',user.id),('claim_id.user_id','=',False)]</field>
+        <field name="groups" eval="[(4, ref('rma_ept.group_rma_user_ept'))]"/>
+    </record>
+
+    <record id="crm_claim_line_ept_rule_all_claims" model="ir.rule">
+        <field name="name">All Claims</field>
+        <field ref="model_crm_claim_ept" name="model_id"/>
+        <field name="domain_force">[(1,'=',1)]</field>
+        <field name="groups" eval="[(4, ref('rma_ept.group_rma_manager_ept'))]"/>
+    </record>
+
+    <record id="crm_claim_line_ept_rule_all_claim_lines" model="ir.rule">
+        <field name="name">All Claim Lines</field>
+        <field ref="model_claim_line_ept" name="model_id"/>
+        <field name="domain_force">[(1,'=',1)]</field>
+        <field name="groups" eval="[(4, ref('rma_ept.group_rma_manager_ept'))]"/>
+    </record>
+
+    <record id="crm_claim_line_ept_personal_rule" model="ir.rule">
+        <field name="name">Personal Claim Lines</field>
+        <field ref="model_claim_line_ept" name="model_id"/>
+        <field name="domain_force">[('claim_id.message_partner_ids','child_of',[user.commercial_partner_id.id])]</field>
+        <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        <field name="perm_unlink">False</field>
+    </record>
+
+</odoo>
