@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="inherit_view_mrp_production_filter" model="ir.ui.view">
+        <field name="name">mrp.production.search.view.inherit</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.view_mrp_production_filter" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='origin']" position="after">
+                <filter string="RMA Orders" name="rma_orders" domain="[('quality_check_id', '!=', False)]"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

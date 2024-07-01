@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Stock Picking From -->
+    <record id="inherit_view_picking_form" model="ir.ui.view">
+        <field name="name">stock.picking.form.inherit</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <field name="is_rma_in" invisible="1"/>
+                <field name="is_rma_out" invisible="1"/>
+            </xpath>
+            <xpath expr="//page[@name='operations']//field[@name='move_ids_without_package']//field[@name='product_id']" position="after">
+                <field name="receipt_note" column_invisible="parent.picking_type_code not in ['incoming', 'internal'] and not parent.claim_id"/>
+                <field name="delivery_note" column_invisible="parent.picking_type_code != 'outgoing' and not parent.claim_id"/>
+            </xpath>
+            <xpath expr="//button[@name='action_confirm']" position="attributes">
+                <attribute name="invisible">state != 'draft' or (is_rma_out or is_rma_in)</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_confirm']" position="after">
+                <button name="action_confirm" invisible="state != 'draft' or not (is_rma_out or is_rma_in)" string="Do As Received" type="object" class="oe_highlight" groups="base.group_user" data-hotkey="q"/>
+            </xpath>
+            <xpath expr="//button[@name='action_assign']" position="attributes">
+                <attribute name="groups">stock.group_stock_manager</attribute>
+            </xpath>
+            <xpath expr="//button[@name='button_validate']" position="attributes">
+                <attribute name="groups">stock.group_stock_manager</attribute>
+            </xpath>
+            <xpath expr="//button[@name='button_validate'][2]" position="attributes">
+                <attribute name="groups">stock.group_stock_manager</attribute>
+            </xpath>
+            <xpath expr="//button[@name='%(stock.act_stock_return_picking)d']" position="attributes">
+                <attribute name="groups">stock.group_stock_manager</attribute>
+            </xpath>
+            <xpath expr="//button[@name='check_quality']" position="attributes">
+                <attribute name="groups">stock.group_stock_manager</attribute>
+            </xpath>
+            <xpath expr="//button[@name='button_quality_alert']" position="attributes">
+                <attribute name="groups">stock.group_stock_manager</attribute>
+            </xpath>
+
+        </field>
+    </record>
+    <!-- Stock Picking type -->
+    <record id="inherit_view_picking_type_form" model="ir.ui.view">
+        <field name="name">stock.picking.type.form.inherit</field>
+        <field name="model">stock.picking.type</field>
+        <field name="inherit_id" ref="stock.view_picking_type_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='locations']" position="after">
+                <group string="RMA" name="rma" invisible="1">
+                    <field name="is_rma_in" />
+                    <field name="is_rma_out" />
+                </group>
+            </xpath>
+        </field>
+    </record>
+    <!-- Stock Scrap -->
+    <record id="inherit_stock_scrap_form_view" model="ir.ui.view">
+        <field name="name">stock.scrap.rma.form</field>
+        <field name="model">stock.scrap</field>
+        <field name="inherit_id" ref="stock.stock_scrap_form_view" />
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_validate']" position="attributes">
+                <attribute name="groups">quality.group_quality_manager</attribute>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <field name="rma_count" invisible="1" />
+                <button name="action_view_rma" type="object" class="oe_stat_button" icon="fa-mail-reply" invisible="rma_count == 0">
+                    <span class="o_stat_text">RMA</span>
+                </button>
+            </xpath>
+        </field>
+    </record>
+    <record id="inherit_stock_scrap_search_view" model="ir.ui.view">
+        <field name="name">stock.scrap.search.form.inherit</field>
+        <field name="model">stock.scrap</field>
+        <field name="inherit_id" ref="stock.stock_scrap_search_view" />
+        <field name="arch" type="xml">
+            <xpath expr="//group[@expand='0']" position="before">
+                <filter string="RMA Orders" name="rma_orders" domain="['|', ('quality_check_id', '!=', False), ('claim_id', '!=', False)]"/>
+            </xpath>
+        </field>
+    </record>
+    <!-- Stock Warehouse -->
+    <record id="inherit_view_warehouse_from" model="ir.ui.view">
+        <field name="name">stock.warehouse.form.inherit</field>
+        <field name="model">stock.warehouse</field>
+        <field name="inherit_id" ref="stock.view_warehouse" />
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='technical_info']//group[2]" position="inside">
+                <field name="manu_refurbish_type_id" readonly="1"/>
+                <field name="rma_in_type_id" readonly="1"/>
+                <field name="rma_out_type_id" readonly="1"/>
+            </xpath>
+        </field>
+    </record>
+    <!-- Stock Location -->
+    <record id="inherit_view_location_form" model="ir.ui.view">
+        <field name="name">stock.location.form.inherit</field>
+        <field name="model">stock.location</field>
+        <field name="inherit_id" ref="stock.view_location_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='scrap_location']" position="after">
+                <field name="rma_scrap_location" invisible="not scrap_location"/>
+            </xpath>
+            <xpath expr="//field[@name='valuation_in_account_id']" position="attributes">
+                <attribute name="required">rma_scrap_location</attribute>
+            </xpath>
+            <xpath expr="//field[@name='valuation_out_account_id']" position="attributes">
+                <attribute name="required">rma_scrap_location</attribute>
+            </xpath>
+        </field>
+    </record>
+    <!-- Action Window -->
+    <record id="rma_receipt_action" model="ir.actions.act_window">
+        <field name="name">RMA Receipt</field>
+        <field name="res_model">stock.picking</field>
+        <field name="view_mode">tree,kanban,form,calendar,activity</field>
+        <field name="context">{'contact_display': 'partner_address', 'default_company_id': allowed_company_ids[0], 'restricted_picking_type_code': 'incoming', 'create': False}</field>
+        <field name="domain">[('picking_type_code', '=', 'incoming'), ("picking_type_id.is_rma_in", "=", True)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Record and track your customers' RMA Receipt.
+            </p>
+        </field>
+    </record>
+    <record id="rma_delivery_action" model="ir.actions.act_window">
+        <field name="name">RMA Deliveries</field>
+        <field name="res_model">stock.picking</field>
+        <field name="view_mode">tree,kanban,form,calendar,activity</field>
+        <field name="context">{'contact_display': 'partner_address', 'default_company_id': allowed_company_ids[0], 'restricted_picking_type_code': 'outgoing', 'create': False}</field>
+        <field name="domain">[('picking_type_code', '=', 'outgoing'), ("picking_type_id.is_rma_out", "=", True)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Record and track your customers' RMA Deliveries.
+            </p>
+        </field>
+    </record>
+    <!-- Menu -->
+    <menuitem id="menu_stock_rma_transfers" name="RMA Transfers" parent="stock.menu_stock_warehouse_mgmt" sequence="1"/>
+    <menuitem id="menu_rma_receipt" name="Receipts" action="rma_receipt_action" parent="menu_stock_rma_transfers"/>
+    <menuitem id="menu_rma_delivery" name="Deliveries" action="rma_delivery_action" parent="menu_stock_rma_transfers"/>
+</odoo>
