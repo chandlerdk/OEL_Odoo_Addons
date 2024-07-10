@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<odoo>
+    <record model="ir.ui.view" id="claim_reject_message_tree_view">
+        <field name="name">Claim Reject MessageTree</field>
+        <field name="model">claim.reject.message</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" />
+            </tree>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="claim_reject_message_form_view">
+        <field name="name">Claim Reject Message Form</field>
+        <field name="model">claim.reject.message</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record model="ir.actions.act_window" id="claim_reject_message_action">
+        <field name="name">Claim Reject Message</field>
+        <field name="res_model">claim.reject.message</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    <menuitem id="menu_claim_reject_message_ept" action="claim_reject_message_action" parent="rma_ept.menu_crm_claim_ept_after_sale" name="Claim Reject Message" groups="rma_ept.group_rma_user_ept" sequence="3" />
+</odoo>

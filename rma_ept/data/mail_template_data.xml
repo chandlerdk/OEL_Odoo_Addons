@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="mail_rma_details_notification_ept" model="mail.template">
+        <field name="name">RMA Notification Email</field>
+        <field name="model_id" ref="model_crm_claim_ept"/>
+        <field name="subject">{{object.company_id.name}} RMA (Ref {{object.code or 'n/a' }})</field>
+        <field name="email_from">{{(object.user_id.email_formatted or user.email_formatted)}}</field>
+        <field name="partner_to">{{object.rma_support_person_id.id}},{{object.partner_id.id}}</field>
+        <field name="body_html" type="html">
+            <div style="margin: 0px; padding: 0px;">
+                <p style="margin: 0px; padding: 0px; font-size: 12px;">
+                    Dear
+                    <t t-if="object.partner_id.parent_id">
+                        <t t-out="object.partner_id.name or ''">Deco Addict</t>
+                        (<t t-out="object.partner_id.parent_id.name or ''">Deco Addict</t>),
+                    </t>
+                    <t t-else="">
+                        <t t-out="object.partner_id.name or ''">Deco Addict</t>,
+                    </t>
+                    <br/>
+                    <br/>
+                    <p>
+                        Please find attached Return for
+                        <strong t-out="object.sale_id.name or ''"/>
+                        with
+                        <strong t-out="object.code"/>
+                        in
+                        <strong t-out="object.state"/>
+                        status.
+                    </p>
+                    <br/>
+                    <p>Thank you,</p>
+                    <br/>
+                    <p style="color:#888888;">
+                        <t t-if="object.user_id">
+                            <t t-if="object.user_id.signature or ''">
+                                <t t-out="object.user_id.signature or ''">--<br/>Mitchell Admin
+                                </t>
+                            </t>
+                        </t>
+                    </p>
+                </p>
+            </div>
+        </field>
+        <field name="report_template_ids" eval="[(4, ref('action_report_rma'))]"/>
+        <field name="lang">{{ object.partner_id.lang }}</field>
+        <field name="auto_delete" eval="True"/>
+    </record>
+</odoo>

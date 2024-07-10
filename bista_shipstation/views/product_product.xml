@@ -1,0 +1,14 @@
+<odoo>
+    <record id="action_set_to_sync_product" model="ir.actions.server">
+        <field name="name">Sync products with ShipStation</field>
+        <field name="model_id" ref="product.model_product_product"/>
+        <field name="binding_model_id" ref="product.model_product_product"/>
+        <field name="binding_view_types">form,list</field>
+        <field name="state">code</field>
+        <field name="code">
+            if records:
+            records.write({"to_sync": True})
+            records.env["delivery.carrier"].run_product_sync()
+        </field>
+    </record>
+</odoo>

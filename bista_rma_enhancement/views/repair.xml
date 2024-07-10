@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="inherit_view_repair_order_form_filter" model="ir.ui.view">
+        <field name="name">repair.order.search.view.inherit</field>
+        <field name="model">repair.order</field>
+        <field name="inherit_id" ref="repair.view_repair_order_form_filter" />
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='filter_late']" position="after">
+                <filter string="RMA Orders" name="rma_orders" domain="[('quality_check_id', '!=', False)]"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

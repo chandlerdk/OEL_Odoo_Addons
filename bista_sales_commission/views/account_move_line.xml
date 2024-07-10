@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="account_move_line_commission_tree" model="ir.ui.view">
+        <field name="name">account_move_line_commission_tree</field>
+        <field name="model">account.move.line</field>
+        <field name="arch" type="xml">
+            <tree string="commission_tree">
+                <header>
+                    <button type="object" name="generate_bill" string="Generate Bill" class="oe_highlight"/>
+                </header>
+                <field name="commission_date" string="Date"/>
+                <field name="partner_id" widget="many2onebutton"/>
+                <field name="sale_person_id" widget="many2onebutton"/>
+                <field name="team_id" widget="many2onebutton"/>
+                <field name="move_id" string="Related Invoice" widget="many2onebutton"/>
+                <field name="invoice_payment_state" string="Payment State"/>
+                <field name="commission_move_id" string="Related Bill" widget="many2onebutton"/>
+                <field name="commission_move_line_id" optional="hide"/>
+                <field name="reversed_move_id" optional="hide"/>
+                <field name="commission_payment_state"/>
+                <field name="commission_policy"/>
+                <field name="commission_user_id" string="Sales Person" widget="many2onebutton"/>
+                <field name="commission_amount" string="Amount"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="account_move_line_commission_search_view" model="ir.ui.view">
+        <field name="name">account_move_line_commission_search_view</field>
+        <field name="model">account.move.line</field>
+        <field name="inherit_id" ref="account.view_account_move_line_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='reconcile_model_id']" position="after">
+                <field name="commission_date"/>
+                <field name="commission_move_id"/>
+                <field name="commission_user_id"/>
+                <field name="commission_amount"/>
+                <filter string="Commission To Bill" name="to_bill"
+                        domain="[('commission_to_bill', '=', True)]"/>
+            </xpath>
+            <xpath expr="//group" position="inside">
+                <filter string="Commission Date" name="group_commission_date" domain="[]"
+                        context="{'group_by': 'commission_date'}"/>
+                <filter string="Commission Sales Person" name="group_commission_user_id" domain="[]"
+                        context="{'group_by': 'commission_user_id'}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="sale_commission_report_action" model="ir.actions.act_window">
+        <field name="name">To Bill</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">account.move.line</field>
+        <field name="view_mode">tree</field>
+        <field name="domain">[('commission_id','!=', False)]</field>
+        <field name="context">{'create': 0, 'delete': 0, 'edit': 0, 'search_default_to_bill': 1,
+            'search_group_commission_user_id': 1}
+        </field>
+    </record>
+
+    <record id="account_move_line_commission_action_tree_view" model="ir.actions.act_window.view">
+        <field name="sequence">1</field>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="account_move_line_commission_tree"/>
+        <field name="act_window_id" ref="sale_commission_report_action"/>
+    </record>
+
+    <menuitem id="sale_commission_report_menu"
+              name="To Bill"
+              parent="sale_commission_root"
+              action="sale_commission_report_action" sequence="2"/>
+
+</odoo>

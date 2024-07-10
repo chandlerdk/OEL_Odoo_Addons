@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo noupdate="0">
+
+    <record model="ir.rule" id="delivery_store_id">
+      <field name="name">Shipstation store</field>
+      <field name="model_id" ref="model_shipstation_store"/>
+      <field name="domain_force"> ['|', ('company_id', 'in', company_ids), ('company_id', '=', False)]</field>
+    </record>
+
+     <record model="ir.rule" id="delivery_carrier_id">
+      <field name="name">Shipstation Carrier</field>
+      <field name="model_id" ref="model_shipstation_delivery_carrier"/>
+      <field name="domain_force"> ['|', ('company_id', 'in', company_ids), ('company_id', '=', False)]</field>
+    </record>
+
+
+     <record model="ir.rule" id="delivery_carrier_service_id">
+      <field name="name">Shipstation carrier service</field>
+      <field name="model_id" ref="model_shipstation_carrier_service"/>
+      <field name="domain_force"> ['|', ('company_id', 'in', company_ids), ('company_id', '=', False)]</field>
+    </record>
+
+  </odoo>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+
+<odoo>
+    <record id="res_config_settings_google_places_api" model="ir.ui.view">
+        <field name="name">res_config_settings_google_places_api</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="70"/>
+        <field name="inherit_id" ref="base_setup.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//setting[@id='cf-turnstile']" position="after">
+                <div class="app_settings_block" data-string="Autocomplete Services" string="Google Services"
+                     data-key="google_services">
+                        <div class="col-12 col-lg-6 o_setting_box" id="backend_autocomplete_googleplaces_setting">
+                            <div class="o_setting_left_pane">
+                                <field name="autocomplete_addresses"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="autocomplete_addresses"/>
+                                <div class="text-muted">
+                                    Enable this option to utilize Google Places API for automatic address completion.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-lg-6 o_setting_box" id="autocomplete_googleplaces_setting">
+                            <div class="o_setting_left_pane">
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="google_places_api"/>
+                                <div class="text-muted">
+                                    Provide your Google Places API key here to enable the address autocomplete feature.
+                                </div>
+                                <field name="google_places_api" type="password" placeholder="Enter API key here..." widget="password"/>
+                            </div>
+                        </div>
+                    </div>
+            </xpath>
+
+
+        </field>
+    </record>
+</odoo>

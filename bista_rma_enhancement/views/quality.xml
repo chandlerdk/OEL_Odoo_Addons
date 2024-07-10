@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="inherit_quality_check_view_form" model="ir.ui.view">
+        <field name="name">quality.check.form.inherit</field>
+        <field name="model">quality.check</field>
+        <field name="inherit_id" ref="quality_control.quality_check_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <field name="repairs_count" invisible="1" />
+                <field name="mrp_count" invisible="1" />
+                <field name="scrap_count" invisible="1" />
+                <field name="int_transfer_count" invisible="1"/>
+            </xpath>
+            <xpath expr="//div[@class='oe_button_box']" position="inside">
+                <button class="oe_stat_button" name="action_view_repair_orders" icon="fa-wrench" type="object" invisible=" repairs_count == 0">
+                    <span class="o_stat_text">Repairs</span>
+                </button>
+                <button class="oe_stat_button" name="action_view_mrp_production" icon="fa-wrench" type="object" invisible="mrp_count == 0">
+                    <span class="o_stat_text">Manufacturing</span>
+                </button>
+                <button class="oe_stat_button" name="action_see_move_scrap" type="object" icon="oi-arrows-v" invisible="scrap_count == 0">
+                    <span class="o_stat_text">Scrap</span>
+                </button>
+                <button class="oe_stat_button" name="action_see_internal_transfer" type="object" icon="fa-truck" invisible="int_transfer_count == 0">
+                    <span class="o_stat_text">Transfers</span>
+                </button>
+            </xpath>
+        </field>
+    </record>
+</odoo>

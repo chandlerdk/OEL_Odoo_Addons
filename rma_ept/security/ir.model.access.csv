@@ -1,0 +1,12 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_crm_claim_read_ept,model_crm_claim_ept,model_crm_claim_ept,,1,0,0,0
+access_crm_claim_line_read_ept,model_claim_line_ept,model_claim_line_ept,,1,0,0,0
+access_crm_claim_ept,model_crm_claim_ept,model_crm_claim_ept,rma_ept.group_rma_user_ept,1,1,1,1
+access_claim_line_ept,model_claim_line_ept,model_claim_line_ept,rma_ept.group_rma_user_ept,1,1,1,1
+access_claim_reject_message,model_claim_reject_message,model_claim_reject_message,,1,1,1,1
+access_rma_reason_ept_manager,model_rma_reason_ept,model_rma_reason_ept,rma_ept.group_rma_manager_ept,1,1,1,1
+access_rma_reason_ept_user,model_rma_reason_ept,model_rma_reason_ept,rma_ept.group_rma_user_ept,1,0,0,0
+access_portal_crm_claim_ept,model_portal_crm_claim_ept,model_crm_claim_ept,base.group_portal,1,1,1,0
+access_portal_claim_line_ept,model_portal_claim_line_ept,model_claim_line_ept,base.group_portal,1,1,1,0
+access_claim_process_wizard,access_claim_process_wizard,model_claim_process_wizard,,1,1,1,1
+access_create_partner_delivery_address_ept,access_create_partner_delivery_address_ept,model_create_partner_delivery_address_ept,,1,1,1,1

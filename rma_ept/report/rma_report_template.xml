@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="report_rma_document">
+        <t t-call="web.external_layout">
+            <t t-set="doc" t-value="doc.with_context({'lang':doc.partner_id.lang})"/>
+            <div class="page">
+                <div class="oe_structure"/>
+                <h2 style="padding-top:20px;">
+                    <span name="rma_heading">Return Order #</span>
+                    <span name="rma_code" t-field="doc.code"/>
+                    <t name="state_name">
+                        <span t-if="doc.state in ['approve','process']">- Approved</span>
+                        <span t-if="doc.state in ['draft']">- Waiting For Approval</span>
+                        <span t-if="doc.state in ['close']">- Closed</span>
+                        <span t-if="doc.state in ['reject']">- Rejected</span>
+                    </t>
+                </h2>
+
+                <br/>
+                <div class="row">
+                    <div class="col-auto" name="partner_name">
+                        <strong>Customer:</strong>
+                        <p t-field="doc.partner_id"/>
+                    </div>
+                    <div class="col-auto" t-if="doc.date" name="rma_date">
+                        <strong>Date:</strong>
+                        <p t-field="doc.date"/>
+                    </div>
+                    <div class="col-auto" name="sale_order">
+                        <strong>Order Reference:</strong>
+                        <p t-field="doc.sale_id"/>
+                    </div>
+                    <div class="col-auto" name="rma_shipping_name">
+                        <strong>Shipping Reference:</strong>
+                        <p t-field="doc.picking_id"/>
+                    </div>
+                </div>
+                <br/>
+
+                <div class="row">
+                    <div class="col-auto">
+                        <strong>Return Address:</strong>
+                        <t t-if="doc.sale_id.warehouse_id.return_partner_id">
+                            <address t-field="doc.sale_id.warehouse_id.return_partner_id"
+                                t-options='{"widget": "contact", "fields": ["address"], "no_marker": True}'/>
+                        </t>
+                        <t t-else="">
+                            <address t-field="doc.sale_id.warehouse_id.partner_id"
+                                t-options='{"widget": "contact", "fields": ["address"], "no_marker": True}'/>
+                        </t>
+                    </div>
+                    <div class="col-auto">
+                        <div t-if="doc.user_id.name">
+                            <strong>Responsible:</strong>
+                            <p t-field="doc.user_id"/>
+                        </div>
+                    </div>
+                </div>
+
+                <div t-if='doc.reject_message_id and doc.state=="reject"'>
+                    <strong style='color:red'>Reject Reason:
+                        <span t-field='doc.reject_message_id.name'/>
+                    </strong>
+                </div>
+                <br/>
+                <table class="table table-condensed" name="rma_table">
+                    <thead>
+                        <tr>
+                            <th name="name_heading">Description</th>
+                            <th name="delivered_qty_heading" class="text-center">Delivered Quantity</th>
+                            <th name="return_qty_heading" class="text-center">Return Quantity</th>
+                            <th name="reason_heading" class="text-center">Reason</th>
+                        </tr>
+                    </thead>
+                    <tbody class="sale_tbody">
+                        <t t-foreach="doc.claim_line_ids" t-as="line">
+                            <tr name="claim_lines">
+                                <td name="product_name">
+                                    [<span t-field="line.product_id.default_code"/>]
+                                    <span t-field="line.product_id.name"/>
+                                </td>
+                                <td name="product_delivered_qty" class="text-center">
+                                    <span t-field="line.done_qty"/>
+                                </td>
+                                <td name="product_return_qty" class="text-center">
+                                    <span t-field="line.quantity"/>
+                                </td>
+                                <td name="return_reason" class="text-center">
+                                    <span t-field="line.rma_reason_id.name"/>
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+                <div t-if="doc.description" height="10px">
+                    <strong>RMA Note:</strong>
+                    <p t-field="doc.description"/>
+                </div>
+                <div class="oe_structure"/>
+            </div>
+        </t>
+    </template>
+
+    <template id="report_rma">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="rma_ept.report_rma_document" t-lang="doc.partner_id.lang"/>
+            </t>
+        </t>
+    </template>
+
+</odoo>

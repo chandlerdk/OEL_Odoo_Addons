@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_purchase_advance_payment_inv" model="ir.ui.view">
+            <field name="name">Bill Orders</field>
+            <field name="model">purchase.advance.payment.inv</field>
+            <field name="arch" type="xml">
+                <form string="Bill Purchase Order">
+                    <p class="oe_grey">
+                        Bills will be created in draft so that you can review
+                        them before validation.
+                    </p>
+                    <group>
+                        <field name="count"
+
+                               invisible="count == 1" readonly="True"/>
+                        <field name="advance_payment_method" class="oe_inline" widget="radio"
+                               invisible="count > 1"/>
+                        <field name="has_pre_payments" invisible="1"/>
+                        <label for="deduct_pre_payments" string=""
+                               invisible="has_pre_payments == False or advance_payment_method != 'delivered'"/>
+                        <div invisible="has_pre_payments == False or advance_payment_method != 'delivered'">
+                            <field name="deduct_pre_payments" nolabel="1"/>
+                            <label for="deduct_pre_payments"/>
+                        </div>
+                        <field name="product_id"
+                               context="{'default_invoice_policy': 'order'}" class="oe_inline"
+                               invisible="1"/>
+                        <label for="amount"
+                               invisible="advance_payment_method not in ['fixed','percentage']"/>
+                        <div invisible="advance_payment_method not in ['fixed','percentage']">
+                            <field name="currency_id" invisible="1"/>
+                            <field name="fixed_amount"
+                                   required="advance_payment_method == 'fixed'"
+                                   invisible="advance_payment_method != 'fixed'"
+                                   class="oe_inline"/>
+                            <field name="amount"
+                                   required="advance_payment_method == 'percentage'"
+                                   invisible="advance_payment_method != 'percentage'"
+                                   class="oe_inline"/>
+                            <span
+                                    invisible="advance_payment_method != 'percentage'"
+                                    class="oe_inline">%
+                            </span>
+                        </div>
+                        <field name="deposit_account_id" options="{'no_create': True}" class="oe_inline"
+                               invisible="advance_payment_method not in ['fixed','percentage'] or product_id != False"
+                               groups="account.group_account_manager"/>
+                        <field name="deposit_taxes_id" class="oe_inline" widget="many2many_tags"
+                               domain="[('type_tax_use','=','purchase')]"
+                               invisible="advance_payment_method not in ['fixed','percentage'] or product_id != False"/>
+
+                    </group>
+                    <footer>
+                        <button name="create_invoices" string="Create and View Bills" type="object"
+                                context="{'open_invoices': True}" class="btn-primary"/>
+                        <button name="create_invoices" string="Create Bill" type="object"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_view_purchase_advance_payment_inv" model="ir.actions.act_window">
+            <field name="name">Create Bills</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">purchase.advance.payment.inv</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="binding_model_id" ref="purchase.model_purchase_order"/>
+            <field name="binding_view_types">list</field>
+        </record>
+    </data>
+</odoo>

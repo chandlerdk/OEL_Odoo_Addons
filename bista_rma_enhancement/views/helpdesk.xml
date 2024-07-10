@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="inherit_helpdesk_ticket_view_form" model="ir.ui.view">
+        <field name="name">helpdesk.ticket.form.inherit</field>
+        <field name="model">helpdesk.ticket</field>
+        <field name="inherit_id" ref="helpdesk.helpdesk_ticket_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <field name="is_rma" invisible="1"/>
+                <button type="object" name="create_rma" class="oe_highlight" string="Create RMA" invisible="not is_rma" />
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <field name="rma_count" invisible="1" />
+                <button name="action_view_rma" type="object" class="oe_stat_button" icon="fa-mail-reply" invisible="rma_count == 0">
+                    <span class="o_stat_text">RMA</span>
+                </button>
+            </xpath>
+        </field>
+    </record>
+    <record id="inherit_helpdesk_team_view_form" model="ir.ui.view">
+        <field name="name">helpdesk.team.form.inherit</field>
+        <field name="model">helpdesk.team</field>
+        <field name="inherit_id" ref="helpdesk.helpdesk_team_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//div[@id='after-sales']" position="inside">
+                <setting help="Return Merchandise Authorization">
+                    <field name="is_rma" />
+                </setting>
+            </xpath>
+        </field>
+    </record>
+</odoo>

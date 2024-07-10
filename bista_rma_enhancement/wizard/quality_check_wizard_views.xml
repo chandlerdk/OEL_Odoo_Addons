@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="inherit_view_quality_check_wizard" model="ir.ui.view">
+        <field name="name">quality.check.wizard.wizard.inherit</field>
+        <field name="model">quality.check.wizard</field>
+        <field name="inherit_id" ref="quality_control.view_quality_check_wizard" />
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='do_pass'][2]" position="after">
+                <button name="do_pass" type="object" class="btn-success " string="(Pass) Use As Is" invisible="quality_state != 'none' or test_type not in ('disposition_2', 'disposition_4')" context="{'is_disposition': True}" data-hotkey="w" />
+                <button name="do_repair" type="object" class="btn-danger" string="Repair" invisible="quality_state != 'none' or test_type != 'disposition_4'" data-hotkey="k" />
+                <button name="do_refurbish" type="object" class="btn-danger" string="Refurbish" invisible="quality_state != 'none' or test_type != 'disposition_4'" data-hotkey="k" />
+                <button name="do_scrap" type="object" class="btn-danger" string="Scrap" invisible="quality_state != 'none' or test_type not in ('disposition_2', 'disposition_4')" data-hotkey="k" />
+            </xpath>
+        </field>
+    </record>
+</odoo>

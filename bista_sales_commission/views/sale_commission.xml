@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="commission_view_form" model="ir.ui.view">
+        <field name="name">commission_view_form</field>
+        <field name="model">sale.commission</field>
+        <field name="arch" type="xml">
+            <form string="commission_form">
+                <sheet>
+                    <group>
+                        <group string="Commission Rule">
+                            <field name="name" placeholder="Give it a name"/>
+                            <field name="expense_account_id"/>
+                            <field name="payout_account_id"/>
+                        </group>
+                        <group string="Partner">
+                            <field name="partner_ids" widget="many2many_tags"/>
+                            <field name="related_partners" widget="boolean_toggle"/>
+                            <field name="related_partner_ids" widget="many2many_tags"
+                                   invisible="not related_partners"/>
+                        </group>
+                        <group string="Product">
+                            <field name="ttype" placeholder="Select Option"/>
+                            <field name="product_ids" widget="many2many_tags"
+                                   required="ttype == 'product'"
+                                   invisible="ttype != 'product'"/>
+                            <field name="product_category_ids" widget="many2many_tags"
+                                   required="ttype == 'product_category'"
+                                   invisible="ttype != 'product_category'"/>
+                        </group>
+                        <group string="Commission Partner">
+                            <field name="sale_partner_type" placeholder="Select Option"/>
+                            <field name="user_ids" widget="many2many_tags"
+                                   required="sale_partner_type == 'user'"
+                                   invisible="sale_partner_type != 'user'"/>
+                            <field name="sale_team_ids" widget="many2many_tags"
+                                   required="sale_partner_type == 'sale_team'"
+                                   invisible="sale_partner_type != 'sale_team'"/>
+                            <field name="sale_team_rep"
+                                   required="sale_partner_type == 'sale_team'"
+                                   invisible="sale_partner_type != 'sale_team'"
+                            />
+                        </group>
+                        <group string="Rate">
+                            <field name="percentage"/>
+                            <field name="amount"/>
+                            <field name="profit_margin" widget="boolean_toggle"/>
+                            <field name="share_loss" widget="boolean_toggle"/>
+                            <field name="payout_policy"/>
+                            <field name="tax_policy"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Terms">
+                            <field name="terms" placeholder="Reader reference only..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="commission_view_tree" model="ir.ui.view">
+        <field name="name">commission_view_tree</field>
+        <field name="model">sale.commission</field>
+        <field name="arch" type="xml">
+            <tree string="commission_tree">
+                <field name="name"/>
+                <field name="ttype"/>
+                <field name="sale_partner_type"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="sale_commission_action" model="ir.actions.act_window">
+        <field name="name">Sales Commission</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">sale.commission</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="sale_commission_root"
+              name="Commission"
+              sequence="10"
+              groups="bista_sales_commission.group_sales_commission"
+              action="sale_commission_action"
+              web_icon="bista_sales_commission,static/description/icon.png"/>
+    <menuitem id="sale_commission_menu"
+              name="Sales Commission"
+              parent="sale_commission_root"
+              action="sale_commission_action" sequence="1"/>
+
+</odoo>

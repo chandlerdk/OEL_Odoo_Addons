@@ -1,0 +1,23 @@
+<odoo>
+    <record id="res_config_settings_view_form_inherit" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.sale</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="10"/>
+        <field name="inherit_id" ref="sale.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//setting[@id='proforma_configuration']" position="after">
+                <div class="col-12 col-lg-6 o_setting_box" id="order_confirm_hour">
+                    <div class="o_setting_right_pane">
+                        <label for="order_confirm_hour"/>
+                        <div class="text-muted">
+                            Set order date time on sale order
+                        </div>
+                        <div class="text-muted">
+                            <field name="order_confirm_hour"/>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

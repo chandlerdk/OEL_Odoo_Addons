@@ -1,0 +1,46 @@
+<odoo>
+    <record id="shipstation_store_form_view" model="ir.ui.view">
+        <field name="name">store.view.form</field>
+        <field name="model">shipstation.store</field>
+        <field name="arch" type="xml">
+            <form string="Store">
+                <sheet>
+                    <group>
+                        <field name="store_id"/>
+                        <field name="store_name"/>
+                        <field name="company_id"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="shipstation_store_tree_view" model="ir.ui.view">
+        <field name="name">store.view.tree</field>
+        <field name="model">shipstation.store</field>
+        <field name="arch" type="xml">
+            <tree string="Store">
+                <field name="store_id"/>
+                <field name="store_name"/>
+                <field name="company_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="shipstation_store_action" model="ir.actions.act_window">
+        <field name="name">Shipstation Store</field>
+        <field name="res_model">shipstation.store</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem name="Shipstation"
+              id="shipstation_menu"
+              parent="stock.menu_stock_config_settings"/>
+
+    <menuitem id="shipstation_id"
+              name="Shipstation Store"
+              parent="bista_shipstation.shipstation_menu"
+              action="shipstation_store_action"
+              sequence="1"/>
+
+</odoo>

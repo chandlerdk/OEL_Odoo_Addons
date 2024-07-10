@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="commission_view_form" model="ir.ui.view">
+        <field name="name">commission_view_form</field>
+        <field name="model">sale.commission</field>
+        <field name="inherit_id" ref="bista_sales_commission.commission_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='sale_partner_type']" position="after">
+                <field name="sale_rep_id"
+                       context="{'default_is_sale_rep': 1}"
+                       required="sale_partner_type == 'sale_rep'"
+                       invisible="sale_partner_type != 'sale_rep'"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

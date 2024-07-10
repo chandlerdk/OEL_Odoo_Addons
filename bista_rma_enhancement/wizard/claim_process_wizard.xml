@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="inherit_view_claim_picking" model="ir.ui.view">
+        <field name="name">claim.process.wizard.inherit</field>
+        <field name="model">claim.process.wizard</field>
+        <field name="inherit_id" ref="rma_ept.view_claim_picking" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_id']" position="attributes">
+                <attribute name="readonly">state != 'draft'</attribute>
+            </xpath>
+            <xpath expr="//field[@name='quantity']" position="attributes">
+                <attribute name="readonly">state != 'draft'</attribute>
+            </xpath>
+            <xpath expr="//field[@name='is_create_invoice']" position="attributes">
+                <attribute name="readonly">state != 'draft'</attribute>
+                <attribute name="invisible">hide == 'true' or context.get('hide_create_invoice')</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,15 @@
+<odoo>
+
+    <record id="sale_rep_commission_wizard_view_form" model="ir.ui.view">
+        <field name="name">commission_wizard_view_form</field>
+        <field name="model">commission.bill.wizard</field>
+        <field name="inherit_id" ref="bista_sales_commission.commission_wizard_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='sale_person_ids']" position="after">
+                <field name="sale_rep_id"/>
+            </xpath>
+        </field>
+    </record>
+
+
+</odoo>

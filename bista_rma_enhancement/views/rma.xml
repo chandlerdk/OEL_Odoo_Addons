@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="inherit_crm_claims_ept_form_view" model="ir.ui.view">
+        <field name="name">crm.claim.ept.form.inherit</field>
+        <field name="model">crm.claim.ept</field>
+        <field name="inherit_id" ref="rma_ept.crm_claims_ept_form_view" />
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='approve_claim']" position="attributes">
+                <attribute name="groups">rma_ept.group_rma_manager_ept</attribute>
+            </xpath>
+            <xpath expr="//button[@name='reject_claim']" position="attributes">
+                <attribute name="groups">rma_ept.group_rma_manager_ept</attribute>
+            </xpath>
+            <xpath expr="//button[@name='set_to_draft']" position="attributes">
+                <attribute name="groups">rma_ept.group_rma_manager_ept</attribute>
+            </xpath>
+            <xpath expr="//button[@name='process_claim']" position="attributes">
+                <attribute name="groups">rma_ept.group_rma_manager_ept</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_claim_reject_process_ept']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//button[@name='action_claim_reject_process_ept']" position="attributes">
+                <attribute name="groups">rma_ept.group_rma_manager_ept</attribute>
+            </xpath>
+            <xpath expr="//field[@name='partner_delivery_id']" position="attributes">
+                <attribute name="required">0</attribute>
+                <attribute name="domain">[('type', '=', 'delivery'), ('parent_id', '=', partner_id)]</attribute>
+            </xpath>
+            <xpath expr="//field[@name='location_id']" position="attributes">
+                <attribute name="required">is_legacy_order</attribute>
+                <attribute name="domain">[('return_location', '=', True), ('warehouse_id', '!=', False)]</attribute>
+            </xpath>
+            <xpath expr="//field[@name='sale_id']" position="attributes">
+                <attribute name="invisible">is_legacy_order</attribute>
+            </xpath>
+            <xpath expr="//field[@name='picking_id']" position="attributes">
+                <attribute name="required">not is_legacy_order</attribute>
+                <attribute name="invisible">is_legacy_order</attribute>
+            </xpath>
+            <xpath expr="//field[@name='date']" position="before">
+                <field name="is_legacy_order" readonly="state != 'draft'"/>
+            </xpath>
+            <xpath expr="//header" position="inside">
+                <button type="object" name="find_nearest_warehouse" class="oe_highlight" string="Find Nearest Warehouse" invisible="state != 'draft'" />
+            </xpath>
+            <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
+                <field name="helpdesk_ticket_count" invisible="1" />
+                <button class="oe_stat_button" name="action_see_move_scrap" type="object" icon="oi-arrows-v" invisible="scrap_count == 0">
+                    <field name="scrap_count" string="Scrap" widget="statinfo" />
+                </button>
+                <button name="action_see_helpdesk_ticket" type="object" class="oe_stat_button" icon="fa-life-ring" invisible="helpdesk_ticket_count == 0">
+                    <span class="o_stat_text">Tickets</span>
+                </button>
+            </xpath>
+            <xpath expr="//page[@name='rma_details']//field[@name='claim_line_ids']" position="attributes">
+                <attribute name="invisible">is_legacy_order</attribute>
+            </xpath>
+            <xpath expr="//field[@name='is_rma_without_incoming']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//page[@name='rma_details']//field[@name='claim_line_ids']//tree//field[@name='move_id']" position="attributes">
+                <attribute name="column_invisible">1</attribute>
+            </xpath>
+            <xpath expr="//page[@name='rma_details']//field[@name='claim_line_ids']//tree//field[@name='serial_lot_ids']" position="attributes">
+                <attribute name="column_invisible">not parent.claim_lot_ids</attribute>
+            </xpath>
+            <xpath expr="//page[@name='rma_details']//field[@name='claim_line_ids']" position="attributes">
+                <attribute name="readonly">state != 'draft'</attribute>
+            </xpath>
+            <xpath expr="//button[@name='show_delivery_picking']" position="replace">
+                <button class="oe_stat_button" name="show_delivery_picking" type="object" icon="fa-truck" invisible="not to_return_picking_ids">
+                    <field name="delivery_count" string="Deliveries" widget="statinfo" />
+                </button>
+            </xpath>
+            <xpath expr="//button[@name='show_return_picking']" position="replace">
+                <button class="oe_stat_button" name="show_return_picking" type="object" icon="fa-truck" invisible="return_picking_id == False or state == 'draft'">
+                    <field name="receipt_count" string="Receipt" widget="statinfo" />
+                </button>
+            </xpath>
+            <xpath expr="//page[@name='rma_details']//field[@name='claim_line_ids']//field[@name='rma_reason_id']" position="after">
+                <field name="route_id" optional="hide"/>
+                <field name="receipt_note" optional="hide"/>
+                <field name="delivery_note" optional="hide"/>
+            </xpath>
+            <xpath expr="//page[@name='rma_details']//field[@name='claim_line_ids']//tree//button[@name='action_claim_refund_process_ept']" position="attributes">
+                <attribute name="invisible">claim_type not in ['replace_other_product', 'replace_other_scrap_product']</attribute>
+            </xpath>
+            <xpath expr="//separator[@name='claim_line_ids']" position="after">
+                <field name="legacy_order_line_ids" nolabel="1" invisible="not is_legacy_order" readonly="state != 'draft'">
+                    <tree editable="bottom" edit="true">
+                        <field name="product_id" options="{'no_quick_create': True, 'no_create_edit': True}" domain="[('type', '!=', 'service')]" readonly="parent.state != 'draft'" required="parent.state == 'draft'" />
+                        <field name="legacy_done_qty" readonly="parent.state != 'draft'" />
+                        <field name="quantity" readonly="parent.state != 'draft'" required="parent.state == 'draft'" />
+                        <field name="rma_reason_id" readonly="parent.state != 'draft'" required="parent.state == 'draft'" />
+                        <field name="route_id" optional="hide"/>
+                        <field name="receipt_note" optional="hide"/>
+                        <field name="delivery_note" optional="hide"/>
+                        <field name="return_qty" readonly="True" />
+                        <field name="claim_type" force_save="1" readonly="parent.state != 'process'" required="parent.state == 'process'" />
+                        <button name="action_claim_refund_process_ept" icon="fa-cogs" title="Set product to be replace" type="object" invisible="claim_type not in ['replace_other_product', 'replace_other_scrap_product']" />
+                    </tree>
+                    <form>
+                        <group>
+                            <group>
+                                <field name="product_id" />
+                                <field name="claim_type" />
+                            </group>
+                            <group>
+                                <field name="done_qty" />
+                                <field name="quantity" />
+                            </group>
+                        </group>
+                    </form>
+                </field>
+            </xpath>
+        </field>
+    </record>
+</odoo>
