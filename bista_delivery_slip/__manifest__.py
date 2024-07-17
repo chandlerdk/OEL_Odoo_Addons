@@ -1,0 +1,26 @@
+# -*- encoding: utf-8 -*-
+##############################################################################
+#
+# Bista Solutions Pvt. Ltd
+# Copyright (C) 2024 (http://www.bistasolutions.com)
+#
+##############################################################################
+{
+    'name': 'Bista Delivery Slip',
+    'category': 'stock',
+    'summary': 'This module Offers customize Delivery Slip',
+    'version': '17.0.1.0.1',
+    'author': 'Bista Solutions',
+    'website': 'http://www.bistasolutions.com',
+    'license': 'AGPL-3',
+    'description': """The Delivery Slip Report
+    """,
+    'depends': ['sale', 'stock','web'],
+    'data': [
+        'reports/report_delivery_slip.xml',
+],
+
+    'installable': True,
+    'application': True,
+
+}
