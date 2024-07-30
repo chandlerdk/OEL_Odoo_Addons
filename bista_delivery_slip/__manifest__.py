@@ -18,6 +18,7 @@
     'depends': ['sale', 'stock','web'],
     'data': [
         'reports/report_delivery_slip.xml',
+        'reports/report_stock_picking_operations.xml',
 ],
 
     'installable': True,
