@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <record id="ir_mail_server_email_from_filter" model="ir.ui.view">
+        <field name="name">ir_mail_server_email_from_filter</field>
+        <field name="model">ir.mail_server</field>
+        <field name="inherit_id" ref="base.ir_mail_server_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='from_filter']" position="after">
+                <field name="email_from"/>
+                <field name="from_name_type"/>
+                <field name="from_name"
+                       invisible="from_name_type != 'static'"
+                       required="from_name_type == 'static'"/>
+                <field name="email_reply"/>
+                <field name="reply_name_type"/>
+                <field name="reply_name"
+                       invisible="reply_name_type != 'static'"
+                       required="reply_name_type == 'static'"
+                />
+            </xpath>
+        </field>
+    </record>
+</odoo>
