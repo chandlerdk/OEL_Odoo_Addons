@@ -45,7 +45,7 @@
                                     <t t-esc="o.name"/>
                                 </span>
                             </div>
-                            <div class="row" style="padding-top:25px;">
+                            <div class="row" style="padding-top:16px;">
 
                                 <div name="div_outgoing_address">
                                     <t t-set="partner" t-value="o.sale_id.partner_id  or False"/>
@@ -97,7 +97,7 @@
                                     <t t-esc="o.sale_id.partner_id.partner_reference_no"/>
                                 </span>
                             </div>
-                            <div class="row" style="padding-top:50px;">
+                            <div class="row" style="padding-top:35px;">
 
                                 <div name="div_outgoing_address">
                                     <div name="outgoing_delivery_address" t-if="o.should_print_delivery_address()">
@@ -177,11 +177,11 @@
                         </thead>
                         <tbody style="border-bottom:2px solid black">
                             <tr>
-                                <td>Example PO</td>
+                                <td><t t-esc="o.sale_id.client_order_ref"/></td>
                                 <td>
                                      <t t-esc="o.sale_id.ship_via"/>
                                 </td>
-                                <td>Example F.O.B</td>
+                                <td><t t-esc="o.sale_id.incoterm.name"/></td>
                                 <td>
                                     <t t-esc="o.sale_id.payment_term_id.name"/>
                                 </td>
