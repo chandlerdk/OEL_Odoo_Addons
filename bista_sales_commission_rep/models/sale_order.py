@@ -23,5 +23,6 @@ class SaleOrder(models.Model):
     @api.model
     def create(self, vals):
         ret = super().create(vals)
-        ret._get_sale_rep_id()
+        if not ret.sale_rep_id:
+            ret._get_sale_rep_id()
         return ret
