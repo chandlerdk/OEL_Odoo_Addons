@@ -1,0 +1,25 @@
+<odoo>
+    <record id="account_payment_tree" model="ir.ui.view">
+        <field name="name">view_account_payment_tree</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree//header" position="inside">
+                <button type="object" name="report_positive_pay" string="Print Positive Pay"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_account_payment_form" model="ir.ui.view">
+        <field name="name">view_account_payment_form</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form//header" position="inside">
+                <button type="object" name="report_positive_pay" string="Print Positive Pay"
+                        invisible="state != 'posted' or payment_type != 'outbound'"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
