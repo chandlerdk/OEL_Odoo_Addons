@@ -7,6 +7,20 @@
         <field name="arch" type="xml">
             <xpath expr="//page[@name='order_lines']//tree//field[@name='name']" position="after">
                 <field invisible="parent.state in ['draft', 'sent']" name="tracking_ref" optional="hide" readonly="1"/>
-            </xpath></field>
+            </xpath>
+            <xpath expr="//notebook[last()]" position="inside">
+                <page  string="Shipstation Third Party Account">
+                    <group>
+                        <field name="bill_account"/>
+                        <field name="bill_postal_code"/>
+                        <field name="bill_country_code"/>
+                        <field name="carrier_id"/>
+                        <field name="service_id"/>
+                    </group>
+                </page>
+            </xpath>
+
+        </field>
+
     </record>
 </odoo>

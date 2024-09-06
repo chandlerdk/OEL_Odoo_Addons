@@ -19,6 +19,23 @@ class SaleOrder(models.Model):
     no_ship_cost_synced = fields.Boolean(copy=False, string="No Shipping Cost Sync")
     add_ship_no_delivery_line = fields.Boolean(string="shipping cost",copy=False)
 
+    bill_account = fields.Char('Account No')
+    bill_postal_code = fields.Char('Postal Code')
+    bill_country_code = fields.Many2one('res.country', string="Country")
+    carrier_id = fields.Many2one('shipstation.delivery.carrier')
+    service_id = fields.Many2one('shipstation.carrier.service')
+
+    @api.onchange('partner_id')
+    def _onchange_shipstation_third_acc(self):
+        for rec in self:
+            if rec.partner_id:
+                rec.update({
+                    'bill_account': rec.partner_id.bill_account,
+                    'bill_postal_code': rec.partner_id.bill_postal_code,
+                    'bill_country_code': rec.partner_id.bill_country_code,
+                    'carrier_id': rec.partner_id.carrier_id,
+                    'service_id': rec.partner_id.service_id,
+                })
 
     @api.onchange('partner_id')
     def _onchange_partner_id(self):
