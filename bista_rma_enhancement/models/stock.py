@@ -228,6 +228,8 @@ class StockMove(models.Model):
     receipt_note = fields.Text(string="Receipt Note")
     delivery_note = fields.Text(string="Delivery Note")
 
+
+
     def _prepare_move_line_vals(self, quantity=None, reserved_quant=None):
         vals = super()._prepare_move_line_vals(quantity, reserved_quant)
         mrp_id = self.raw_material_production_id
