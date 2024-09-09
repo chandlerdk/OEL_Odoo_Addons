@@ -17,6 +17,7 @@
         'stock',
         'mrp',
         'sale_stock',
+        'sale_management',
         'stock_account'
     ],
     "data": [
@@ -31,6 +32,7 @@
         'views/repair.xml',
         'views/account.xml',
         'views/res_partner.xml',
+        'views/sale_order_template.xml',
     ],
     "application": True,
     "installable": True,
