@@ -45,7 +45,7 @@
                                     <t t-esc="o.name"/>
                                 </span>
                             </div>
-                            <div class="row" style="padding-top:16px;">
+                            <div class="row" style="padding-top:25px;">
 
                                 <div name="div_outgoing_address">
                                     <t t-set="partner" t-value="o.sale_id.partner_id  or False"/>
@@ -75,6 +75,8 @@
                                      style="width: 70%;"/>
                             </div>
                         </div>
+                        <br/>
+                        <br/>
                         <div class="col-4" style="padding-left:0;">
                             <div class="row">
                                 <span style="display: inline-block; width: 100%; white-space: nowrap;">
@@ -97,7 +99,7 @@
                                     <t t-esc="o.sale_id.partner_id.partner_reference_no"/>
                                 </span>
                             </div>
-                            <div class="row" style="padding-top:35px;">
+                            <div class="row" style="padding-top:50px;">
 
                                 <div name="div_outgoing_address">
                                     <div name="outgoing_delivery_address" t-if="o.should_print_delivery_address()">
@@ -161,8 +163,9 @@
                             <p t-else="" t-field="o.scheduled_date"/>
                         </div>
                     </div>
-
-                    <div style="margin-bottom:8px;padding-left:12px">
+                    <br/>
+                    <br/>
+                    <div style="margin-bottom:8px;padding-left:12px;">
                         <span>
                             Confirm To:
                         </span>
@@ -177,11 +180,11 @@
                         </thead>
                         <tbody style="border-bottom:2px solid black">
                             <tr>
-                                <td><t t-esc="o.sale_id.client_order_ref"/></td>
+                                <td>Example PO</td>
                                 <td>
                                      <t t-esc="o.sale_id.ship_via"/>
                                 </td>
-                                <td><t t-esc="o.sale_id.incoterm.name"/></td>
+                                <td>Example F.O.B</td>
                                 <td>
                                     <t t-esc="o.sale_id.payment_term_id.name"/>
                                 </td>
