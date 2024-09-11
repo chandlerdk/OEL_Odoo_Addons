@@ -17,7 +17,7 @@
     """,
     'depends': ['sale', 'stock','web','account'],
     'data': [
-            'reports/invoice_report.xml',
+            'reports/invoice_report_enhance.xml',
 ],
 
     'installable': True,
