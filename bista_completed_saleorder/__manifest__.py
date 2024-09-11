@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    "name": "Sale Order - Completed",
+    "name": "Bista Sale Order - Completed",
     "version": "17.0",
     "author": "Bista Solutions",
     "website": "https://www.bistasolutions.com",
