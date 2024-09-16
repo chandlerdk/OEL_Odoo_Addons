@@ -4,9 +4,9 @@ from odoo import fields, models
 class SaleReport(models.Model):
     _inherit = 'sale.report'
 
-    flag = fields.Boolean('Margin')
+    complete_order = fields.Boolean('Complete Orders')
 
     def _select_additional_fields(self):
         res = super()._select_additional_fields()
-        res['flag'] = "s.flag"
+        res['complete_order'] = "s.complete_order"
         return res

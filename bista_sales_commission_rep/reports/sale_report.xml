@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_order_sale_ref_search_inherit" model="ir.ui.view">
+        <field name="name">sale.report.search.extend</field>
+        <field name="model">sale.report</field>
+        <field name="inherit_id" ref="sale.view_order_product_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='Sales']" position='after'>
+                <separator/>
+                 <filter string="Sales Representative" name="sales_channel" context="{'group_by':'sale_rep_id'}"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

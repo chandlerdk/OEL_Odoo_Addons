@@ -214,7 +214,7 @@
                                     </td>
                                     <td class="text-end">
                                         <span t-field="line.product_uom_qty"/>
-                                        <span t-field="line.product_uom"/>
+<!--                                        <span t-field="line.product_uom"/>-->
                                         <span t-if="line.product_packaging_id">
                                             (
                                             <span t-field="line.product_packaging_qty"
@@ -247,7 +247,7 @@
                                         </td>
                                         <td class="text-end">
                                             <span t-field="move_line.product_uom_qty"/>
-                                            <span t-field="move_line.product_uom"/>
+<!--                                            <span t-field="move_line.product_uom"/>-->
                                         </td>
                                         <td class="text-end"></td>
                                         <td style="border-left:2px solid black;" class="text-center"></td>
@@ -265,7 +265,7 @@
                                     </td>
                                     <td class="text-end">
                                         <span t-field="bo_line.product_uom_qty"/>
-                                        <span t-field="bo_line.product_uom"/>
+<!--                                        <span t-field="bo_line.product_uom"/>-->
                                     </td>
 
                                     <td class="text-end">
@@ -275,7 +275,7 @@
                                     </td>
                                     <td style="border-left:2px solid black;" class="text-center">
                                         <span t-field="bo_line.product_uom_qty">3.00</span>
-                                        <span t-field="bo_line.product_uom">units</span>
+<!--                                        <span t-field="bo_line.product_uom">units</span>-->
                                     </td>
                                 </tr>
 
