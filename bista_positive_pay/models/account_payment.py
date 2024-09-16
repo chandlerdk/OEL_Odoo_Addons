@@ -24,6 +24,12 @@ class AccountPayment(models.Model):
         }
 
     def get_line(self):
+        if not self.check_number:
+            raise UserError(f"Payment does not have a check number. {self.name}")
+        if not self.partner_id:
+            raise UserError(f"Payment does not have a a partner assigned. {self.name}")
+        if not self.amount:
+            raise UserError(f"Payment amount should not be zero. {self.name}")
         account_number = self.journal_id.default_account_id.code
         check = self.check_number
         date = self.date.strftime("%m%d%y")
@@ -43,8 +49,10 @@ class AccountPayment(models.Model):
             raise UserError("Amount is exceeding the 9 digit limit")
 
         reserve_27_29 = "  "
-        amount_holder = str(amount).ljust(9, "0")[:9]
+        amount_padding = (9 - len(str(amount)))
+        print("Amount Padding ", amount_padding)
+        amount_holder = (amount_padding * "0") + str(amount)[:9]
         reserve_28 = " "
-        return reserve_1_4 + account_number.ljust(available_characters, "0")[
-                             :17] + check_number + reserve_27_29 + amount_holder + reserve_28 + check_type + partner[
-                                                                                                             :128]
+        return (reserve_1_4 + account_number[:17] + str(
+            available_characters * "0") + check_number + reserve_27_29 + amount_holder +
+                reserve_28 + check_type + partner[:128])
