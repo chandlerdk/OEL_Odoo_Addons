@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="report_payment_enclosed_stub_receipt_document">
+            <t t-call="web.basic_layout">
+                <t t-set="o" t-value="o.with_context(lang=lang)"/>
+                <div class="page">
+                    <!-- Header Section -->
+                    <h3 style="text-align: center; margin-top: 0px;">Remittance Advice</h3>
+                    <p>
+                        <strong>
+                            <span t-field="o.company_id.name"/>
+                        </strong>
+                        <br/>
+                        <div class="row">
+                            <div class="col-4">
+                                <strong>Check:</strong>
+                                <span t-field="o.check_number"/>
+                            </div>
+
+                            <div class="col-8">
+                                <strong>Vendor:</strong>
+                                <span t-field="o.partner_id.name"/>
+                            </div>
+                        </div>
+
+                    </p>
+
+                    <!-- Table Section -->
+                    <table class="table table-borderless" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th style="width: 16.66%;" class="text-start">Date</th>
+                                <th style="width: 16.66%;" class="text-start">Invoice Number</th>
+                                <th style="width: 16.66%;">Comment</th>
+                                <th style="width: 16.66%;" class="text-end">Amount</th>
+                                <th style="width: 20.66%;" class="text-end">Discount Amount</th>
+                                <th style="width: 16.66%;" class="text-end">Net Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Loop Through Each Invoice -->
+                            <t t-set="total_amount" t-value="0"/>
+                            <t t-set="total_discount" t-value="0"/>
+                            <t t-set="total_net" t-value="0"/>
+                            <tr t-foreach="o.reconciled_bill_ids" t-as="invoice">
+                                <tr t-foreach="invoice.invoice_line_ids" t-as="record">
+                                    <t t-if="record.discount > 0">
+                                        <t t-set="disc_val" t-value="record.price_unit * record.discount / 100"/>
+                                    </t>
+
+                                    <td class="text-start">
+                                        <span t-field="invoice.date"/><!--Invoice Date-->
+                                    </td>
+                                    <td class="text-start">
+                                        <span t-esc="record.ref"/><!--Invoice Number-->
+                                    </td>
+                                    <td class="text-center">
+                                        <!-- Comment Column (currently empty) -->
+                                    </td>
+                                    <td class="text-end">
+                                        <span t-field="invoice.amount_total"/><!-- Amount -->
+                                        <t t-set="total_amount" t-value="total_amount + invoice.amount_total"/>
+                                    </td>
+                                    <td class="text-end">
+                                        <span t-esc="record.discount"/><!-- Discount -->
+                                         <t t-set="total_discount" t-value="total_discount + record.discount"/>
+                                    </td>
+                                    <td>
+                                        <!-- Net Amount (currently empty) -->
+                                    </td>
+                                </tr>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td style="border-bottom: 1px solid black;"></td>
+                                <td style="border-bottom: 1px solid black;"></td>
+                                <td style="border-bottom: 1px solid black;"></td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td class="text-end">
+                                    <span>Totals:</span>
+                                </td>
+                                <td class="text-end">
+                                    <span t-esc="total_amount"/>
+                                </td>
+                                <td class="text-end">
+                                    <span t-esc="total_discount"/>
+                                </td>
+                                <td class="text-end">
+                                    <span t-esc="total_net"/>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+
+
+                </div>
+            </t>
+        </template>
+
+
+        <template id="report_payment_enclose_stub">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-set="lang" t-value="o.partner_id.lang or o.company_id.partner_id.lang"/>
+                    <t t-call="bista_check_enhancement.report_payment_enclosed_stub_receipt_document" t-lang="lang"/>
+                </t>
+            </t>
+        </template>
+        <record id="paperformat_enclose_stub_paper" model="report.paperformat">
+            <field name="name">A4 - statement</field>
+            <field name="default" eval="True"/>
+            <field name="format">A4</field>
+            <field name="page_height">0</field>
+            <field name="page_width">0</field>
+            <field name="orientation">Portrait</field>
+            <field name="margin_top">10.00</field>
+            <field name="margin_bottom">32</field>
+            <field name="margin_left">7</field>
+            <field name="margin_right">7</field>
+            <field name="header_line" eval="False"/>
+            <field name="header_spacing">35</field>
+            <field name="dpi">90</field>
+        </record>
+
+
+        <record id="action_report_payment_encolosed_stub_report" model="ir.actions.report">
+            <field name="name">Enclosed Stub</field>
+            <field name="model">account.payment</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">bista_check_enhancement.report_payment_enclose_stub</field>
+            <field name="report_file">bista_check_enhancement.report_payment_enclose_stub</field>
+            <field name="paperformat_id" ref="paperformat_enclose_stub_paper"/>
+            <field name="binding_model_id" ref="model_account_payment"/>
+            <field name="binding_type">report</field>
+        </record>
+
+
+    </data>
+</odoo>
