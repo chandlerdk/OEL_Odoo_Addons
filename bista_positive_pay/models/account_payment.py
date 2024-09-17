@@ -30,10 +30,10 @@ class AccountPayment(models.Model):
             raise UserError(f"Payment does not have a a partner assigned. {self.name}")
         if not self.amount:
             raise UserError(f"Payment amount should not be zero. {self.name}")
-        account_number = self.journal_id.default_account_id.code
+        account_number = self.journal_id.bank_account_id.acc_number
         check = self.check_number
         date = self.date.strftime("%m%d%y")
-        amount = int(self.amount)
+        amount = str(float(self.amount)).replace(".", "")
         partner = self.partner_id.name
         check_type = "I" if self.state == 'posted' else "V"
         check_number = check + str(date)
@@ -50,7 +50,6 @@ class AccountPayment(models.Model):
 
         reserve_27_29 = "  "
         amount_padding = (9 - len(str(amount)))
-        print("Amount Padding ", amount_padding)
         amount_holder = (amount_padding * "0") + str(amount)[:9]
         reserve_28 = " "
         return (reserve_1_4 + account_number[:17] + str(
