@@ -12,7 +12,7 @@ class StockPicking(models.Model):
     is_rma_out = fields.Boolean(string="RMA Out", related="picking_type_id.is_rma_out")
     quality_check_id = fields.Many2one('quality.check', string="Quality Check")
     internal_delivery_note = fields.Html('Internal Delivery Note')
-    
+
 
     @api.model_create_multi
     def create(self, vals_list):

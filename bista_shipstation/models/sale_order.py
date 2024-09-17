@@ -24,6 +24,7 @@ class SaleOrder(models.Model):
     bill_country_code = fields.Many2one('res.country', string="Country")
     carrier_id = fields.Many2one('shipstation.delivery.carrier')
     service_id = fields.Many2one('shipstation.carrier.service')
+    ups_bill_my_account = fields.Boolean(related='carrier_id.ups_bill_my_account', readonly=True)
 
     @api.onchange('partner_id')
     def _onchange_shipstation_third_acc(self):
