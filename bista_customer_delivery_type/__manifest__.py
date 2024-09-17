@@ -14,7 +14,6 @@
     'data': [
 
         'views/partner_view.xml',
-        'views/purchase_order.xml',
 
     ],
     'installable': True,

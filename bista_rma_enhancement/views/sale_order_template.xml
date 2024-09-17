@@ -6,7 +6,9 @@
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
             <field colspan="2" name="note" nolabel="1" position="after">
-                <field  colspan="2" name="delivery_note" nolabel="1" placeholder="Delivery Note..."/>
+                <field  colspan="2" name="delivery_note" placeholder="Delivery Note..."/>
+                <field  colspan="2" name="internal_delivery_note" placeholder="Internal Delivery Note..."/>
+
             </field>
         </field>
     </record>

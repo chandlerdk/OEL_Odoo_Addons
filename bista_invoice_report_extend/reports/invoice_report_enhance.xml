@@ -65,13 +65,36 @@
                 <strong>FOB:</strong>
                 <br/>
                 <t t-set="sale_order" t-value="env['sale.order'].search([('name', '=', o.invoice_origin)], limit=1)"/>
-                <span t-field="sale_order.incoterm"/>
+<!--                <span t-field="sale_order.incoterm"/>-->
+                <t t-if="sale_order.bill_account">
+                    <t t-esc="sale_order.bill_account"/>
+                </t>
+                <t t-if="sale_order.no_ship_cost_synced">
+                    <t t-if="not sale_order.bill_account">
+                        <span>
+                            Allowed
+                         </span>
+                    </t>
+                </t>
+                <t t-if="not sale_order.no_ship_cost_synced">
+                    <t t-if="not sale_order.bill_account">
+                        <span>
+                            PP&amp;Add
+                         </span>
+                    </t>
+                </t>
             </div>
             <div t-attf-class="#{'col-auto col-3 mw-100' if report_type != 'html' else 'col'} mb-2" t-if="o.sale_rep_id"
                  name="sale_rep">
                 <strong>Sales Rep</strong>
                 <br/>
                 <span t-field="o.sale_rep_id"></span>
+            </div>
+            <div t-attf-class="#{'col-auto col-3 mw-100' if report_type != 'html' else 'col'} mb-2" t-if="sale_order.ship_via"
+                 name="ship_via">
+                <strong>Ship VIA</strong>
+                <br/>
+                <span t-field="sale_order.ship_via"></span>
             </div>
         </xpath>
 
@@ -105,13 +128,22 @@
                     <t t-foreach="pickings" t-as="picking">
                         <span class="fw-bold" t-esc="picking.carrier_tracking_ref"/>
                     </t>
+
                 </p>
+                <p t-if="pickings.filtered(lambda p: p.note)" name="delivery_note">
+                    Delivery Note:
+                    <t t-foreach="pickings" t-as="picking">
+                        <span class="fw-bold" t-esc="picking.note"/>
+                    </t>
+                </p>
+
                 </t>
             </div>
         </xpath>
 
-        <xpath expr="//div[@name='delivery_date']" position="replace">
+        <xpath expr="//div[@name='delivery_date']/strong" position="replace">
             <!-- This will remove the div element -->
+             <strong t-esc="'Ship Date:'"/>
         </xpath>
         <xpath expr="//div[@name='incoterm_id']" position="replace">
             <!-- This will remove the div element -->

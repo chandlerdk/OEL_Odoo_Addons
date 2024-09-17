@@ -70,8 +70,8 @@
                                     </span>
                                     <br/>
                                     <span>
-                                        <strong>Salesperson:</strong>
-                                        <t t-esc="o.partner_id.user_id.name"/>
+                                        <strong>Salesrep:</strong>
+                                        <t t-esc="o.sale_id.sale_rep_id.name"/>
                                     </span>
                                     <br/>
                                     <span>
@@ -164,7 +164,26 @@
                                     <td>
                                         <t t-esc="o.sale_id.ship_via"/>
                                     </td>
-                                    <td>Example F.O.B</td>
+                                    <td>
+                                    <t t-if="o.sale_id.bill_account">
+                                        <t t-esc="o.sale_id.bill_account"/>
+                                    </t>
+                                    <t t-if="o.sale_id.no_ship_cost_synced">
+                                        <t t-if="not o.sale_id.bill_account">
+                                            <span>
+                                                Allowed
+                                             </span>
+                                        </t>
+                                    </t>
+                                    <t t-if="not o.sale_id.no_ship_cost_synced">
+                                        <t t-if="not o.sale_id.bill_account">
+                                            <span>
+                                                PP&amp;Add
+                                             </span>
+                                        </t>
+                                    </t>
+
+                                </td>
                                     <td>
                                         <t t-esc="o.sale_id.payment_term_id.name"/>
                                     </td>
@@ -212,7 +231,7 @@
                                             <span t-field="line.product_id.description_sale"/>
                                         </p>
                                     </td>
-                                    <td class="text-end">
+                                    <td class="text-center">
                                         <span t-field="line.product_uom_qty"/>
 <!--                                        <span t-field="line.product_uom"/>-->
                                         <span t-if="line.product_packaging_id">
@@ -281,6 +300,14 @@
 
                             </tbody>
                         </table>
+                        <br/>
+                        <div>
+                            Delivery Note: <span class="fw-bold" t-esc="o.note"/>
+                        </div>
+                        <br/>
+                        <div>
+                            Internal Delivery Note: <span class="fw-bold" t-esc="o.internal_delivery_note"/>
+                        </div>
 
 
                         <div t-if="not o.signature" class="oe_structure"></div>

@@ -38,6 +38,9 @@
             <xpath expr="//button[@name='button_quality_alert']" position="attributes">
                 <attribute name="groups">stock.group_stock_manager</attribute>
             </xpath>
+            <xpath expr="//field[@name='note']" position="after">
+                <field name="internal_delivery_note" placeholder="Internal Delivery Note..."/>
+            </xpath>
 
         </field>
     </record>

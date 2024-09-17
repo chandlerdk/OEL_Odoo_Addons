@@ -12,7 +12,7 @@
     'support': '',
     'depends': ['base','sale'],
     'data': [
-
+        'views/sale_view.xml',
     ],
     'installable': True,
     'auto_install': False,
