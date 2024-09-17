@@ -12,9 +12,7 @@
     'support': '',
     'depends': ['base','purchase','stock'],
     'data': [
-
         'views/partner_view.xml',
-
     ],
     'installable': True,
     'auto_install': False,

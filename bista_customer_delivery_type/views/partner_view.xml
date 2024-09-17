@@ -8,8 +8,6 @@
              <xpath expr="//group//field[@name='property_purchase_currency_id']" position="after">
                 <field name="delivery_id"/>
             </xpath>
-
-
         </field>
     </record>
 
