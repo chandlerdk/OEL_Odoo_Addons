@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <record id="view_delivery_carrier_form_inherit_delivery_shipstation" model="ir.ui.view">
+            <field name="name">view_delivery_carrier_form_inherit_delivery_shipstation</field>
+            <field name="model">delivery.carrier</field>
+            <field name="inherit_id" ref="delivery.view_delivery_carrier_form"/>
+            <field name="arch" type="xml">
+                <page name="destination" position="before">
+                    <page invisible="delivery_type != 'shipstation'" string="ShipStation Configuration">
+                        <group>
+                            <group>
+                                <field name="api_url"/>
+                                <field name="store_id"/>
+                                <field name="carrier_code"/>
+                                <field invisible="1" name="package_type_ship"/>
+                                <button name="import_store_from_ship_station" string="Import Store" type="object"/>
+                                <button name="import_dc_from_ship_station" string="Import Delivery Carrier" type="object"/>
+                                <button name="import_cs_from_ship_station" string="Import Carrier Service" type="object"/>
+                                <button name="import_package_from_ship_station" string="Import Package" type="object"/>
+<!--                                <field name="free_delivery_limit"/>-->
+                            </group>
+                            <group>
+                                <field name="shipstation_production_api_key" required="delivery_type == 'shipstation'"/>
+                                <field name="shipstation_production_api_secret" required="delivery_type == 'shipstation'" widget="password"/>
+                                <field name="shipstation_weight_uom_id" required="delivery_type == 'shipstation'"/>
+                                <field name="shipstation_delivery_type" required="delivery_type == 'shipstation'" string="Carrier Type"/>
+                                <field domain="[('shipstation_carrier','=',shipstation_delivery_type)]" name="shipstation_default_service_id" string="Default service"/>
+                            </group>
+                        </group>
+                    </page>
+                </page>
+<!--                <xpath expr="//field[@name='free_over']" position="before">-->
+<!--                    <field name="add_ship_cost" attrs="{'invisible': [('delivery_type', '!=', 'shipstation')]}"/>-->
+<!--                </xpath>-->
+                <xpath expr="//field[@name='product_id']" position="before">
+                    <field name="add_ship_cost" invisible="delivery_type != 'shipstation'"/>
+                    <field name="remove_backorder_ship_line" invisible="delivery_type != 'shipstation'"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

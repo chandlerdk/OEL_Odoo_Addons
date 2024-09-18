@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="shipstation_view_picking_withcarrier_out_form_bista" model="ir.ui.view">
+            <field name="name">shipstation_view_picking_withcarrier_out_form</field>
+            <field name="model">stock.picking</field>
+            <field name="inherit_id" ref="stock_delivery.view_picking_withcarrier_out_form"/>
+            <field name="arch" type="xml">
+                <field name="carrier_id" position="after">
+                    <field invisible="delivery_type != 'shipstation'" name="shipstation_service"/>
+                    <field force_save="1" invisible="1" name="shipstation_service_code" readonly="1"/>
+                    <field invisible="1" name="delivery_type"/>
+                    <field force_save="1" invisible="1" name="shipstation_order_id"/>
+                    <field force_save="1" invisible="1" name="shipstation_order_key"/>
+                </field>
+            </field>
+        </record>
+    </data>
+</odoo>
