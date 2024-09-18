@@ -18,7 +18,6 @@ class SaleOrder(models.Model):
     is_synced = fields.Boolean(copy=False, string="Add Shipping Cost")
     no_ship_cost_synced = fields.Boolean(copy=False, string="No Shipping Cost Sync")
     add_ship_no_delivery_line = fields.Boolean(string="shipping cost",copy=False)
-
     bill_account = fields.Char('Account No')
     bill_postal_code = fields.Char('Postal Code')
     bill_country_code = fields.Many2one('res.country', string="Country")

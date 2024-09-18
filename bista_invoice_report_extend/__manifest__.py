@@ -15,7 +15,7 @@
     'license': 'AGPL-3',
     'description': """The Invoice Report
     """,
-    'depends': ['sale', 'stock','web','account'],
+    'depends': ['sale', 'stock','web','account','bista_shipstation'],
     'data': [
             'reports/invoice_report_enhance.xml',
 ],
