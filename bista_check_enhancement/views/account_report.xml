@@ -29,12 +29,12 @@
                     <!-- Table Section -->
                     <table class="table table-borderless" style="width: 100%;">
                         <thead>
-                            <tr>
-                                <th style="width: 16.66%;" class="text-start">Date</th>
+                            <tr style="border-bottom: 2px solid #000; ">
+                                <th style="width: 13.00%;" class="text-start">Date</th>
                                 <th style="width: 16.66%;" class="text-start">Invoice Number</th>
-                                <th style="width: 16.66%;">Comment</th>
+                                <th style="width: 21.66%;" class="text-start">Comment</th>
                                 <th style="width: 16.66%;" class="text-end">Amount</th>
-                                <th style="width: 20.66%;" class="text-end">Discount Amount</th>
+                                <th style="width: 17.80%;" class="text-end">Discount Amount</th>
                                 <th style="width: 16.66%;" class="text-end">Net Amount</th>
                             </tr>
                         </thead>
@@ -64,7 +64,7 @@
                                     </td>
                                     <td class="text-end">
                                         <span t-esc="record.discount"/><!-- Discount -->
-                                         <t t-set="total_discount" t-value="total_discount + record.discount"/>
+                                        <t t-set="total_discount" t-value="total_discount + record.discount"/>
                                     </td>
                                     <td>
                                         <!-- Net Amount (currently empty) -->
@@ -75,9 +75,15 @@
                                 <td></td>
                                 <td></td>
                                 <td></td>
-                                <td style="border-bottom: 1px solid black;"></td>
-                                <td style="border-bottom: 1px solid black;"></td>
-                                <td style="border-bottom: 1px solid black;"></td>
+                                <td>
+                                    <div style="width: 100%; height: 1px; background-color: black; margin: 0 auto;"></div>
+                                </td>
+                                <td>
+                                    <div style="width: 100%; height: 1px; background-color: black; margin: 0 auto;"></div>
+                                </td>
+                                <td>
+                                    <div style="width: 100%; height: 1px; background-color: black; margin: 0 auto;"></div>
+                                </td>
                             </tr>
                         </tbody>
                         <tfoot>
@@ -88,7 +94,8 @@
                                     <span>Totals:</span>
                                 </td>
                                 <td class="text-end">
-                                    <span t-esc="total_amount"/>
+                                    <span t-field="o.currency_id.symbol"/>
+                                    <span t-esc="total_amount and '{:,.3f}'.format(total_amount) or '0.000'"/>
                                 </td>
                                 <td class="text-end">
                                     <span t-esc="total_discount"/>

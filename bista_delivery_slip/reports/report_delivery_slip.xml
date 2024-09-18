@@ -86,11 +86,11 @@
                                 <br/>
                                 <span>
                                     <strong>Order Date:</strong>
-                                    <t t-esc="o.scheduled_date"/>
+                                    <t t-esc="o.scheduled_date.strftime('%m-%d-%Y')"/>
                                 </span>
                                 <br/>
                                 <span>
-                                    <strong>Salesrep:</strong>
+                                    <strong>Sales Rep:</strong>
                                     <t t-esc="o.sale_id.sale_rep_id.name"/>
                                 </span>
                                 <br/>
@@ -166,9 +166,9 @@
                     <br/>
                     <br/>
                     <div style="margin-bottom:8px;padding-left:12px;">
-                        <span>
-                            Confirm To:
-                        </span>
+<!--                        <span>-->
+<!--                            Confirm To:-->
+<!--                        </span>-->
                     </div>
                     <table class="table table-sm table-borderless">
                         <thead style="border-top:2px solid black" class="text-start">
@@ -232,7 +232,7 @@
                         <tbody style="border-bottom:2px solid black">
                             <t t-set="backorders"
                                t-value="o.backorder_ids.filtered(lambda x: x.state not in ('done', 'cancel'))"/>
-                            <t t-set="lines" t-value="o.sale_id.order_line"/>
+                            <t t-set="lines" t-value="o.sale_id.order_line.filtered(lambda line: line.display_type not in ['line_section', 'line_note'])"/>
                             <tr t-foreach="lines" t-as="line">
                                 <td>
                                     <span t-field="line.product_id"/>

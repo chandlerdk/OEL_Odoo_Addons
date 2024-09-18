@@ -36,17 +36,20 @@
                                     </span>
                                 </div>
                                 <div class="row" style="padding-top:25px;">
-
                                     <div name="div_outgoing_address">
-                                        <t t-set="partner" t-value="o.sale_id.partner_id  or False"/>
-                                        <div name="customer_address">
-                                            <span>
-                                                <strong>Sold To:</strong>
-                                            </span>
-                                        </div>
-                                        <div name="partner_header">
-                                            <div t-field="o.sale_id.partner_id"
-                                                 t-options='{"widget": "contact", "fields": ["address", "name", "phone",], "no_marker": True, "phone_icons": True}'/>
+                                        <div name="div_outgoing_address"
+                                             style="display: block; max-width: 100%; min-width: 200px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word;">
+                                            <t t-set="partner" t-value="o.sale_id.partner_id  or False"/>
+                                            <div name="customer_address">
+                                                <span>
+                                                    <strong>Sold To:</strong>
+                                                </span>
+                                            </div>
+                                            <div name="partner_header"
+                                                 style="display: flex; flex-direction: column; flex-wrap: wrap;">
+                                                <div t-field="o.sale_id.partner_id"
+                                                     t-options='{"widget": "contact", "fields": ["address", "name", "phone",], "no_marker": True, "phone_icons": True}'/>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -66,11 +69,11 @@
                                     <br/>
                                     <span>
                                         <strong>Order Date:</strong>
-                                        <t t-esc="o.scheduled_date"/>
+                                        <t t-esc="o.scheduled_date.strftime('%m-%d-%Y')"/>
                                     </span>
                                     <br/>
                                     <span>
-                                        <strong>Salesrep:</strong>
+                                        <strong>Sales Rep:</strong>
                                         <t t-esc="o.sale_id.sale_rep_id.name"/>
                                     </span>
                                     <br/>
@@ -81,7 +84,9 @@
                                 </div>
                                 <div class="row" style="padding-top:50px;">
 
-                                    <div name="div_outgoing_address">
+                                    <!--                                    <div name="div_outgoing_address">-->
+                                    <div name="div_outgoing_address"
+                                         style="max-width: 100%; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word;">
                                         <div name="outgoing_delivery_address" t-if="o.should_print_delivery_address()">
                                             <span>
                                                 <strong>Ship To:</strong>
@@ -145,11 +150,14 @@
                         </div>
                         <br/>
                         <br/>
-                        <div style="margin-bottom:8px;padding-left:12px">
-                            <span>
-                                Confirm To:
-                            </span>
-                        </div>
+                       
+
+                        <!--                        <div style="margin-bottom:8px;padding-left:12px">-->
+                        <!--                            <span>-->
+                        <!--                                Confirm To:-->
+                        <!--                            </span>-->
+                        <!--                        </div>-->
+
                         <table class="table table-sm table-borderless">
                             <thead style="border-top:2px solid black" class="text-start">
                                 <th>Customer P.O</th>
@@ -165,25 +173,25 @@
                                         <t t-esc="o.sale_id.ship_via"/>
                                     </td>
                                     <td>
-                                    <t t-if="o.sale_id.bill_account">
-                                        <t t-esc="o.sale_id.bill_account"/>
-                                    </t>
-                                    <t t-if="o.sale_id.no_ship_cost_synced">
-                                        <t t-if="not o.sale_id.bill_account">
-                                            <span>
-                                                Allowed
-                                             </span>
+                                        <t t-if="o.sale_id.bill_account">
+                                            <t t-esc="o.sale_id.bill_account"/>
                                         </t>
-                                    </t>
-                                    <t t-if="not o.sale_id.no_ship_cost_synced">
-                                        <t t-if="not o.sale_id.bill_account">
-                                            <span>
-                                                PP&amp;Add
-                                             </span>
+                                        <t t-if="o.sale_id.no_ship_cost_synced">
+                                            <t t-if="not o.sale_id.bill_account">
+                                                <span>
+                                                    Allowed
+                                                </span>
+                                            </t>
                                         </t>
-                                    </t>
+                                        <t t-if="not o.sale_id.no_ship_cost_synced">
+                                            <t t-if="not o.sale_id.bill_account">
+                                                <span>
+                                                    PP&amp;Add
+                                                </span>
+                                            </t>
+                                        </t>
 
-                                </td>
+                                    </td>
                                     <td>
                                         <t t-esc="o.sale_id.payment_term_id.name"/>
                                     </td>
@@ -223,7 +231,8 @@
 
                                 <t t-set="phantom_move_lines"
                                    t-value="o.move_ids.filtered(lambda x: x.product_uom_qty and any(bom.type == 'phantom' for bom in x.sale_line_id.product_id.bom_ids) and x.product_id.id not in backordered_product_ids)"/>
-                                <t t-set="lines" t-value="o.sale_id.order_line"/>
+                                <t t-set="lines"
+                                   t-value="o.sale_id.order_line.filtered(lambda line: line.display_type not in ['line_section', 'line_note'])"/>
                                 <tr t-foreach="lines" t-as="line">
                                     <td>
                                         <span t-field="line.product_id"/>
@@ -233,10 +242,11 @@
                                     </td>
                                     <td class="text-center">
                                         <span t-field="line.product_uom_qty"/>
-<!--                                        <span t-field="line.product_uom"/>-->
+                                        <!--                                        <span t-field="line.product_uom"/>-->
                                         <span t-if="line.product_packaging_id">
                                             (
                                             <span t-field="line.product_packaging_qty"
+                                                  t-if="line.product_id.type == 'product'"
                                                   t-options='{"widget": "integer"}'/>
                                             <span t-field="line.product_packaging_id"/>)
                                         </span>
@@ -266,7 +276,7 @@
                                         </td>
                                         <td class="text-end">
                                             <span t-field="move_line.product_uom_qty"/>
-<!--                                            <span t-field="move_line.product_uom"/>-->
+                                            <!--                                            <span t-field="move_line.product_uom"/>-->
                                         </td>
                                         <td class="text-end"></td>
                                         <td style="border-left:2px solid black;" class="text-center"></td>
@@ -284,7 +294,7 @@
                                     </td>
                                     <td class="text-end">
                                         <span t-field="bo_line.product_uom_qty"/>
-<!--                                        <span t-field="bo_line.product_uom"/>-->
+                                        <!--                                        <span t-field="bo_line.product_uom"/>-->
                                     </td>
 
                                     <td class="text-end">
@@ -294,7 +304,7 @@
                                     </td>
                                     <td style="border-left:2px solid black;" class="text-center">
                                         <span t-field="bo_line.product_uom_qty">3.00</span>
-<!--                                        <span t-field="bo_line.product_uom">units</span>-->
+                                        <!--                                        <span t-field="bo_line.product_uom">units</span>-->
                                     </td>
                                 </tr>
 
@@ -302,11 +312,13 @@
                         </table>
                         <br/>
                         <div>
-                            Delivery Note: <span class="fw-bold" t-esc="o.note"/>
+                            Delivery Note:
+                            <span class="fw-bold" t-esc="o.note"/>
                         </div>
                         <br/>
                         <div>
-                            Internal Delivery Note: <span class="fw-bold" t-esc="o.internal_delivery_note"/>
+                            Internal Delivery Note:
+                            <span class="fw-bold" t-esc="o.internal_delivery_note"/>
                         </div>
 
 

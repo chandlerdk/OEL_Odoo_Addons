@@ -22,9 +22,9 @@ class SaleOrder(models.Model):
     bill_account = fields.Char('Account No')
     bill_postal_code = fields.Char('Postal Code')
     bill_country_code = fields.Many2one('res.country', string="Country")
-    carrier_id = fields.Many2one('shipstation.delivery.carrier')
+    ship_carrier_id = fields.Many2one('shipstation.delivery.carrier')
     service_id = fields.Many2one('shipstation.carrier.service')
-    ups_bill_my_account = fields.Boolean(related='carrier_id.ups_bill_my_account', readonly=True)
+    ups_bill_my_account = fields.Boolean(related='ship_carrier_id.ups_bill_my_account', readonly=True)
 
     @api.onchange('partner_id')
     def _onchange_shipstation_third_acc(self):
@@ -34,7 +34,7 @@ class SaleOrder(models.Model):
                     'bill_account': rec.partner_id.bill_account,
                     'bill_postal_code': rec.partner_id.bill_postal_code,
                     'bill_country_code': rec.partner_id.bill_country_code,
-                    'carrier_id': rec.partner_id.carrier_id,
+                    'ship_carrier_id': rec.partner_id.carrier_id,
                     'service_id': rec.partner_id.service_id,
                 })
 

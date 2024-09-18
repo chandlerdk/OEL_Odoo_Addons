@@ -14,7 +14,7 @@
                         <field name="bill_account"/>
                         <field name="bill_postal_code"/>
                         <field name="bill_country_code"/>
-                        <field name="carrier_id"/>
+                        <field name="ship_carrier_id"/>
                         <field name="service_id"/>
                     </group>
                 </page>

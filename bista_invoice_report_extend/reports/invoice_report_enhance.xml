@@ -65,7 +65,7 @@
                 <strong>FOB:</strong>
                 <br/>
                 <t t-set="sale_order" t-value="env['sale.order'].search([('name', '=', o.invoice_origin)], limit=1)"/>
-<!--                <span t-field="sale_order.incoterm"/>-->
+                <!--                <span t-field="sale_order.incoterm"/>-->
                 <t t-if="sale_order.bill_account">
                     <t t-esc="sale_order.bill_account"/>
                 </t>
@@ -73,14 +73,14 @@
                     <t t-if="not sale_order.bill_account">
                         <span>
                             Allowed
-                         </span>
+                        </span>
                     </t>
                 </t>
                 <t t-if="not sale_order.no_ship_cost_synced">
                     <t t-if="not sale_order.bill_account">
                         <span>
                             PP&amp;Add
-                         </span>
+                        </span>
                     </t>
                 </t>
             </div>
@@ -88,9 +88,10 @@
                  name="sale_rep">
                 <strong>Sales Rep</strong>
                 <br/>
-                <span t-field="o.sale_rep_id"></span>
+                <span t-field="o.sale_rep_id.name"></span>
             </div>
-            <div t-attf-class="#{'col-auto col-3 mw-100' if report_type != 'html' else 'col'} mb-2" t-if="sale_order.ship_via"
+            <div t-attf-class="#{'col-auto col-3 mw-100' if report_type != 'html' else 'col'} mb-2"
+                 t-if="sale_order.ship_via"
                  name="ship_via">
                 <strong>Ship VIA</strong>
                 <br/>
@@ -103,47 +104,61 @@
             <attribute name="t-if">False</attribute>
         </xpath>
 
+<!--        Removed on this account form div p-->
+        <xpath expr="//p[@name='payment_communication']" position="replace">
+            <p name="payment_communication">
+                Payment Communication:
+                <span class="fw-bold" t-field="o.payment_reference">INV/2023/00001</span>
+<!--                <t t-if="o.partner_bank_id">-->
+<!--                    <br/>-->
+<!--                    on this account:-->
+<!--                    <span t-field="o.partner_bank_id" class="fw-bold"/>-->
+<!--                </t>-->
+            </p>
+        </xpath>
+
         <!-- Remove the Taxes data column -->
         <xpath expr="//td[@name='td_taxes']" position="attributes">
             <attribute name="t-if">False</attribute>
         </xpath>
 
-        <!--        <xpath expr="//p[@name='payment_communication']" position="after">-->
-        <!--            <t t-set="sale_order" t-value="env['sale.order'].search([('name', '=', o.invoice_origin)], limit=1)"/>-->
-        <!--            <t t-set="pickings" t-value="env['stock.picking'].search([('sale_id', '=', sale_order.id)])"/>-->
-        <!--            <p name="tracking_reference">-->
-        <!--                Tracking References:-->
-        <!--                <t t-foreach="pickings" t-as="picking">-->
-        <!--                    <span class="fw-bold" t-esc="picking.carrier_tracking_ref"/>-->
-        <!--                </t>-->
-        <!--            </p>-->
-        <!--        </xpath>-->
         <xpath expr="//div[@name='qr_code_placeholder']" position="before">
             <div>
                 <t t-set="sale_order" t-value="env['sale.order'].search([('name', '=', o.invoice_origin)], limit=1)"/>
                 <t t-set="pickings" t-value="env['stock.picking'].search([('sale_id', '=', sale_order.id)])"/>
                 <t t-if="pickings">
-                <p t-if="pickings.filtered(lambda p: p.carrier_tracking_ref)" name="tracking_reference">
-                    Tracking References:
-                    <t t-foreach="pickings" t-as="picking">
-                        <span class="fw-bold" t-esc="picking.carrier_tracking_ref"/>
-                    </t>
+                    <p t-if="pickings.filtered(lambda p: p.carrier_tracking_ref)" name="tracking_reference">
+                        Tracking References:
+                        <t t-foreach="pickings" t-as="picking">
+                            <span class="fw-bold" t-esc="picking.carrier_tracking_ref"/>
+                        </t>
 
-                </p>
-                <p t-if="pickings.filtered(lambda p: p.note)" name="delivery_note">
-                    Delivery Note:
-                    <t t-foreach="pickings" t-as="picking">
-                        <span class="fw-bold" t-esc="picking.note"/>
-                    </t>
-                </p>
+                    </p>
+                    <p t-if="pickings.filtered(lambda p: p.note)" name="delivery_note">
+                        Delivery Note:
+                        <t t-foreach="pickings" t-as="picking">
+                            <span class="fw-bold" t-esc="picking.note"/>
+                        </t>
+                    </p>
 
+                </t>
+            </div>
+        </xpath>
+
+        <xpath expr="//div[@id='informations']" position="after">
+            <div name="customer_number">
+                <strong>Customer Number:</strong>
+                <br/>
+                <t t-set="sale_order" t-value="env['sale.order'].search([('name', '=', o.invoice_origin)], limit=1)"/>
+                <t t-if="sale_order and sale_order.partner_id">
+                    <span t-esc="sale_order.partner_id.partner_reference_no"/>
                 </t>
             </div>
         </xpath>
 
         <xpath expr="//div[@name='delivery_date']/strong" position="replace">
             <!-- This will remove the div element -->
-             <strong t-esc="'Ship Date:'"/>
+            <strong t-esc="'Ship Date:'"/>
         </xpath>
         <xpath expr="//div[@name='incoterm_id']" position="replace">
             <!-- This will remove the div element -->
