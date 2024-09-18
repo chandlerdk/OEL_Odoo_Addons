@@ -7,6 +7,7 @@
         <field name="arch" type="xml">
             <field name="payment_term_id" position="after">
                 <field name="complete_order"/>
+                <field name="flag" invisible="1"/>
             </field>
         </field>
     </record>
@@ -17,11 +18,9 @@
         <field name="inherit_id" ref="sale.view_sales_order_filter"/>
         <field name="arch" type="xml">
             <xpath expr="//filter[@name='my_sale_orders_filter']" position="after">
-                <filter string="complete Orders" name="completed_order"
-                domain="[('complete_order', '=', True)]"/>
-
-                <filter string="Incomplete Orders" name="completed_order"
-                domain="[('complete_order', '=', False)]"/>
+                <filter string="Complete Orders" name="completed_order"
+                domain="[('flag', '=', True)]"/>
+                <filter string="Incomplete Orders" name="incompleted_order" domain="[('flag', '=', False)]"/>
             </xpath>
         </field>
     </record>
@@ -32,9 +31,9 @@
         <field name="inherit_id" ref="sale.view_order_product_search"/>
         <field name="arch" type="xml">
             <xpath expr="//search" position="inside">
-                <field name="complete_order" string="Complete Order"/>
-                <filter string="Complete Order" name="custom_filter" domain="[('complete_order', '=', True)]"/>
-                <filter string="Incomplete Order" name="custom_filter" domain="[('complete_order', '=', False)]"/>
+                <field name="flag" string="Complete Order"/>
+                <filter string="Complete Order" name="custom_filter" domain="[('flag', '=', True)]"/>
+                <filter string="Incomplete Order" name="custom_filter" domain="[('flag', '=', False)]"/>
             </xpath>
         </field>
     </record>
