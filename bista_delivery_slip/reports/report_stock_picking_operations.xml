@@ -232,7 +232,7 @@
                                    t-value="backorders.mapped('move_ids.product_id.id')"/>
 
                                 <t t-set="phantom_move_lines"
-                                   t-value="o.move_ids.filtered(lambda x: x.product_uom_qty and any(bom.type == 'phantom' for bom in x.sale_line_id.product_id.bom_ids) and x.product_id.id not in backordered_product_ids)"/>
+                                   t-value="o.move_ids.filtered(lambda x: x.product_uom_qty and any(bom.type == 'phantom' for bom in x.sale_line_id.product_id.bom_ids) and x.product_id.id )"/>
                                 <t t-set="lines"
                                    t-value="o.sale_id.order_line.filtered(lambda line: line.display_type not in ['line_section', 'line_note'])"/>
                                 <tr t-foreach="lines" t-as="line">
@@ -243,7 +243,15 @@
                                         </p>
                                     </td>
                                     <td class="text-center">
-                                        <span t-field="line.product_uom_qty"/>
+                                        <t t-if="not o.backorder_id">
+                                            <span t-field="line.product_uom_qty"/>
+                                        </t>
+                                        <t t-else="">
+                                            <t t-foreach="o.move_ids.filtered(lambda move: move.sale_line_id == line)[:1]"
+                                               t-as="move">
+                                                <span t-field="move.so_quantity"/>
+                                            </t>
+                                        </t>
                                         <!--                                        <span t-field="line.product_uom"/>-->
                                         <span t-if="line.product_packaging_id">
                                             (
@@ -277,7 +285,7 @@
                                             </p>
                                         </td>
                                         <td class="text-end">
-                                            <span t-field="move_line.product_uom_qty"/>
+                                            <span t-field="move_line.quantity"/>
                                             <!--                                            <span t-field="move_line.product_uom"/>-->
                                         </td>
                                         <td class="text-end"></td>
@@ -285,30 +293,30 @@
                                     </tr>
 
                                 </tr>
-                                <tr t-foreach="backorders.mapped('move_ids').filtered(lambda x: x.product_uom_qty)"
-                                    t-as="bo_line">
-                                    <td>
-                                        <span t-field="bo_line.product_id">Office Chair</span>
-                                        <p t-if="bo_line.description_picking != bo_line.product_id.name and bo_line.description_picking != bo_line.product_id.display_name">
-                                            <span t-field="bo_line.description_picking">Description on transfer
-                                            </span>
-                                        </p>
-                                    </td>
-                                    <td class="text-end">
-                                        <span t-field="bo_line.product_uom_qty"/>
-                                        <!--                                        <span t-field="bo_line.product_uom"/>-->
-                                    </td>
+                                <!--                                <tr t-foreach="backorders.mapped('move_ids').filtered(lambda x: x.product_uom_qty)"-->
+                                <!--                                    t-as="bo_line">-->
+                                <!--                                    <td>-->
+                                <!--                                        <span t-field="bo_line.product_id">Office Chair</span>-->
+                                <!--                                        <p t-if="bo_line.description_picking != bo_line.product_id.name and bo_line.description_picking != bo_line.product_id.display_name">-->
+                                <!--                                            <span t-field="bo_line.description_picking">Description on transfer-->
+                                <!--                                            </span>-->
+                                <!--                                        </p>-->
+                                <!--                                    </td>-->
+                                <!--                                    <td class="text-end">-->
+                                <!--                                        <span t-field="bo_line.product_uom_qty"/>-->
+                                <!--                                        &lt;!&ndash;                                        <span t-field="bo_line.product_uom"/>&ndash;&gt;-->
+                                <!--                                    </td>-->
 
-                                    <td class="text-end">
-                                        <!--                                            <span t-field="bo_line.quantity"/>-->
-                                        <!--                                            <span t-field="bo_line.product_uom"/>-->
+                                <!--                                    <td class="text-end">-->
+                                <!--                                        &lt;!&ndash;                                            <span t-field="bo_line.quantity"/>&ndash;&gt;-->
+                                <!--                                        &lt;!&ndash;                                            <span t-field="bo_line.product_uom"/>&ndash;&gt;-->
 
-                                    </td>
-                                    <td style="border-left:2px solid black;" class="text-center">
-                                        <span t-field="bo_line.product_uom_qty">3.00</span>
-                                        <!--                                        <span t-field="bo_line.product_uom">units</span>-->
-                                    </td>
-                                </tr>
+                                <!--                                    </td>-->
+                                <!--                                    <td style="border-left:2px solid black;" class="text-center">-->
+                                <!--                                        <span t-field="bo_line.product_uom_qty">3.00</span>-->
+                                <!--                                        &lt;!&ndash;                                        <span t-field="bo_line.product_uom">units</span>&ndash;&gt;-->
+                                <!--                                    </td>-->
+                                <!--                                </tr>-->
 
                             </tbody>
                         </table>

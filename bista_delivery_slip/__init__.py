@@ -5,3 +5,4 @@
 # Copyright (C) 2024 (http://www.bistasolutions.com)
 #
 ##############################################################################
+from . import models
