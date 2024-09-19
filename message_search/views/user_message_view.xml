@@ -1,0 +1,72 @@
+<odoo>
+    <data>
+        <record id="view_user_message_views" model="ir.ui.view">
+            <field name="name">mail.message</field>
+            <field name="model">mail.message</field>
+            <field name="priority">500</field>
+            <field name="arch" type="xml">
+                <form string="Message" create="false" edit="false" delete="false">
+                    <sheet>
+                        <group>
+                            <field name="subject"/>
+                            <field name="body" widget="mail_body" readonly="1"/>
+                            <field name="record_link"/>
+                            <field name="partner_ids" widget="many2many_tags"/>
+                            <field name="create_date"/>
+                            <field name="create_uid"/>
+                            <field name="date"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_user_message_tree" model="ir.ui.view">
+            <field name="name">mail.message.tree</field>
+            <field name="model">mail.message</field>
+            <field name="priority">500</field>
+            <field name="arch" type="xml">
+                <tree string="Messages" create="false" edit="false" delete="false">
+                    <field name="record_link"/>
+                    <field name="subject"/>
+                    <field name="body"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_user_message_search" model="ir.ui.view">
+            <field name="name">mail.message.search</field>
+            <field name="model">mail.message</field>
+            <field name="priority">500</field>
+            <field name="arch" type="xml">
+                <search string="Search">
+                    <field name="record_link" string="Name"
+                           filter_domain="['|', '|', ('subject', 'ilike', self), ('body', 'ilike', self),('record_link', 'ilike', self)]"/>
+                    <field name="subject" string="Subject"
+                           filter_domain="[('subject', 'ilike', self)]"/>
+                    <field name="body" string="Body"
+                           filter_domain="['|', ('subject', 'ilike', self), ('body', 'ilike', self)]"/>
+                    <field name="create_date" string="Create Date"/>
+                    <field name="create_uid" string="Create User"/>
+                    <field name="date" string="Date"/>
+                    <field name="partner_ids" string="Contacts"/>
+                </search>
+            </field>
+        </record>
+
+
+        <record id="action_user_message" model="ir.actions.act_window">
+            <field name="name">Messages</field>
+            <field name="res_model">mail.message</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_ids" eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'tree', 'view_id': ref('view_user_message_tree')}),
+                (0, 0, {'view_mode': 'form', 'view_id': ref('view_user_message_views')})]"/>
+            <field name="search_view_id" ref="view_user_message_search"/>
+        </record>
+
+        <menuitem id="menu_user_message" name="Messages" action="action_user_message" sequence="10"
+                  web_icon="message_search,static/description/app_icon.png"/>
+
+    </data>
+</odoo>
