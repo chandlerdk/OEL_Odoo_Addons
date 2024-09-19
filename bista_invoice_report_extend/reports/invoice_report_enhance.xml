@@ -158,7 +158,7 @@
 
         <xpath expr="//div[@name='delivery_date']/strong" position="replace">
             <!-- This will remove the div element -->
-            <strong t-esc="'Ship Date:'"/>
+            <strong t-esc="'Ship Date:'"/> 
         </xpath>
         <xpath expr="//div[@name='incoterm_id']" position="replace">
             <!-- This will remove the div element -->
