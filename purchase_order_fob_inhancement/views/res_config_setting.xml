@@ -9,7 +9,7 @@
         <field name="arch" type="xml">
             <xpath expr="//setting[@id='manage_purchase_agreements']" position="after">
                 <setting id="fob_setting"  help="Select Fob">
-                    <field name="fob" widget="many2many_tags"/>
+                    <field name="fob_ids" widget="many2many_tags"/>
                 </setting>
             </xpath>
         </field>
