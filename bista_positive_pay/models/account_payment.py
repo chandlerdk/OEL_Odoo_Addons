@@ -33,6 +33,8 @@ class AccountPayment(models.Model):
         if not self.amount:
             raise UserError(f"Payment amount should not be zero. {self.name}")
         account_number = self.journal_id.bank_account_id.acc_number
+        if not account_number:
+            raise UserError(f"Payment does not have a Account number. {self.name}")
         check = self.check_number
         date = self.date.strftime("%m%d%y")
         amount = str(float(self.amount)).replace(".", "")
