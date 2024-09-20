@@ -242,15 +242,23 @@
                                     </p>
                                 </td>
                                 <td class="text-center">
-                                    <t t-if="not o.backorder_id">
+                                    <t t-if="o.move_ids.filtered(lambda move: move.remaining_qty) and not o.backorder_id">
+                                        <t t-set="first_move"
+                                           t-value="o.move_ids.filtered(lambda move: move.remaining_qty)[:1]"/>
+                                        <span t-field="first_move.remaining_qty"/>
+                                    </t>
+                                    <t t-elif="not o.backorder_id">
                                         <span t-field="line.product_uom_qty"/>
                                     </t>
+
                                     <t t-else="">
                                         <t t-foreach="o.move_ids.filtered(lambda move: move.sale_line_id == line)[:1]"
                                            t-as="move">
                                             <span t-field="move.so_quantity"/>
                                         </t>
                                     </t>
+
+
                                     <span t-if="line.product_packaging_id">
                                         (
                                         <span t-field="line.product_packaging_qty" t-options='{"widget": "integer"}'/>
@@ -258,20 +266,14 @@
                                     </span>
                                 </td>
                                 <td class="text-end">
-                                    <t t-foreach="o.move_ids.filtered(lambda move: move.sale_line_id == line)[:1]"
-                                       t-as="move">
-                                            <t t-set="delivered_qty" t-value="move.so_quantity-move.quantity"/>
-                                        <span t-esc="delivered_qty"/>
-                                    </t>
-
-                                    <!--                                    <span t-field="line.qty_delivered"/>-->
-                                    <!--                                    <span t-field="line.product_uom"/>-->
-                                    <span t-if="line.product_packaging_id">
-                                        (
-                                        <span t-field="line.product_packaging_quantity"
-                                              t-options='{"widget": "integer"}'/>
-                                        <span t-field="line.product_packaging_id"/>)
-                                    </span>
+<!--                                    <span t-field="line.qty_delivered"/>-->
+<!--                                    &lt;!&ndash;                                    <span t-field="line.product_uom"/>&ndash;&gt;-->
+<!--                                    <span t-if="line.product_packaging_id">-->
+<!--                                        (-->
+<!--                                        <span t-field="line.product_packaging_quantity"-->
+<!--                                              t-options='{"widget": "integer"}'/>-->
+<!--                                        <span t-field="line.product_packaging_id"/>)-->
+<!--                                    </span>-->
                                 </td>
                                 <td style="border-left:2px solid black;" class="text-center">
                                     <t t-set="bo_qty"

@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
-
     <template id="l10n_us_check_printing.ckus_check">
         <div class="ckus_check">
             <t t-if="page['state'] == 'cancelled'">
@@ -10,7 +8,7 @@
             <div class="ckus_payee_addr" t-if="page['sequence_number'] and page['manual_sequencing']"
                  t-out="page['sequence_number']"/>
             <div class="ckus_date" t-out="page['date']"/>
-            <div class="ckus_payee_name" t-out="page['partner_name']"/>
+<!--            <div class="ckus_payee_name" t-out="page['partner_name']"/>-->
             <div class="ckus_amount">
                 <t t-out="page['amount'].replace(o.currency_id.symbol, '')"/>
             </div>

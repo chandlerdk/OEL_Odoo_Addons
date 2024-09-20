@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+purchase_order_fob_inhancement.access_purchase_fob,access_purchase_fob,purchase_order_fob_inhancement.model_purchase_fob,base.group_user,1,1,1,1
