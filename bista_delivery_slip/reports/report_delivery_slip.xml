@@ -45,7 +45,7 @@
                                     <t t-esc="o.name"/>
                                 </span>
                             </div>
-                            <div class="row" style="padding-top:16px;">
+                            <div class="row" style="padding-top:25px;">
 
                                 <div name="div_outgoing_address">
                                     <t t-set="partner" t-value="o.sale_id.partner_id  or False"/>
@@ -75,6 +75,8 @@
                                      style="width: 70%;"/>
                             </div>
                         </div>
+                        <br/>
+                        <br/>
                         <div class="col-4" style="padding-left:0;">
                             <div class="row">
                                 <span style="display: inline-block; width: 100%; white-space: nowrap;">
@@ -84,12 +86,12 @@
                                 <br/>
                                 <span>
                                     <strong>Order Date:</strong>
-                                    <t t-esc="o.scheduled_date"/>
+                                    <t t-esc="o.scheduled_date.strftime('%m-%d-%Y')"/>
                                 </span>
                                 <br/>
                                 <span>
-                                    <strong>Salesperson:</strong>
-                                    <t t-esc="o.sale_id.partner_id.user_id.name"/>
+                                    <strong>Sales Rep:</strong>
+                                    <t t-esc="o.sale_id.sale_rep_id.name"/>
                                 </span>
                                 <br/>
                                 <span>
@@ -97,7 +99,7 @@
                                     <t t-esc="o.sale_id.partner_id.partner_reference_no"/>
                                 </span>
                             </div>
-                            <div class="row" style="padding-top:35px;">
+                            <div class="row" style="padding-top:50px;">
 
                                 <div name="div_outgoing_address">
                                     <div name="outgoing_delivery_address" t-if="o.should_print_delivery_address()">
@@ -161,11 +163,12 @@
                             <p t-else="" t-field="o.scheduled_date"/>
                         </div>
                     </div>
-
-                    <div style="margin-bottom:8px;padding-left:12px">
-                        <span>
-                            Confirm To:
-                        </span>
+                    <br/>
+                    <br/>
+                    <div style="margin-bottom:8px;padding-left:12px;">
+                        <!--                        <span>-->
+                        <!--                            Confirm To:-->
+                        <!--                        </span>-->
                     </div>
                     <table class="table table-sm table-borderless">
                         <thead style="border-top:2px solid black" class="text-start">
@@ -177,11 +180,30 @@
                         </thead>
                         <tbody style="border-bottom:2px solid black">
                             <tr>
-                                <td><t t-esc="o.sale_id.client_order_ref"/></td>
+                                <td>Example PO</td>
                                 <td>
-                                     <t t-esc="o.sale_id.ship_via"/>
+                                    <t t-esc="o.sale_id.ship_via"/>
                                 </td>
-                                <td><t t-esc="o.sale_id.incoterm.name"/></td>
+                                <td>
+                                    <t t-if="o.sale_id.bill_account">
+                                        <t t-esc="o.sale_id.bill_account"/>
+                                    </t>
+                                    <t t-if="o.sale_id.no_ship_cost_synced">
+                                        <t t-if="not o.sale_id.bill_account">
+                                            <span>
+                                                Allowed
+                                            </span>
+                                        </t>
+                                    </t>
+                                    <t t-if="not o.sale_id.no_ship_cost_synced">
+                                        <t t-if="not o.sale_id.bill_account">
+                                            <span>
+                                                PP&amp;Add
+                                            </span>
+                                        </t>
+                                    </t>
+
+                                </td>
                                 <td>
                                     <t t-esc="o.sale_id.payment_term_id.name"/>
                                 </td>
@@ -190,65 +212,6 @@
                         </tbody>
 
                     </table>
-                    <!--                    <table class="table table-sm table-borderless" name="stock_move_table">-->
-                    <!--                        <thead style="border-bottom:2px solid black">-->
-                    <!--                            <tr>-->
-                    <!--                                <th name="th_sm_product" class="text-start">-->
-                    <!--                                    <strong>Item Number</strong>-->
-                    <!--                                </th>-->
-
-                    <!--                                <th name="th_sm_ordered">-->
-                    <!--                                    <strong>Ordered</strong>-->
-                    <!--                                </th>-->
-
-                    <!--                                <th name="th_sm_quantity">-->
-                    <!--                                    <strong>Shipped</strong>-->
-                    <!--                                </th>-->
-                    <!--                                <th name="th_sm_shipped">-->
-                    <!--                                    <strong>Back Ordered</strong>-->
-                    <!--                                </th>-->
-                    <!--                            </tr>-->
-                    <!--                        </thead>-->
-                    <!--                        <tbody style="border-bottom:2px solid black">-->
-                    <!--                            <t t-set="backorders"-->
-                    <!--                               t-value="o.backorder_ids.filtered(lambda x: x.state not in ('done', 'cancel'))"/>-->
-                    <!--                            <t t-set="lines" t-value="o.sale_id.order_line.filtered(lambda x: x.product_uom_qty)"/>-->
-                    <!--                            <tr t-foreach="lines" t-as="move">-->
-                    <!--                                <td>-->
-                    <!--                                    <span t-field="move.product_id"/>-->
-                    <!--                                    <p t-if="move.name != move.product_id.name and move.name != move.product_id.display_name">-->
-                    <!--                                        <span t-field="move.product_id.description_sale"/>-->
-                    <!--                                    </p>-->
-                    <!--                                </td>-->
-                    <!--                                <td class="text-end">-->
-                    <!--                                    <span t-field="move.product_uom_qty"/>-->
-                    <!--                                    <span t-field="move.product_uom"/>-->
-                    <!--                                    <span t-if="move.product_packaging_id">-->
-                    <!--                                        (-->
-                    <!--                                        <span t-field="move.product_packaging_qty" t-options='{"widget": "integer"}'/>-->
-                    <!--                                        <span t-field="move.product_packaging_id"/>)-->
-                    <!--                                    </span>-->
-                    <!--                                </td>-->
-
-                    <!--                                <td class="text-end">-->
-                    <!--                                    <span t-field="move.qty_delivered"/>-->
-                    <!--                                    <span t-field="move.product_uom"/>-->
-                    <!--                                    <span t-if="move.product_packaging_id">-->
-                    <!--                                        (-->
-                    <!--                                        <span t-field="move.product_packaging_quantity"-->
-                    <!--                                              t-options='{"widget": "integer"}'/>-->
-                    <!--                                        <span t-field="move.product_packaging_id"/>)-->
-                    <!--                                    </span>-->
-                    <!--                                </td>-->
-                    <!--                                <td style="border-left:2px solid black;" class="text-center">-->
-                    <!--                                    <span t-set="bo_qty"-->
-                    <!--                                          t-value="sum(backorders.mapped('move_ids').filtered(lambda m: m.product_id == line.product_id).mapped('product_uom_qty'))"/>-->
-                    <!--&lt;!&ndash;                                    <span t-esc="bo_qty" t-if="bo_qty > 0"></span>&ndash;&gt;-->
-                    <!--                                </td>-->
-                    <!--                            </tr>-->
-                    <!--                        </tbody>-->
-                    <!--                    </table>-->
-
                     <table class="table table-sm table-borderless" name="stock_move_table">
                         <thead style="border-bottom:2px solid black">
                             <tr>
@@ -269,7 +232,8 @@
                         <tbody style="border-bottom:2px solid black">
                             <t t-set="backorders"
                                t-value="o.backorder_ids.filtered(lambda x: x.state not in ('done', 'cancel'))"/>
-                            <t t-set="lines" t-value="o.sale_id.order_line"/>
+                            <t t-set="lines"
+                               t-value="o.sale_id.order_line.filtered(lambda line: line.display_type not in ['line_section', 'line_note'])"/>
                             <tr t-foreach="lines" t-as="line">
                                 <td>
                                     <span t-field="line.product_id"/>
@@ -277,9 +241,24 @@
                                         <span t-field="line.product_id.description_sale"/>
                                     </p>
                                 </td>
-                                <td class="text-end">
-                                    <span t-field="line.product_uom_qty"/>
-                                    <span t-field="line.product_uom"/>
+                                <td class="text-center">
+                                    <t t-if="o.move_ids.filtered(lambda move: move.remaining_qty) and not o.backorder_id">
+                                        <t t-set="first_move"
+                                           t-value="o.move_ids.filtered(lambda move: move.remaining_qty)[:1]"/>
+                                        <span t-field="first_move.remaining_qty"/>
+                                    </t>
+                                    <t t-elif="not o.backorder_id">
+                                        <span t-field="line.product_uom_qty"/>
+                                    </t>
+
+                                    <t t-else="">
+                                        <t t-foreach="o.move_ids.filtered(lambda move: move.sale_line_id == line)[:1]"
+                                           t-as="move">
+                                            <span t-field="move.so_quantity"/>
+                                        </t>
+                                    </t>
+
+
                                     <span t-if="line.product_packaging_id">
                                         (
                                         <span t-field="line.product_packaging_qty" t-options='{"widget": "integer"}'/>
@@ -287,14 +266,14 @@
                                     </span>
                                 </td>
                                 <td class="text-end">
-                                    <span t-field="line.qty_delivered"/>
-                                    <span t-field="line.product_uom"/>
-                                    <span t-if="line.product_packaging_id">
-                                        (
-                                        <span t-field="line.product_packaging_quantity"
-                                              t-options='{"widget": "integer"}'/>
-                                        <span t-field="line.product_packaging_id"/>)
-                                    </span>
+<!--                                    <span t-field="line.qty_delivered"/>-->
+<!--                                    &lt;!&ndash;                                    <span t-field="line.product_uom"/>&ndash;&gt;-->
+<!--                                    <span t-if="line.product_packaging_id">-->
+<!--                                        (-->
+<!--                                        <span t-field="line.product_packaging_quantity"-->
+<!--                                              t-options='{"widget": "integer"}'/>-->
+<!--                                        <span t-field="line.product_packaging_id"/>)-->
+<!--                                    </span>-->
                                 </td>
                                 <td style="border-left:2px solid black;" class="text-center">
                                     <t t-set="bo_qty"
@@ -428,7 +407,7 @@
                                     <!--                                    <td/>-->
                                     <td class="text-center w-auto">
                                         <span t-field="bo_line.product_uom_qty">3.00</span>
-                                        <span t-field="bo_line.product_uom">units</span>
+                                        <!--                                        <span t-field="bo_line.product_uom">units</span>-->
                                     </td>
                                     <td class="text-center w-auto">
                                     </td>
@@ -437,6 +416,12 @@
                                 </tr>
                             </tbody>
                         </table>
+                    </div>
+
+                    <br/>
+                    <div>
+                        Delivery Note:
+                        <span class="fw-bold" t-esc="o.note"/>
                     </div>
 
                     <div t-if="not o.signature" class="oe_structure"></div>
@@ -478,7 +463,7 @@
         </t>
         <td class="text-center" name="move_line_lot_quantity">
             <span t-field="move_line.quantity"/>
-            <span t-field="move_line.product_uom_id"/>
+            <!--            <span t-field="move_line.product_uom_id"/>-->
         </td>
     </template>
     <template id="stock_report_delivery_aggregated_move_lines">
@@ -492,7 +477,7 @@
             <td class="text-center" name="move_line_aggregated_qty_ordered">
                 <span t-esc="aggregated_lines[line]['qty_ordered']"
                       t-options="{'widget': 'float', 'decimal_precision': 'Product Unit of Measure'}"/>
-                <span t-esc="aggregated_lines[line]['product_uom'].name"/>
+                <!--                <span t-esc="aggregated_lines[line]['product_uom'].name"/>-->
                 <span t-if="aggregated_lines[line]['packaging'].name">
                     (
                     <span t-out="aggregated_lines[line]['packaging_qty']" t-options='{"widget": "integer"}'/>
@@ -503,7 +488,7 @@
                 <t t-if="aggregated_lines[line]['quantity']">
                     <span t-esc="aggregated_lines[line]['quantity']"
                           t-options="{'widget': 'float', 'decimal_precision': 'Product Unit of Measure'}"/>
-                    <span t-esc="aggregated_lines[line]['product_uom'].name"/>
+                    <!--                    <span t-esc="aggregated_lines[line]['product_uom'].name"/>-->
                     <span t-if="aggregated_lines[line]['packaging'].name">
                         (
                         <span t-out="aggregated_lines[line]['packaging_quantity']" t-options='{"widget": "integer"}'/>
@@ -549,7 +534,7 @@
         <field name="margin_left">7</field>
         <field name="margin_right">7</field>
         <field name="header_line" eval="False"/>
-        <field name="header_spacing">83</field>
+        <field name="header_spacing">85</field>
         <field name="dpi">80</field>
     </record>
     <record id="stock.action_report_delivery" model="ir.actions.report">

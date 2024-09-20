@@ -8,3 +8,4 @@ from . import quality
 from . import mrp
 from . import account
 from . import res_partner
+from . import sale_order

@@ -87,7 +87,7 @@ class PurchaseOrder(models.Model):
 
     def button_approve(self, force=False):
         result = super(PurchaseOrder, self).button_approve(force=force)
-        if self.delivery_generate and not self.picking_ids.move_ids.is_subcontract:
+        if self.delivery_generate:
             self._create_delivery()
         return result
 

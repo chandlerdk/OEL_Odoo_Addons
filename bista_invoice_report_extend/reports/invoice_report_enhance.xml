@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="custom_report_invoice_document" inherit_id="account.report_invoice_document">
+        <xpath expr="//div[1]" position="replace">
+            <div class="row">
+                <t t-if="o.partner_shipping_id and (o.partner_shipping_id != o.partner_id)">
+                    <div class="col-6">
+                        <t t-set="information_block">
+                            <strong>Sold To:</strong>
+                            <address class="mb-0" t-field="o.partner_id"
+                                     t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}'/>
+                            <div t-if="o.partner_id.vat" id="partner_vat_address_not_same_as_shipping">
+                                <t t-if="o.company_id.account_fiscal_country_id.vat_label"
+                                   t-out="o.company_id.account_fiscal_country_id.vat_label" id="inv_tax_id_label"/>
+                                <t t-else="">Tax ID</t>:
+                                <span t-field="o.partner_id.vat"/>
+                            </div>
+
+                        </t>
+                    </div>
+                    <div class="col-6" name="address_not_same_as_shipping">
+                        <t t-set="address">
+                            <div groups="account.group_delivery_invoice_address" name="shipping_address_block">
+                                <strong>Ship To:</strong>
+                                <div t-field="o.partner_shipping_id"
+                                     t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}'/>
+                            </div>
+                        </t>
+                    </div>
+                </t>
+                <t t-elif="o.partner_shipping_id and (o.partner_shipping_id == o.partner_id)">
+                    <div class="offset-col-6 col-6" name="address_same_as_shipping">
+                        <t t-set="address">
+                            <address class="mb-0" t-field="o.partner_id"
+                                     t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}'/>
+                            <div t-if="o.partner_id.vat" id="partner_vat_address_same_as_shipping">
+                                <t t-if="o.company_id.account_fiscal_country_id.vat_label"
+                                   t-out="o.company_id.account_fiscal_country_id.vat_label" id="inv_tax_id_label"/>
+                                <t t-else="">Tax ID</t>:
+                                <span t-field="o.partner_id.vat"/>
+                            </div>
+                        </t>
+                    </div>
+                </t>
+                <t t-else="">
+                    <div class="offset-col-6 col-6" name="no_shipping">
+                        <t t-set="address">
+                            <address class="mb-0" t-field="o.partner_id"
+                                     t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}'/>
+                            <div t-if="o.partner_id.vat" id="partner_vat_no_shipping">
+                                <t t-if="o.company_id.account_fiscal_country_id.vat_label"
+                                   t-out="o.company_id.account_fiscal_country_id.vat_label" id="inv_tax_id_label"/>
+                                <t t-else="">Tax ID</t>:
+                                <span t-field="o.partner_id.vat"/>
+                            </div>
+                        </t>
+                    </div>
+                </t>
+            </div>
+        </xpath>
+
+        <xpath expr="//div[@name='reference']" position="after">
+            <div t-attf-class="#{'col-auto col-3 mw-100' if report_type != 'html' else 'col'} mb-2"
+                 t-if="o.invoice_origin" name="fob">
+                <strong>FOB:</strong>
+                <br/>
+                <t t-set="sale_order" t-value="env['sale.order'].search([('name', '=', o.invoice_origin)], limit=1)"/>
+                <!--                <span t-field="sale_order.incoterm"/>-->
+                <t t-if="sale_order.bill_account">
+                    <t t-esc="sale_order.bill_account"/>
+                </t>
+                <t t-if="sale_order.no_ship_cost_synced">
+                    <t t-if="not sale_order.bill_account">
+                        <span>
+                            Allowed
+                        </span>
+                    </t>
+                </t>
+                <t t-if="not sale_order.no_ship_cost_synced">
+                    <t t-if="not sale_order.bill_account">
+                        <span>
+                            PP&amp;Add
+                        </span>
+                    </t>
+                </t>
+            </div>
+            <div t-attf-class="#{'col-auto col-3 mw-100' if report_type != 'html' else 'col'} mb-2" t-if="o.sale_rep_id"
+                 name="sale_rep">
+                <strong>Sales Rep</strong>
+                <br/>
+                <span t-field="o.sale_rep_id.name"></span>
+            </div>
+            <div t-attf-class="#{'col-auto col-3 mw-100' if report_type != 'html' else 'col'} mb-2"
+                 t-if="sale_order.ship_via"
+                 name="ship_via">
+                <strong>Ship VIA</strong>
+                <br/>
+                <span t-field="sale_order.ship_via"></span>
+            </div>
+        </xpath>
+
+        <!-- Remove the Taxes column header -->
+        <xpath expr="//th[@name='th_taxes']" position="attributes">
+            <attribute name="t-if">False</attribute>
+        </xpath>
+
+<!--        Removed on this account form div p-->
+        <xpath expr="//p[@name='payment_communication']" position="replace">
+            <p name="payment_communication">
+                Payment Communication:
+                <span class="fw-bold" t-field="o.payment_reference">INV/2023/00001</span>
+<!--                <t t-if="o.partner_bank_id">-->
+<!--                    <br/>-->
+<!--                    on this account:-->
+<!--                    <span t-field="o.partner_bank_id" class="fw-bold"/>-->
+<!--                </t>-->
+            </p>
+        </xpath>
+
+        <!-- Remove the Taxes data column -->
+        <xpath expr="//td[@name='td_taxes']" position="attributes">
+            <attribute name="t-if">False</attribute>
+        </xpath>
+
+        <xpath expr="//div[@name='qr_code_placeholder']" position="before">
+            <div>
+                <t t-set="sale_order" t-value="env['sale.order'].search([('name', '=', o.invoice_origin)], limit=1)"/>
+                <t t-set="pickings" t-value="env['stock.picking'].search([('sale_id', '=', sale_order.id)])"/>
+                <t t-if="pickings">
+                    <p t-if="pickings.filtered(lambda p: p.carrier_tracking_ref)" name="tracking_reference">
+                        Tracking References:
+                        <t t-foreach="pickings" t-as="picking">
+                            <span class="fw-bold" t-esc="picking.carrier_tracking_ref"/>
+                        </t>
+
+                    </p>
+                    <p t-if="pickings.filtered(lambda p: p.note)" name="delivery_note">
+                        Delivery Note:
+                        <t t-foreach="pickings" t-as="picking">
+                            <span class="fw-bold" t-esc="picking.note"/>
+                        </t>
+                    </p>
+
+                </t>
+            </div>
+        </xpath>
+
+        <xpath expr="//div[@id='informations']" position="after">
+            <div name="customer_number">
+                <strong>Customer Number:</strong>
+                <br/>
+                <t t-set="sale_order" t-value="env['sale.order'].search([('name', '=', o.invoice_origin)], limit=1)"/>
+                <t t-if="sale_order and sale_order.partner_id">
+                    <span t-esc="sale_order.partner_id.partner_reference_no"/>
+                </t>
+            </div>
+        </xpath>
+
+        <xpath expr="//div[@name='delivery_date']/strong" position="replace">
+            <!-- This will remove the div element -->
+            <strong t-esc="'Ship Date:'"/> 
+        </xpath>
+        <xpath expr="//div[@name='incoterm_id']" position="replace">
+            <!-- This will remove the div element -->
+        </xpath>
+
+        <xpath expr="//div[@name='origin']/strong" position="replace">
+            <strong t-esc="'Sales Order:'"/>
+        </xpath>
+        <xpath expr="//div[@name='reference']/strong" position="replace">
+            <strong t-esc="'Customer PO:'"/>
+        </xpath>
+
+    </template>
+
+    <template id="document_tax_totals_inherit_remove_tax_lines" inherit_id="account.document_tax_totals_template">
+        <!-- Remove the call to the tax_groups_totals template to prevent tax lines from being displayed -->
+        <xpath expr="//t[@t-call='account.tax_groups_totals']" position="replace"/>
+    </template>
+</odoo>

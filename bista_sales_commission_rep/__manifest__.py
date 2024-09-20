@@ -18,6 +18,8 @@
         'views/sale_order.xml',
         'views/res_partner.xml',
         'views/account_move.xml',
+        'reports/sale_report.xml',
+        'reports/account_invoice_report.xml',
         'wizard/commission_bill_wizard.xml',
     ],
     "auto_install": False,

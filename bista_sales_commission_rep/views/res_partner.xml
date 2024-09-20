@@ -7,6 +7,7 @@
         <field name="inherit_id" ref="base.view_partner_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='team_id']" position="after">
+                <field name="is_sale_rep"/>
                 <field name="sale_rep_id"/>
             </xpath>
         </field>

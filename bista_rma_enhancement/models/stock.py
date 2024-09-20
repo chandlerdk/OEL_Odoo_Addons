@@ -11,6 +11,8 @@ class StockPicking(models.Model):
     is_rma_in = fields.Boolean(string="RMA In", related="picking_type_id.is_rma_in")
     is_rma_out = fields.Boolean(string="RMA Out", related="picking_type_id.is_rma_out")
     quality_check_id = fields.Many2one('quality.check', string="Quality Check")
+    internal_delivery_note = fields.Html('Internal Delivery Note')
+
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -227,6 +229,8 @@ class StockMove(models.Model):
 
     receipt_note = fields.Text(string="Receipt Note")
     delivery_note = fields.Text(string="Delivery Note")
+
+
 
     def _prepare_move_line_vals(self, quantity=None, reserved_quant=None):
         vals = super()._prepare_move_line_vals(quantity, reserved_quant)

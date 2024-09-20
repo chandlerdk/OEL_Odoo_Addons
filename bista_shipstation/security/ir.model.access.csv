@@ -8,3 +8,5 @@ access_delivery_shipstation_service_stock_manager,shipstation.service stock_mana
 access_shipstation_order,access.shipstation.order,model_shipstation_store,,1,1,1,1
 access_shipstation_carrier,access.shipstation.carrier,model_shipstation_delivery_carrier,,1,1,1,1
 acces_shipstation_service,access.shipstation.service,model_shipstation_carrier_service,,1,1,1,1
+access_choose_delivery_carrier_sale,access.choose.delivery.carrier.sale,model_choose_delivery_carrier,sales_team.group_sale_salesman_all_leads,1,1,1,0
+access_delivery_carrier_sale,access.delivery.carrier.sale,model_delivery_carrier,sales_team.group_sale_salesman_all_leads,1,1,1,0

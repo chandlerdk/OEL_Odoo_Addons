@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
-    'name': "ShipStation Odoo Integration",
-    'description': "ShipStation Odoo Integration",
+    'name': "ShipStation Odoo Integrations",
+    'description': "ShipStation Odoo Integrations",
     'category': 'Operations/Inventory/Delivery',
     'license': 'LGPL-3',
     'version': '17.0.0.0.0',

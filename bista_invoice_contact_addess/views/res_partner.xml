@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data noupdate="0">
+        
+        <record id="view_partner_form_pmb" model="ir.ui.view">
+            <field name="name">view_partner_form_pmb</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form" />
+            <field name="arch" type="xml">
+                <field name="vat" position="after">
+                    <field name="email_all_contact_invoice" widget="boolean_toggle" />
+                </field>
+                
+                <xpath expr="//field[@name='child_ids']/form//field[@name='comment']" position="after">
+                    <field name="email_all_contact_invoice" widget="boolean_toggle" />                    
+                </xpath>
+                
+            </field>
+        </record>
+        
+    </data>
+</odoo>

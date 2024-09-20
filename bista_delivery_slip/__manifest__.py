@@ -15,7 +15,7 @@
     'license': 'AGPL-3',
     'description': """The Delivery Slip Report
     """,
-    'depends': ['sale', 'stock','web'],
+    'depends': ['sale', 'stock','web','bista_shipstation'],
     'data': [
         'reports/report_delivery_slip.xml',
         'reports/report_stock_picking_operations.xml',

@@ -26,6 +26,7 @@ class ShipstationDeliveryCarrier(models.Model):
                                          size=256)
     balance = fields.Float(string="Balance")
     company_id = fields.Many2one('res.company')
+    ups_bill_my_account = fields.Boolean('Ups Bill My Account')
 
 
 class ShipstationCarrierService(models.Model):
