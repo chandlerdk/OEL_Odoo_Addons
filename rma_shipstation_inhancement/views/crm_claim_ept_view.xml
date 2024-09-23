@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data noupdate="0">
+        <record id="rma_crm_claim_shipstation_from_inherit" model="ir.ui.view">
+            <field name="name">crm.claim.ept.form</field>
+            <field name="model">crm.claim.ept</field>
+            <field name="inherit_id" ref="rma_ept.crm_claims_ept_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='location_id']" position="after">
+                    <field name="rma_ship_via"/>
+                    <field name="no_ship_cost_synced"/>
+                </xpath>
+                <xpath expr="//page[@name='followup']" position="after">
+                    <page string="Shipstation Third Party Account">
+                        <group>
+                            <field name="bill_account"/>
+                            <field name="bill_postal_code"/>
+                            <field name="bill_country_code"/>
+                            <field name="rma_carrier_id"/>
+                            <field name="service_id"/>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+
+        </record>
+    </data>
+</odoo>
