@@ -19,6 +19,7 @@
 
     'data': [
         'views/crm_claim_ept_view.xml',
+        'views/crm_line_ept_view.xml',
 
     ],
 

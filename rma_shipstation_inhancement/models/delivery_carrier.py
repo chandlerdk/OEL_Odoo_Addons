@@ -87,7 +87,8 @@ class DeliverCarrier(models.Model):
                 #     'is_synced': True
                 # })
 
-                if not (ship_station.remove_backorder_ship_line and picking_id.backorder_id):
+                if not (ship_station.remove_backorder_ship_line and picking_id.backorder_id
+                        and not rma_id.no_ship_cost_synced):
                     rma_id._create_delivery_line(ship_station, amount)
                 delivery_lines = request.env['claim.line.ept'].sudo().search(
                     [('claim_id', 'in', rma_id.ids)], order="create_date desc", limit=1)

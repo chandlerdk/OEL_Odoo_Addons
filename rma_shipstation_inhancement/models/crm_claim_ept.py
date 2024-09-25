@@ -27,19 +27,6 @@ class CrmClaimEpt(models.Model):
 
 
     def _prepare_delivery_line_vals(self, carrier, price_unit):
-        # context = {}
-        # if self.partner_id:
-            # set delivery detail in the customer language
-            # context['lang'] = self.partner_id.lang
-            # carrier = carrier.with_context(lang=self.partner_id.lang)
-
-        # Apply fiscal position
-        # taxes = carrier.product_id.taxes_id._filter_taxes_by_company(self.company_id)
-        # taxes_ids = taxes.ids
-        # if self.partner_id and self.fiscal_position_id:
-        #     taxes_ids = self.fiscal_position_id.map_tax(taxes).ids
-
-        # Create the sales order line
 
         if carrier.product_id.description_sale:
             so_description = '%s: %s' % (carrier.name,
@@ -48,19 +35,12 @@ class CrmClaimEpt(models.Model):
             so_description = carrier.name
         values = {
             'claim_id': self.id,
-            # 'name': so_description,
-            # 'price_unit': price_unit,
-            'done_qty': 1,
-            # 'product_uom': carrier.product_id.uom_id.id,
+            'delivery_cost': price_unit,
+            'done_qty': 1.0,
             'product_id': carrier.product_id.id,
-            # 'tax_id': [(6, 0, taxes_ids)],
-            # 'is_delivery': True,
         }
         if carrier.free_over and self.currency_id.is_zero(price_unit) :
             values['name'] += '\n' + _('Free Shipping')
-        # if self.claim_line_ids:
-        #     values['sequence'] = self.claim_line_ids[-1].sequence + 1
-        # del context
         return values
 
     def _create_delivery_line(self, carrier, price_unit):

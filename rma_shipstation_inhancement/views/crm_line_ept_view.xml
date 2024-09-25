@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <record id="rma_crm_claim_line_shipstation_from_inherit" model="ir.ui.view">
+            <field name="name">crm.claim.ept.form</field>
+            <field name="model">crm.claim.ept</field>
+            <field name="inherit_id" ref="rma_ept.crm_claims_ept_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='claim_line_ids']//field[@name='done_qty']" position="after">
+                    <field  name="delivery_cost"/>
+                </xpath></field>
+        </record>
+    </data>
+</odoo>

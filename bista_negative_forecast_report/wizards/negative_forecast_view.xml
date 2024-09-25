@@ -1,0 +1,48 @@
+<odoo>
+
+    <record id="view_negative_forecast_report_form" model="ir.ui.view">
+        <field name="name">negative.forecast.from</field>
+        <field name="model">negative.forecast</field>
+        <field name="arch" type="xml">
+            <form string="Negative Forecast Report">
+                <header>
+                   <button string="Forecast Report" class="btn-primary" type="object" name="future_negative_forecasted_quantity"/>
+               </header>
+<!--                <field name="product_id"/>-->
+<!--                <field name="date"/>-->
+<!--                <field name="negative_qty"/>-->
+            </form>
+        </field>
+    </record>
+
+    <!-- Define the tree view -->
+    <record id="view_negative_forecast_report_tree" model="ir.ui.view">
+        <field name="name">negative.forecast.tree</field>
+        <field name="model">negative.forecast</field>
+        <field name="arch" type="xml">
+            <tree string="Negative Forecast Report">
+                <field name="product_id"/>
+                <field name="date"/>
+                <field name="negative_qty"/>
+            </tree>
+        </field>
+    </record>
+
+
+    <record id="action_wizard_product_negative_forecast" model="ir.actions.act_window">
+        <field name="name">Negative Forecast Report</field>
+        <field name="res_model">negative.forecast</field>
+        <field name="view_mode">tree,form</field>
+        <field name="target">new</field>
+        <field name="view_id" ref="view_negative_forecast_report_form"/>
+        <!--        <field name="context">{'default_negative_forecast_ids': []}</field>-->
+    </record>
+
+
+    <menuitem id="negative_forecast_report_menu"
+              name="Negative Forecast Report"
+              parent="sale.menu_sale_report"
+              action="action_wizard_product_negative_forecast"
+              sequence="100"/>
+
+</odoo>
