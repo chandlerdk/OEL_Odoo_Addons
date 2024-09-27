@@ -9,6 +9,7 @@
                  t-out="page['sequence_number']"/>
             <div class="ckus_date" t-out="page['date']"/>
 <!--            <div class="ckus_payee_name" t-out="page['partner_name']"/>-->
+            
             <div class="ckus_amount">
                 <t t-out="page['amount'].replace(o.currency_id.symbol, '')"/>
             </div>
