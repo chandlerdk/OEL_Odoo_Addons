@@ -32,7 +32,7 @@
                 <br/>
                 <span class="m-0" t-field="doc.ship_via">SO0000</span>
             </div>
-            
+
             <div t-if="doc.ship_via" class="col-auto col-3 mw-100 mb-2" name="informations_customernumber">
                 <strong>Customer Number:</strong>
                 <br/>
