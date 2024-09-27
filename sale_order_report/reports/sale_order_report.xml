@@ -1,0 +1,52 @@
+<odoo>
+    <!-- Inherit the existing Sale Order Report Template -->
+    <template id="report_saleorder_document_inherited" inherit_id="sale.report_saleorder_document">
+        <!-- Add FOB after the informations_date section -->
+        <xpath expr="//div[@name='informations_date']" position="after">
+            <div class="col-auto col-3 mw-100 mb-2">
+                <strong>F.O.B:</strong>
+                <br/>
+                <span>
+                    <t t-if="doc.bill_account">
+                        <t t-esc="doc.bill_account"/>
+                    </t>
+                    <t t-if="doc.no_ship_cost_synced">
+                        <t t-if="not doc.bill_account">
+                            <span>
+                                Allowed
+                            </span>
+                        </t>
+                    </t>
+                    <t t-if="not doc.no_ship_cost_synced">
+                        <t t-if="not doc.bill_account">
+                            <span>
+                                PP&amp;Add
+                            </span>
+                        </t>
+                    </t>
+                </span>
+            </div>
+
+            <div t-if="doc.ship_via" class="col-auto col-3 mw-100 mb-2" name="informations_shipvia">
+                <strong>Ship Via:</strong>
+                <br/>
+                <span class="m-0" t-field="doc.ship_via">SO0000</span>
+            </div>
+
+            <div t-if="doc.ship_via" class="col-auto col-3 mw-100 mb-2" name="informations_customernumber">
+                <strong>Customer Number:</strong>
+                <br/>
+                <span class="m-0" t-field="doc.partner_id.partner_reference_no">SO0000</span>
+            </div>
+        </xpath>
+        <xpath expr="//div[@class='col-auto col-3 mw-100 mb-2'][last()]" position="replace">
+                <div class="col-auto col-3 mw-100 mb-2">
+                    <strong>Sales Rep:</strong><br/>
+                    <span class="m-0" t-field="doc.sale_rep_id.name">Mitchell Admin</span>
+                </div>
+            </xpath>
+        <xpath expr="//div[@name='informations_reference']/strong" position="replace">
+            <strong>Customer PO:</strong>
+        </xpath>
+    </template>
+</odoo>

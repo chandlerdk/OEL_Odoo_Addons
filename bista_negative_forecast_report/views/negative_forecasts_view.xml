@@ -1,0 +1,58 @@
+<odoo>
+    <!-- Define the tree view -->
+    <record id="view_negative_forecast_report_tree" model="ir.ui.view">
+        <field name="name">negative.forecast.tree</field>
+        <field name="model">negative.forecast</field>
+        <field name="arch" type="xml">
+            <tree string="Negative Forecasts Report">
+                <field name="product_id"/>
+                <field name="date"/>
+                <field name="negative_qty"/>
+                <field name="total_qty"/>
+            </tree>
+        </field>
+    </record>
+
+       <!-- Define the search view with filters -->
+    <record id="view_negative_forecast_search" model="ir.ui.view">
+        <field name="name">negative.forecast.search</field>
+        <field name="model">negative.forecast</field>
+        <field name="arch" type="xml">
+            <search string="Negative Forecast Search">
+                <!-- Add filters -->
+<!--                <filter name="date_today" string="Today" domain="[('date', '=', context_today())]"/>-->
+<!--                <filter name="future_dates" string="Future Dates" domain="[('date', '&gt;', context_today())]"/>-->
+
+                <!-- Add groupby options -->
+                <group expand="1" string="Group By">
+                    <filter name="group_by_product" string="Product" context="{'group_by': 'product_id'}"/>
+                    <filter name="group_by_date" string="Date" context="{'group_by': 'date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Define the action -->
+    <record id="action_wizard_product_negative_forecasts" model="ir.actions.server">
+        <field name="name">Negative Forecast Report</field>
+        <field name="model_id" ref="model_negative_forecast"/>
+        <field name="state">code</field>
+        <field name="code">action = env['negative.forecast'].future_negative_forecasted_quantity()</field>
+    </record>
+
+    <!-- Define the action to include tree and search view -->
+    <record id="action_negative_forecast_tree" model="ir.actions.act_window">
+        <field name="name">Negative Forecasts Report</field>
+        <field name="res_model">negative.forecast</field>
+        <field name="view_mode">tree,search</field>
+        <field name="view_id" ref="view_negative_forecast_report_tree"/>
+        <field name="search_view_id" ref="bista_negative_forecast_report.view_negative_forecast_search"/>
+    </record>
+
+    <!-- Define the menu item -->
+    <menuitem id="negative_forecast_report_menu"
+              name="Negative Forecast Report"
+              parent="sale.menu_sale_report"
+              action="action_wizard_product_negative_forecasts"
+              sequence="100"/>
+</odoo>

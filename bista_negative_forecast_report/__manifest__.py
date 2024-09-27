@@ -10,6 +10,6 @@
     'depends': ['purchase', 'sale', 'base','stock'],
     'data': [
             'security/ir.model.access.csv',
-            'wizards/negative_forecast_view.xml',
+            'views/negative_forecasts_view.xml',
     ],
 }

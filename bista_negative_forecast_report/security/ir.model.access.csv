@@ -1,2 +1,2 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-bista_negative_forecast_report.access_negative_forecast,access_negative_forecast,bista_negative_forecast_report.model_negative_forecast,base.group_user,1,1,1,1
+bista_negative_forecast_report.access_negative_forecast,access_negative_forecast,bista_negative_forecast_report.model_negative_forecast,base.group_user,1,1,1,1,
