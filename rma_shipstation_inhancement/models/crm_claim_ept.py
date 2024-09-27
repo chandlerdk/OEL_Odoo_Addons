@@ -24,6 +24,8 @@ class CrmClaimEpt(models.Model):
     bill_country_code = fields.Many2one('res.country', string="Country")
     rma_carrier_id = fields.Many2one('shipstation.delivery.carrier')
     service_id = fields.Many2one('shipstation.carrier.service')
+    
+
 
 
     def _prepare_delivery_line_vals(self, carrier, price_unit):
