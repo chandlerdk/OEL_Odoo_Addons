@@ -5,6 +5,9 @@
         <field name="model">negative.forecast</field>
         <field name="arch" type="xml">
             <tree string="Negative Forecasts Report">
+                <header>
+                   <button name="refresh_negative_forecast" string="Refresh" type="object" class="btn-primary ms-1" display="always"/>
+               </header>
                 <field name="product_id"/>
                 <field name="date"/>
                 <field name="negative_qty"/>
@@ -20,8 +23,8 @@
         <field name="arch" type="xml">
             <search string="Negative Forecast Search">
                 <!-- Add filters -->
-<!--                <filter name="date_today" string="Today" domain="[('date', '=', context_today())]"/>-->
-<!--                <filter name="future_dates" string="Future Dates" domain="[('date', '&gt;', context_today())]"/>-->
+                <filter name="date_today" string="Today" domain="[('date', '=', context_today())]"/>
+                 <field name="product_id" string="Product" filter_domain="[('product_id', 'ilike', self)]"/>
 
                 <!-- Add groupby options -->
                 <group expand="1" string="Group By">
@@ -44,8 +47,9 @@
     <record id="action_negative_forecast_tree" model="ir.actions.act_window">
         <field name="name">Negative Forecasts Report</field>
         <field name="res_model">negative.forecast</field>
-        <field name="view_mode">tree,search</field>
+        <field name="view_mode">tree</field>
         <field name="view_id" ref="view_negative_forecast_report_tree"/>
+        <field name="context">{'create': 0}</field>
         <field name="search_view_id" ref="bista_negative_forecast_report.view_negative_forecast_search"/>
     </record>
 
@@ -53,6 +57,6 @@
     <menuitem id="negative_forecast_report_menu"
               name="Negative Forecast Report"
               parent="sale.menu_sale_report"
-              action="action_wizard_product_negative_forecasts"
+              action="action_negative_forecast_tree"
               sequence="100"/>
 </odoo>

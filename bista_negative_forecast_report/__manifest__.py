@@ -7,9 +7,10 @@
     'license': 'LGPL-3',
     'version': '17.0.0.0.0',
     'application': True,
-    'depends': ['purchase', 'sale', 'base','stock'],
+    'depends': ['purchase', 'sale', 'base', 'stock'],
     'data': [
-            'security/ir.model.access.csv',
-            'views/negative_forecasts_view.xml',
+        'security/ir.model.access.csv',
+        'data/ir_cron.xml',
+        'views/negative_forecasts_view.xml',
     ],
 }
