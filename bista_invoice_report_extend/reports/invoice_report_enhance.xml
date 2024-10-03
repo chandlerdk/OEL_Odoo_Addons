@@ -91,7 +91,7 @@
                 <span t-field="o.sale_rep_id.name"></span>
             </div>
             <div t-attf-class="#{'col-auto col-3 mw-100' if report_type != 'html' else 'col'} mb-2"
-                 t-if="sale_order.ship_via"
+                t-if="sale_order and sale_order.ship_via"
                  name="ship_via">
                 <strong>Ship VIA</strong>
                 <br/>
