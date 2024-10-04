@@ -77,7 +77,6 @@ class AccountPayment(models.Model):
                 amount_residual_str = formatLang(self.env, invoice_sign * invoice.amount_residual,
                                                  currency_obj=invoice.currency_id)
 
-                print("innnnnnnn",invoice.date)
 
             return {
                 'due_date': format_date(self.env, invoice.invoice_date),

@@ -8,6 +8,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='claim_line_ids']//field[@name='done_qty']" position="after">
                     <field  name="delivery_cost"/>
+                    <field  name="service_cost"/>
                 </xpath></field>
         </record>
     </data>

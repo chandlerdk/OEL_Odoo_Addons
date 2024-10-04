@@ -3,3 +3,4 @@ from . import crm_claim_ept
 from . import stock_picking
 from . import delivery_carrier
 from . import crm_claim_line_ept
+from . import sale_order

@@ -71,6 +71,18 @@ class DeliverCarrier(models.Model):
                 if ship_station.free_over:
                     free_over_amount = rma_id.amount_total >= ship_station.amount
 
+                # Check if a delivery section already exists
+                delivery_section = rma_id.claim_line_ids.filtered(
+                    lambda l: l.display_type == 'line_section' and l.name == 'Delivery')
+
+                # Create the Delivery section if not already present
+                if not delivery_section:
+                     rma_id.claim_line_ids.create({
+                        'name': 'Delivery',
+                        'display_type': 'line_section',
+                        'claim_id': rma_id.id,
+                    })
+
                 # If conditions are met, add shipment cost to the RMA
                 if (not free_over_amount and picking_id.add_service_line and ship_station.add_ship_cost
                         and not rma_id.no_ship_cost_synced):
@@ -81,17 +93,7 @@ class DeliverCarrier(models.Model):
                     if not (ship_station.remove_backorder_ship_line and picking_id.backorder_id):
                         # Create delivery line for RMA
                         rma_id._create_delivery_line(ship_station, amount)
-
-                    # Update the delivery line with correct values
-                    # delivery_lines = request.env['claim.line.ept'].sudo().search(
-                    #     [('claim_id', '=', rma_id.id)], order="create_date desc", limit=1
-                    # )
-
-                    # if delivery_lines:
-                    #     delivery_lines.update({
-                    #         'name': rma_id.ss_quotation_service,
-                    #         'price_unit': amount
-                    #     })
+                        rma_id.sale_id._create_delivery_line(ship_station, amount)
 
             if sale_id:
                 sale_id.get_tracking_ref()
@@ -106,16 +108,6 @@ class DeliverCarrier(models.Model):
                 if (not free_over_amount and picking_id.add_service_line and ship_station.add_ship_cost
                         and not sale_id.no_ship_cost_synced and not sale_id.add_ship_no_delivery_line):
                     shipment_cost = shipment['shipmentCost']
-                    # if fixed_margin and margin_percentage:
-                    #     margin_amount = shipment_cost * margin_percentage
-                    #     amount = shipment_cost + fixed_margin + margin_amount
-                    # elif fixed_margin:
-                    #     amount = shipment_cost + fixed_margin
-                    # elif margin_percentage:
-                    #     margin_amount = shipment_cost * margin_percentage
-                    #     amount = shipment_cost + margin_amount
-                    # else:
-                    #     amount = shipment_cost
                     new_rate = shipment_cost + ship_station.fixed_margin
                     amount = float(new_rate * (1.0 + (ship_station.margin)))
                     sale_id.sudo().update({

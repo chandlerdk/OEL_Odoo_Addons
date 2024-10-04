@@ -66,9 +66,9 @@
             <xpath expr="//page[@name='rma_details']//field[@name='claim_line_ids']//tree//field[@name='serial_lot_ids']" position="attributes">
                 <attribute name="column_invisible">not parent.claim_lot_ids</attribute>
             </xpath>
-            <xpath expr="//page[@name='rma_details']//field[@name='claim_line_ids']" position="attributes">
-                <attribute name="readonly">state != 'draft'</attribute>
-            </xpath>
+<!--            <xpath expr="//page[@name='rma_details']//field[@name='claim_line_ids']" position="attributes">-->
+<!--                <attribute name="readonly">state != 'draft'</attribute>-->
+<!--            </xpath>-->
             <xpath expr="//button[@name='show_delivery_picking']" position="replace">
                 <button class="oe_stat_button" name="show_delivery_picking" type="object" icon="fa-truck" invisible="not to_return_picking_ids">
                     <field name="delivery_count" string="Deliveries" widget="statinfo" />

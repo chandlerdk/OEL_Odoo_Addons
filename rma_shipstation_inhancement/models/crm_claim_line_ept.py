@@ -10,3 +10,4 @@ class CRMClaimLine(models.Model):
 
 
     delivery_cost = fields.Float(string="Delivery Cost")
+    service_cost = fields.Float(string="Service Cost")

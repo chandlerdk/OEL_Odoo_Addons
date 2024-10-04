@@ -9,6 +9,11 @@ class CRMClaimLine(models.Model):
     _name = 'claim.line.ept'
     _description = 'CRM Claim Line'
 
+    display_type = fields.Selection([
+        ('line_section', 'Section'),
+        ('line_note', 'Note')
+    ], string='Display Type')
+    name = fields.Char(string="name")
     is_create_invoice = fields.Boolean("Create Invoice", copy=False)
     quantity = fields.Float('Return Quantity', copy=False)
     done_qty = fields.Float('Delivered Quantity',
@@ -31,6 +36,27 @@ class CRMClaimLine(models.Model):
     move_id = fields.Many2one('stock.move')
     rma_reason_id = fields.Many2one('rma.reason.ept', string="Customer Reason")
     serial_lot_ids = fields.Many2many('stock.lot', string="Lot/Serial Number")
+
+    @api.model
+    def create(self, vals_list):
+        if vals_list.get('display_type'):
+            vals_list.update(product_id=False, quantity=0)
+        return super().create(vals_list)
+
+    def write(self, values):
+        if 'display_type' in values and self.filtered(lambda line: line.display_type != values.get('display_type')):
+            raise UserError(
+                _("You cannot change the type of a warranty order line. Instead you should delete the current line and create a new line of the proper type."))
+        return super().write(values)
+
+    _sql_constraints = [
+        ('accountable_required_fields',
+         "CHECK(display_type IS NOT NULL OR (product_id IS NOT NULL AND quantity IS NOT NULL))",
+         "Missing required fields on accountable CRM claim line."),
+        ('non_accountable_null_fields',
+         "CHECK(display_type IS NULL OR (product_id IS NULL AND quantity = 0))",
+         "Forbidden values on non-accountable CRM claim line."),
+    ]
 
     def _compute_return_quantity(self):
         """

@@ -9,11 +9,19 @@ class StockMove(models.Model):
     remaining_qty = fields.Float(string="Remaining Quantity")
 
 
+    # @api.model_create_multi
+    # def create(self, vals_list):
+    #     for vals in vals_list:
+    #         if vals['product_uom_qty']:
+    #             vals['so_quantity'] =vals['product_uom_qty']
+    #     return super().create(vals_list)
+
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
-            if vals['product_uom_qty']:
-                vals['so_quantity'] =vals['product_uom_qty']
+            product_uom_qty = vals.get('product_uom_qty', 0)
+            if product_uom_qty:
+                vals['so_quantity'] = product_uom_qty
         return super().create(vals_list)
 
     def write(self, vals):
