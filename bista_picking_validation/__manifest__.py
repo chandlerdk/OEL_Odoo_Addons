@@ -10,7 +10,7 @@
     'images': ['static/description/icon.png'],
     'version': '17.0',
     'support': '',
-    'depends': ['base','sale_management','base_setup','mrp','stock'],
+    'depends': ['base','sale_management','base_setup','mrp','stock','purchase'],
     'data': [
 
     ],
