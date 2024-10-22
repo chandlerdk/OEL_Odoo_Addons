@@ -112,6 +112,28 @@
                                     </tr>
                                 </t>
                             </t>
+                            <t t-if="stub_line.get('account_moves')">
+                                     <t t-foreach="stub_line['account_moves']" t-as="move">
+                                         <tr>
+                                            <td class="text-start">
+                                             <t t-esc="move.date" t-options='{"widget": "date"}'/>
+                                            </td>
+                                            <td class="text-start">
+<!--                                                <t t-esc="move.name"/>-->
+                                            </td>
+                                            <td class="text-start">
+                                                <t t-esc="move.ref"/>
+                                            </td>
+                                            <td class="text-center">
+
+                                            </td>
+                                            <td class="text-end">
+                                                -<t t-if="move.currency_id" t-out="move.currency_id.symbol"/>
+                                                <t t-esc="move.amount_total"/>
+                                            </td>
+                                        </tr>
+                                     </t>
+                                 </t>
                         </t>
                     </t>
 
