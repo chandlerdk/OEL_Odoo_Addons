@@ -205,7 +205,7 @@ class StockMove(models.Model):
         if self.picking_id.has_kits == True:
             val = self.get_quants_list()
         else:
-            val = None
+            val = 0.0
 
         StockMove = self.env['stock.move']
         assigned_moves_ids = OrderedSet()
@@ -287,7 +287,6 @@ class StockMove(models.Model):
                         continue
                     # Reserve new quants and create move lines accordingly.
                     forced_package_id = move.package_level_id.package_id or None
-
                     taken_quantity = move._update__reserved_quantity(need,val, move.location_id, package_id=forced_package_id, strict=False)
                     if float_is_zero(taken_quantity, precision_rounding=rounding):
                         continue
@@ -318,7 +317,7 @@ class StockMove(models.Model):
                         # this case `quantity` is directly the quantity on the quants themselves.
 
                         taken_quantity = move.with_context(quants_cache=quants_cache)._update__reserved_quantity(
-                            min(quantity, need), location_id, None, lot_id, package_id, owner_id)
+                            min(quantity, need),val, location_id, None, lot_id, package_id, owner_id)
                         if float_is_zero(taken_quantity, precision_rounding=rounding):
                             continue
                         moves_to_redirect.add(move.id)
@@ -343,7 +342,14 @@ class StockMove(models.Model):
             is performed and reservation is done on the passed quants set
         """
         self.ensure_one()
-        if quant_ids is None:
+        print("quanttttt",need)
+        print("val",val)
+        print("quantlocation_idtttt",location_id)
+        print("quanttttt",lot_id)
+        print("quanttttt",package_id)
+        print("quanttttt",owner_id)
+        print("quanttttstrictt",strict)
+        if not quant_ids:
             quant_ids = self.env['stock.quant']
         if not lot_id:
             lot_id = self.env['stock.lot']
@@ -352,6 +358,8 @@ class StockMove(models.Model):
         if not owner_id:
             owner_id = self.env['res.partner']
 
+        print("qqqqq",quant_ids)
+        print("qqqqq",location_id)
         quants = quant_ids._get_reserve_quantity(
             self.product_id, location_id, need, product_packaging_id=self.product_packaging_id,
             uom_id=self.product_uom, lot_id=lot_id, package_id=package_id, owner_id=owner_id, strict=strict)
