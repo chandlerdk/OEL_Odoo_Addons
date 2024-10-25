@@ -74,16 +74,15 @@ class PurchaseOrder(models.Model):
             result['res_id'] = pickings.id
         return result
 
-    def _check_delivery_done(self):
-        for order in self:
-            delivery_pickings = self.env['stock.picking'].search([
-                ('origin', '=', order.name),
-                ('picking_type_id', '=', self.picking_type_id.delivery_generate_id.id),
-                ('state', '!=', 'done')
-            ])
-            if delivery_pickings:
-                return False
-        return True
+    # def _check_delivery_done(self,partial_allowed=False):
+    #     for order in self:
+    #         delivery_pickings = self.env['stock.picking'].search([
+    #             ('origin', '=', order.name),
+    #             ('picking_type_id', '=', self.picking_type_id.delivery_generate_id.id),
+    #             ('state', '!=', 'done')
+    #         ])
+
+    #     return True
 
     def button_approve(self, force=False):
         result = super(PurchaseOrder, self).button_approve(force=force)
