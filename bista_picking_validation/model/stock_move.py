@@ -342,13 +342,6 @@ class StockMove(models.Model):
             is performed and reservation is done on the passed quants set
         """
         self.ensure_one()
-        print("quanttttt",need)
-        print("val",val)
-        print("quantlocation_idtttt",location_id)
-        print("quanttttt",lot_id)
-        print("quanttttt",package_id)
-        print("quanttttt",owner_id)
-        print("quanttttstrictt",strict)
         if not quant_ids:
             quant_ids = self.env['stock.quant']
         if not lot_id:
@@ -358,8 +351,6 @@ class StockMove(models.Model):
         if not owner_id:
             owner_id = self.env['res.partner']
 
-        print("qqqqq",quant_ids)
-        print("qqqqq",location_id)
         quants = quant_ids._get_reserve_quantity(
             self.product_id, location_id, need, product_packaging_id=self.product_packaging_id,
             uom_id=self.product_uom, lot_id=lot_id, package_id=package_id, owner_id=owner_id, strict=strict)
