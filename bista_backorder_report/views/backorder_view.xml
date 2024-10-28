@@ -22,7 +22,10 @@
         <field name="model">back.order.report</field>
         <field name="arch" type="xml">
             <search string="Back Order Search">
-
+                <field name="product_id"/>
+                <field name="partner_id"/>
+                <field name="sale_id"/>
+                <field name="qty"/>
                 <!-- Add groupby options -->
                 <group expand="1" string="Group By">
                     <filter name="group_by_partner" string="Customer" context="{'group_by': 'partner_id'}"/>
