@@ -170,7 +170,9 @@
                             </thead>
                             <tbody style="border-bottom:2px solid black">
                                 <tr>
-                                    <td>Example PO</td>
+                                    <td>
+                                        <t t-esc="o.sale_id.client_order_ref"/>
+                                    </td>
                                     <td>
                                         <t t-esc="o.sale_id.ship_via"/>
                                     </td>
