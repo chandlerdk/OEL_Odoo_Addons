@@ -13,6 +13,7 @@
                 <field name="sale_id"/>
                 <field name="qty"/>
                 <field name="sale_price"/>
+                <field name="total_amount"/>
             </tree>
         </field>
     </record>
@@ -26,6 +27,7 @@
                 <field name="partner_id"/>
                 <field name="sale_id"/>
                 <field name="qty"/>
+                <separator />
                 <!-- Add groupby options -->
                 <group expand="1" string="Group By">
                     <filter name="group_by_partner" string="Customer" context="{'group_by': 'partner_id'}"/>

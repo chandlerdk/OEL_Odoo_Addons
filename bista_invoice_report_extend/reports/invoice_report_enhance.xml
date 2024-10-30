@@ -123,26 +123,28 @@
         </xpath>
 
         <xpath expr="//div[@name='qr_code_placeholder']" position="before">
-            <div>
-                <t t-set="sale_order" t-value="env['sale.order'].search([('name', '=', o.invoice_origin)], limit=1)"/>
-                <t t-set="pickings" t-value="env['stock.picking'].search([('sale_id', '=', sale_order.id)])"/>
-                <t t-if="pickings">
-                    <p t-if="pickings.filtered(lambda p: p.carrier_tracking_ref)" name="tracking_reference">
-                        Tracking References:
-                        <t t-foreach="pickings" t-as="picking">
-                            <span class="fw-bold" t-esc="picking.carrier_tracking_ref"/>
-                        </t>
+            <t t-if="o.move_type in ['in_invoice','out_invoice']">
+                <div>
+                    <t t-set="sale_order" t-value="env['sale.order'].search([('name', '=', o.invoice_origin)], limit=1)"/>
+                    <t t-set="pickings" t-value="env['stock.picking'].search([('sale_id', '=', sale_order.id)])"/>
+                    <t t-if="pickings">
+                        <p t-if="pickings.filtered(lambda p: p.carrier_tracking_ref)" name="tracking_reference">
+                            Tracking References:
+                            <t t-foreach="pickings" t-as="picking">
+                                <span class="fw-bold" t-esc="picking.carrier_tracking_ref"/>
+                            </t>
 
-                    </p>
-                    <p t-if="pickings.filtered(lambda p: p.note)" name="delivery_note">
-                        Delivery Note:
-                        <t t-foreach="pickings" t-as="picking">
-                            <span class="fw-bold" t-esc="picking.note"/>
-                        </t>
-                    </p>
+                        </p>
+                        <p t-if="pickings.filtered(lambda p: p.note)" name="delivery_note">
+                            Delivery Note:
+                            <t t-foreach="pickings" t-as="picking">
+                                <span class="fw-bold" t-esc="picking.note"/>
+                            </t>
+                        </p>
 
-                </t>
-            </div>
+                    </t>
+                </div>
+            </t>
         </xpath>
 
         <xpath expr="//div[@id='informations']" position="after">
