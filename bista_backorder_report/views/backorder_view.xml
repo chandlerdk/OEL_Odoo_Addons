@@ -13,7 +13,7 @@
                 <field name="sale_id"/>
                 <field name="qty"/>
                 <field name="sale_price"/>
-                <field name="total_amount"/>
+                <field name="total_amount" sum="Total Amount"/>
             </tree>
         </field>
     </record>
