@@ -66,7 +66,7 @@
                     <div t-if="doc.ship_via"
                         class="col-auto col-3 mw-100 mb-2"
                         name="expiration_date">
-                        <strong>Ship Via?:</strong><br/>
+                        <strong>Ship Via:</strong><br/>
                         <span class="m-0" t-field="doc.ship_via"/>
                     </div>
                     <div t-attf-class="#{'col-auto col-3 mw-100' if report_type != 'html' else 'col'} mb-2"
