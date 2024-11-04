@@ -6,20 +6,18 @@
 #
 ##############################################################################
 {
-    'name': 'Bista Delivery Slip',
-    'category': 'stock',
-    'summary': 'This module Offers customize Delivery Slip',
+    'name': 'Bista Sale Order Report',
+    'category': 'Sale',
+    'summary': 'This module Offers customize Sale Report',
     'version': '17.0.1.0.1',
     'author': 'Bista Solutions',
     'website': 'http://www.bistasolutions.com',
     'license': 'AGPL-3',
-    'description': """The Delivery Slip Report
+    'description': """The Invoice Report
     """,
-    'depends': ['sale', 'stock','web','bista_shipstation'],
+    'depends': ['sale', 'base'],
     'data': [
-        'reports/report_delivery_slip.xml',
-        'reports/report_stock_picking_operations.xml',
-        'reports/internal_picking.xml',
+            'report/sale_report_enhance.xml',
 ],
 
     'installable': True,

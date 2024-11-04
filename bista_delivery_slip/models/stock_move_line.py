@@ -17,7 +17,6 @@ class StockMove(models.Model):
         return super().create(vals_list)
 
     def write(self, vals):
-        # for rec in self:
         if vals.get('remaining_qty'):
             vals.update({
                 'so_quantity':vals.get('remaining_qty')
