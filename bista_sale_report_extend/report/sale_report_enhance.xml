@@ -97,9 +97,8 @@
                 <div name="customer_number">
                 <strong>Customer Number:</strong>
                 <br/>
-                <t t-set="sale_order" t-value="env['sale.order'].search([('name', '=', o.name)], limit=1)"/>
-                <t t-if="sale_order and sale_order.partner_id">
-                    <span t-esc="sale_order.partner_id.partner_reference_no"/>
+                <t t-if="doc and doc.partner_id">
+                    <span t-esc="doc.partner_id.partner_reference_no"/>
                 </t>
             </div>
 
