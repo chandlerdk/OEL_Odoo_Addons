@@ -60,7 +60,7 @@
                     </div>
                     <div  class="col-auto col-3 mw-100 mb-2" name="informations_date">
                         <strong t-if="doc.state in ['draft', 'sent']">Quotation Date:</strong>
-                        <strong>Customer PO:</strong>
+                        <strong t-else="">Customer PO:</strong><br/>
                         <span class="m-0" t-field="doc.client_order_ref"/>
                     </div>
                     <div
@@ -94,6 +94,14 @@
                         </t>
                     </div>
                 </div>
+                <div name="customer_number">
+                <strong>Customer Number:</strong>
+                <br/>
+                <t t-set="sale_order" t-value="env['sale.order'].search([('name', '=', o.name)], limit=1)"/>
+                <t t-if="sale_order and sale_order.partner_id">
+                    <span t-esc="sale_order.partner_id.partner_reference_no"/>
+                </t>
+            </div>
 
                 <!-- Is there a discount on at least one line? -->
                 <t t-set="lines_to_report" t-value="doc._get_order_lines_to_report()"/>
