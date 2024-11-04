@@ -19,7 +19,6 @@
     'data': [
         'reports/report_delivery_slip.xml',
         'reports/report_stock_picking_operations.xml',
-        'reports/internal_picking.xml',
 ],
 
     'installable': True,
