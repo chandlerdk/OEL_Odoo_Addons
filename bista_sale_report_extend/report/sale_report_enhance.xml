@@ -60,7 +60,7 @@
                     </div>
                     <div  class="col-auto col-3 mw-100 mb-2" name="informations_date">
                         <strong t-if="doc.state in ['draft', 'sent']">Quotation Date:</strong>
-                        <strong t-else="">Customer PO:</strong><br/>
+                        <strong>Customer PO:</strong>
                         <span class="m-0" t-field="doc.client_order_ref"/>
                     </div>
                     <div
