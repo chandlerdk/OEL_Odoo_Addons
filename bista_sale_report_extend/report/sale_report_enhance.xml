@@ -58,22 +58,22 @@
                         <strong>Sales Order:</strong><br/>
                         <span class="m-0" t-field="doc.name">SO0000</span>
                     </div>
-                    <div t-if="doc.client_order_ref" class="col-auto col-3 mw-100 mb-2" name="informations_date">
+                    <div  class="col-auto col-3 mw-100 mb-2" name="informations_date">
                         <strong t-if="doc.state in ['draft', 'sent']">Quotation Date:</strong>
                         <strong t-else="">Customer PO:</strong><br/>
                         <span class="m-0" t-field="doc.client_order_ref"/>
                     </div>
-                    <div t-if="doc.ship_via"
+                    <div
                         class="col-auto col-3 mw-100 mb-2"
                         name="expiration_date">
                         <strong>Ship Via:</strong><br/>
                         <span class="m-0" t-field="doc.ship_via"/>
                     </div>
                     <div t-attf-class="#{'col-auto col-3 mw-100' if report_type != 'html' else 'col'} mb-2"
-                         t-if="doc.origin" name="fob">
+                          name="fob">
                         <strong>FOB:</strong>
                         <br/>
-                        <t t-set="sale_order" t-value="env['sale.order'].search([('name', '=', doc.origin)], limit=1)"/>
+                        <t t-set="sale_order" t-value="env['sale.order'].search([('name', '=', doc.name)], limit=1)"/>
                         <!--                <span t-field="sale_order.incoterm"/>-->
                         <t t-if="sale_order.bill_account">
                             <t t-esc="sale_order.bill_account"/>
