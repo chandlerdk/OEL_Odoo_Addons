@@ -1,8 +1,8 @@
 import base64
+import datetime
 
 from odoo import models
 from odoo.exceptions import UserError
-import datetime
 
 
 class AccountPayment(models.Model):
@@ -33,11 +33,15 @@ class AccountPayment(models.Model):
         if not self.amount:
             raise UserError(f"Payment amount should not be zero. {self.name}")
         account_number = self.journal_id.bank_account_id.acc_number
+
         if not account_number:
-            raise UserError(f"Payment does not have a Account number. {self.name}")
+            raise UserError(f"Please set an account number in {self.journal_id.name} journal and try again")
+        if not self.date:
+            raise UserError("Please assign a date and try again.")
+
         check = self.check_number
         date = self.date.strftime("%m%d%y")
-        amount = str(float(self.amount)).replace(".", "")
+        amount = str("{:.2f}".format(self.amount)).replace(".", "")
         partner = self.partner_id.name
         check_type = "I" if self.state == 'posted' else "V"
         check_number = check + str(date)
