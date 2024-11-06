@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<odoo>
+
+<!--        <record id="account_followup.email_template_followup_1" model="mail.template">-->
+<!--            <field name="name">Payment Reminder</field>-->
+<!--            <field name="model_id" ref="base.model_res_partner"/>-->
+<!--            <field name="email_from">{{ object._get_followup_responsible().email_formatted }}</field>-->
+<!--            <field name="partner_to">{{ object.id }}</field>-->
+<!--            <field name="subject">{{ (object.company_id or object._get_followup_responsible().company_id).name }} Payment-->
+<!--                Reminder - {{ object.commercial_company_name }}-->
+<!--            </field>-->
+<!--            <field name="body_html" type="html">-->
+<!--                <div>-->
+<!--                    <p>-->
+<!--                        <t t-if="object.id != object.commercial_partner_id.id">Dear-->
+<!--                            <t t-out="object.name or ''"/>-->
+<!--                            (<t t-out="object.commercial_partner_id.name or ''"/>),-->
+<!--                        </t>-->
+<!--                        <t t-else="">Dear<t t-out="object.name or ''"/>,-->
+<!--                        </t>-->
+<!--                        <br/>-->
+<!--                        It has come to our attention that you have an outstanding balance of-->
+<!--                        <t t-out="format_amount(object.total_overdue, object.currency_id) or ''"/>-->
+<!--                        We kindly request that you take necessary action to settle this amount within the next 8 days.-->
+<!--                        &lt;!&ndash;                                <br style="margin: 0; padding: 0;"/>&ndash;&gt;-->
+<!--                        If you have already made the payment after receiving this message, please disregard it.-->
+<!--                        Our accounting department is available if you require any assistance or have any questions.-->
+<!--&lt;!&ndash;                        <br/>&ndash;&gt;-->
+<!--                        Thank you for your cooperation.-->
+<!--&lt;!&ndash;                        <br/>&ndash;&gt;-->
+<!--                        Sincerely,-->
+<!--                        <t t-if="not is_html_empty(object._get_followup_responsible().signature)">-->
+<!--                            <br/>-->
+<!--                            <t t-out="object._get_followup_responsible().signature"/>-->
+<!--                        </t>-->
+<!--                        <t t-else="">-->
+<!--                            <br/>-->
+<!--                            &#45;&#45;-->
+<!--                            <br/>-->
+<!--                            <t t-out="object._get_followup_responsible().name"/>-->
+<!--                        </t>-->
+<!--                    </p>-->
+<!--                </div>-->
+<!--            </field>-->
+<!--            <field name="lang">{{ object.lang }}</field>-->
+<!--            <field name="auto_delete" eval="False"/>-->
+<!--        </record>-->
+
+
+    <record id="account_followup.email_template_followup_1" model="mail.template">
+            <field name="name">Payment Reminder</field>
+            <field name="model_id" ref="base.model_res_partner"/>
+            <field name="email_from">{{ object._get_followup_responsible().email_formatted }}</field>
+            <field name="partner_to">{{ object.id }}</field>
+            <field name="subject">{{ (object.company_id or object._get_followup_responsible().company_id).name }} Payment Reminder - {{ object.commercial_company_name }}</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0; padding: 0;">
+                    <t t-if="object.id != object.commercial_partner_id.id">
+                        Dear <t t-out="object.name or ''"/> (<t t-out="object.commercial_partner_id.name or ''"/>),
+                    </t>
+                    <t t-else="">Dear <t t-out="object.name or ''"/>,</t>
+                    It has come to our attention that you have an outstanding balance of <t t-out="format_amount(object.total_overdue, object.currency_id) or ''"/>
+                    We kindly request that you take necessary action to settle this amount within the next 8 days.
+                    If you have already made the payment after receiving this message, please disregard it.
+                    Our accounting department is available if you require any assistance or have any questions.
+                    <br/>
+                    <div>Thank you for your cooperation.</div>
+                    <div>Sincerely,</div>
+                    <t t-if="not is_html_empty(object._get_followup_responsible().signature)">
+                        <div><t t-out="object._get_followup_responsible().signature"/></div>
+                    </t>
+                    <t t-else="">
+                        <div>--</div>
+                        <div><t t-out="object._get_followup_responsible().name"/></div>
+                    </t>
+                     <div style="page-break-before: always;"></div>
+
+
+                <div style="border-top: 1px solid #000; margin-top: 20px;"></div>
+
+                </div>
+            </field>
+            <field name="lang">{{ object.lang }}</field>
+            <field name="auto_delete" eval="False"/>
+        </record>
+
+</odoo>
