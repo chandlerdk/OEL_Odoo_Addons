@@ -10,6 +10,7 @@
                        context="{'default_is_sale_rep': 1}"
                        required="sale_partner_type == 'sale_rep'"
                        invisible="sale_partner_type != 'sale_rep'"/>
+                <field name="commission_sequence"/>
             </xpath>
         </field>
     </record>

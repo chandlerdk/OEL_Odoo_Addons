@@ -49,7 +49,7 @@ class SaleOrderLine(models.Model):
                 continue
 
             user = line.order_id.user_id
-            rules = self.env['sale.commission'].search([('user_ids', '=', user.id)], order='priority desc')
+            rules = self.env['sale.commission'].search([('user_ids', '=', user.id)], order='commission_sequence asc')
             for rule in rules:
                 data['percentage'] = rule.percentage
                 amount = rule.calculate_amount(data)
