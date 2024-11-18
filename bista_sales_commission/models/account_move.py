@@ -41,8 +41,8 @@ class AccountMove(models.Model):
         elif not moves and active_model == 'account.move':
             moves = self.env['account.move'].browse(active_ids)
         for move in moves:
-            if move.state == 'posted':
-                continue
+            # if move.state == 'posted':
+            #     continue
 
             commission_line_ids = []
             invoice_lien_ids = move.invoice_line_ids.filtered(lambda l: l.commission_id and l.commission_amount)
