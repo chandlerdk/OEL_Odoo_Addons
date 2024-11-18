@@ -64,6 +64,7 @@ class AccountPayment(models.Model):
 
         def prepare_vals(invoice, partials,account_moves):
             number = invoice.ref if invoice.ref else ''
+            check_date = self.date if self.date else ''
             if invoice.is_outbound() or invoice.move_type == 'in_receipt':
                 invoice_sign = 1
                 partial_field = 'debit_amount_currency'
@@ -82,6 +83,7 @@ class AccountPayment(models.Model):
                 'due_date': format_date(self.env, invoice.invoice_date),
                 'date':format_date(self.env, invoice.date),
                 'account_moves': account_moves,
+                'check_date': format_date(self.env, check_date),
                 'name':invoice.name,
                 'ref':invoice.ref,
                 'number': number,

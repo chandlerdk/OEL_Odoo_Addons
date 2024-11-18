@@ -42,6 +42,10 @@
                         <th class="text-center">
                             <span>Invoice Date</span>
                         </th>
+                        <th class="text-center">
+                            <span>Check Date</span>
+                        </th>
+
                         <th class="text-center">Description</th>
                         <th class="text-center">
                             <span>Invoice Number</span>
@@ -97,6 +101,10 @@
                                         <td class="text-start">
                                             <t t-if="stub_line['date']" t-out="stub_line['date']"/>
                                         </td>
+                                        <td class="text-start">
+                                            <t t-out="stub_line['check_date']"/>
+                                        </td>
+
                                         <td class="text-start text-truncate" style="max-width: 500px;">
                                             <t t-out="stub_line['name']"/>
                                         </td>
