@@ -53,7 +53,7 @@
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">account.move.line</field>
         <field name="view_mode">tree</field>
-        <field name="domain">[('commission_id','!=', False)]</field>
+       <field name="domain">[('commission_id', '!=', False), ('commission_amount', '>', 0)]</field>
         <field name="context">{'create': 0, 'delete': 0, 'edit': 0, 'search_default_to_bill': 1,
             'search_group_commission_user_id': 1}
         </field>
