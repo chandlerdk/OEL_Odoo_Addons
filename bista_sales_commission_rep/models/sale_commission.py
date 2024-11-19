@@ -18,4 +18,4 @@ class SaleCommission(models.Model):
     sale_rep_id = fields.Many2one('res.partner',
                                   domain=[('is_sale_rep', '=', True)])
 
-    commission_sequence = fields.Integer(string="Sequence")
+    sequence = fields.Integer(string="Sequence")

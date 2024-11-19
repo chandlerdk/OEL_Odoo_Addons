@@ -47,10 +47,10 @@ class SaleOrderLine(models.Model):
             rules = []
             sale_commission = self.env['sale.commission']
             # if line.sale_rep_id:
-            #     rules = sale_commission.search([('sale_rep_id', '=', line.sale_rep_id.id)], order='priority desc')
+            #     rules = sale_commission.search([('sale_rep_id', '=', line.sale_rep_id.id)], order='sequence')
             # else:
             #     user = line.order_id.user_id
-            #     rules = sale_commission.search([('user_ids', '=', user.id)], order='priority desc')
+            #     rules = sale_commission.search([('user_ids', '=', user.id)], order='sequence')
 
             if line.sale_rep_id:
                 rules = sale_commission.search(

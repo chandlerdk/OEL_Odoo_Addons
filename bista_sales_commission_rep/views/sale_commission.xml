@@ -10,9 +10,21 @@
                        context="{'default_is_sale_rep': 1}"
                        required="sale_partner_type == 'sale_rep'"
                        invisible="sale_partner_type != 'sale_rep'"/>
-                <field name="commission_sequence"/>
+                <field name="sequence"/>
             </xpath>
         </field>
     </record>
+
+    <record id="commission_view_tree_inherit" model="ir.ui.view">
+        <field name="name">commission_view_tree_inherit</field>
+        <field name="model">sale.commission</field>
+        <field name="inherit_id" ref="bista_sales_commission.commission_view_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="before">
+                <field name="sequence" widget="handle"/>
+            </xpath>
+        </field>
+    </record>
+
 
 </odoo>
