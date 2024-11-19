@@ -28,8 +28,8 @@
                 <div class="col-4 text-start" style="white-space: nowrap;">
                     <span t-out="page['partner_name']"/>
                 </div>
-                <div class="col-4 text-end">
-                    <span t-out="page['date']"/>
+                <div class="col-6 text-end">
+                    Check Date:<span t-out="page['date']"/>
                 </div>
 <!--                <div class="col-4 text-end date">-->
 <!--                    <span t-out="page['date']"/>-->
