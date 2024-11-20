@@ -126,6 +126,7 @@
             <t t-if="o.move_type in ['in_invoice','out_invoice']">
                 <div>
                     <t t-set="sale_order" t-value="env['sale.order'].search([('name', '=', o.invoice_origin)], limit=1)"/>
+                    <t t-if="sale_order">
                     <t t-set="pickings" t-value="env['stock.picking'].search([('sale_id', '=', sale_order.id)])"/>
                     <t t-if="pickings">
                         <p t-if="pickings.filtered(lambda p: p.carrier_tracking_ref)" name="tracking_reference">
@@ -141,7 +142,7 @@
                                 <span class="fw-bold" t-esc="picking.note"/>
                             </t>
                         </p>
-
+                    </t>
                     </t>
                 </div>
             </t>
