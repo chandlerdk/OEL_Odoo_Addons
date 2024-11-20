@@ -33,16 +33,16 @@ class SaleOrderLine(models.Model):
                 'percentage': 0
 
             }
-            if not line.validate_commission_rule():
-                continue
-
-            if line.commission_id and line.commission_percent != line.commission_id.percentage:
-                # Update only Commission Amount
-                # Assuming the Difference between same commission object
-                # and percentage is due to manual user interference
-                data['percentage'] = line.commission_percent
-                line.commission_amount = line.commission_id.calculate_amount(data)
-                continue
+            # if not line.validate_commission_rule():
+            #     continue
+            #
+            # if line.commission_id and line.commission_percent != line.commission_id.percentage:
+            #     # Update only Commission Amount
+            #     # Assuming the Difference between same commission object
+            #     # and percentage is due to manual user interference
+            #     data['percentage'] = line.commission_percent
+            #     line.commission_amount = line.commission_id.calculate_amount(data)
+            #     continue
 
             rules = []
             sale_commission = self.env['sale.commission']
