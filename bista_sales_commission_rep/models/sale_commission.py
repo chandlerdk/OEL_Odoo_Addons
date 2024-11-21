@@ -17,3 +17,5 @@ class SaleCommission(models.Model):
                                          ondelete={'sale_rep': 'cascade'})
     sale_rep_id = fields.Many2one('res.partner',
                                   domain=[('is_sale_rep', '=', True)])
+
+    sequence = fields.Integer(string="Sequence")
