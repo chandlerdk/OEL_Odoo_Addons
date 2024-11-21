@@ -6,7 +6,7 @@
                 <t t-if="o.partner_shipping_id and (o.partner_shipping_id != o.partner_id)">
                     <div class="col-6">
                         <t t-set="information_block">
-                            <strong>Sold To:</strong>
+                            <strong>Bill To:</strong>
                             <address class="mb-0" t-field="o.partner_id"
                                      t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}'/>
                             <div t-if="o.partner_id.vat" id="partner_vat_address_not_same_as_shipping">
