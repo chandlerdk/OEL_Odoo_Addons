@@ -28,12 +28,12 @@
                 <div class="col-4 text-start" style="white-space: nowrap;">
                     <span t-out="page['partner_name']"/>
                 </div>
-                <!--            <div class="col-4 text-center">-->
-                <!--                <span t-out="page['date']"/>-->
-                <!--            </div>-->
-                <!--                <div class="col-4 text-end sequence_number">-->
-                <!--                    <span t-if="page['sequence_number']" t-out="page['sequence_number']"/>-->
-                <!--                </div>-->
+                <div class="col-8 text-end">
+                    Check Date:<span t-out="page['date']"/>
+                </div>
+<!--                <div class="col-4 text-end date">-->
+<!--                    <span t-out="page['date']"/>-->
+<!--                </div>-->
             </div>
 
             <table class="table table-bordered table-sm stub_lines">
@@ -42,6 +42,10 @@
                         <th class="text-center">
                             <span>Invoice Date</span>
                         </th>
+<!--                        <th class="text-center">-->
+<!--                            <span>Check Date</span>-->
+<!--                        </th>-->
+
                         <th class="text-center">Description</th>
                         <th class="text-center">
                             <span>Invoice Number</span>
@@ -97,6 +101,10 @@
                                         <td class="text-start">
                                             <t t-if="stub_line['date']" t-out="stub_line['date']"/>
                                         </td>
+<!--                                        <td class="text-start">-->
+<!--                                            <t t-out="stub_line['check_date']"/>-->
+<!--                                        </td>-->
+
                                         <td class="text-start text-truncate" style="max-width: 500px;">
                                             <t t-out="stub_line['name']"/>
                                         </td>
@@ -112,6 +120,28 @@
                                     </tr>
                                 </t>
                             </t>
+                            <t t-if="stub_line.get('account_moves')">
+                                     <t t-foreach="stub_line['account_moves']" t-as="move">
+                                         <tr>
+                                            <td class="text-start">
+                                             <t t-esc="move.date" t-options='{"widget": "date"}'/>
+                                            </td>
+                                            <td class="text-start">
+<!--                                                <t t-esc="move.name"/>-->
+                                            </td>
+                                            <td class="text-start">
+                                                <t t-esc="move.ref"/>
+                                            </td>
+                                            <td class="text-center">
+
+                                            </td>
+                                            <td class="text-end">
+                                                -<t t-if="move.currency_id" t-out="move.currency_id.symbol"/>
+                                                <t t-esc="move.amount_total"/>
+                                            </td>
+                                        </tr>
+                                     </t>
+                                 </t>
                         </t>
                     </t>
 
@@ -134,10 +164,3 @@
     </template>
 
 </odoo>
-
-
-
-
-
-
-
