@@ -43,6 +43,8 @@ class SaleOrderLine(models.Model):
             #     data['percentage'] = line.commission_percent
             #     line.commission_amount = line.commission_id.calculate_amount(data)
             #     continue
+            if line.product_id.detailed_type == 'service':
+                continue
 
             rules = []
             sale_commission = self.env['sale.commission']
