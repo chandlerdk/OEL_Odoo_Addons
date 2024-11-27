@@ -16,6 +16,54 @@ class AccountMove(models.Model):
 
     is_commission_bill = fields.Boolean()
 
+
+
+    def update_commision_on_invoice(self,records):
+        filtered_invoices = records.filtered(
+            lambda inv: any(not line.commission_id for line in inv.invoice_line_ids)
+        )
+        for invoice in filtered_invoices:
+            print("innnnnn",invoice)
+            for line in invoice.invoice_line_ids.filtered(lambda l: not l.commission_id):
+                data = {
+                    'product_id': line.product_id,
+                    'partner_id': invoice.partner_id,
+                    'quantity': line.quantity,
+                    'amount_after_tax': line.price_total,
+                    'amount_before_tax': line.price_subtotal,
+                    'percentage': 0
+                }
+                if line.product_id.detailed_type == 'service':
+                    continue
+                sale_commission = self.env['sale.commission']
+                rules = []
+                if line.sale_rep_id:
+                    rules = sale_commission.search([('sale_rep_id', '=', line.sale_rep_id.id)], order='sequence')
+                else:
+                    user = line.move_id.user_id
+                    rules = sale_commission.search([('user_ids', '=', user.id)], order='sequence')
+
+                for rule in rules:
+                    data['percentage'] = rule.percentage
+                    amount = rule.calculate_amount(data)
+                    print("dataaaaaaaaaa",data)
+                    if amount:
+                        line.write({
+                            'commission_amount': amount,
+                            'commission_id': rule.id,
+                            'commission_percent': rule.percentage
+                        })
+                        break
+            invoice_lines = self.env['account.move.line'].search([
+                ('move_id', '=', invoice.id),
+                ('is_commission_entry', '=', True)
+            ])
+            if invoice_lines:
+                line_ids = tuple(invoice_lines.ids)
+                self._cr.execute("DELETE FROM account_move_line WHERE id IN %s", (line_ids,))
+            invoice._create_commission_payable()
+
+
     def button_draft(self):
         ret = super(AccountMove, self).button_draft()
         self._cancel_commission_payable()
@@ -41,8 +89,8 @@ class AccountMove(models.Model):
         elif not moves and active_model == 'account.move':
             moves = self.env['account.move'].browse(active_ids)
         for move in moves:
-            if move.state == 'posted':
-                continue
+            # if move.state == 'posted':
+            #     continue
 
             commission_line_ids = []
             invoice_lien_ids = move.invoice_line_ids.filtered(lambda l: l.commission_id and l.commission_amount)
