@@ -16,12 +16,13 @@ class AccountMove(models.Model):
 
     is_commission_bill = fields.Boolean()
 
+
     def update_commision_on_invoice(self,records):
-        filtered_invoices = records.filtered(
-            lambda inv: any(not line.commission_id for line in inv.invoice_line_ids)
-        )
-        for invoice in filtered_invoices:
-            for line in invoice.invoice_line_ids.filtered(lambda l: not l.commission_id):
+        # filtered_invoices = records.filtered(
+        #     lambda inv: any(not line.commission_id for line in inv.invoice_line_ids)
+        # )
+        for invoice in records:
+            for line in invoice.invoice_line_ids:
                 data = {
                     'product_id': line.product_id,
                     'partner_id': invoice.partner_id,
@@ -59,7 +60,6 @@ class AccountMove(models.Model):
                 self._cr.execute("DELETE FROM account_move_line WHERE id IN %s", (line_ids,))
             invoice._create_commission_payable()
 
-
     def button_draft(self):
         ret = super(AccountMove, self).button_draft()
         self._cancel_commission_payable()
@@ -85,8 +85,8 @@ class AccountMove(models.Model):
         elif not moves and active_model == 'account.move':
             moves = self.env['account.move'].browse(active_ids)
         for move in moves:
-            if move.state == 'posted':
-                continue
+            # if move.state == 'posted':
+            #     continue
 
             commission_line_ids = []
             invoice_lien_ids = move.invoice_line_ids.filtered(lambda l: l.commission_id and l.commission_amount)
