@@ -310,6 +310,9 @@
                                                 <td class="text-end"></td>
                                                 <td style="border-left:2px solid black;" class="text-center"></td>
                                             </tr>
+                                            <tr>
+                                                <td colspan="4" style="border-top: 2px solid black;"></td>
+                                            </tr>
 
                                         </tr>
                                         <!--                                <tr t-foreach="backorders.mapped('move_ids').filtered(lambda x: x.product_uom_qty)"-->
