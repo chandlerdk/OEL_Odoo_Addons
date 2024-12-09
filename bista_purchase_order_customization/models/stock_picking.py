@@ -21,8 +21,26 @@ class StockPicking(models.Model):
                     ('delivery_generate', '=', True)
                 ])
                 for po in related_purchase_orders:
-                    if not po._check_delivery_done():
-                        raise ValidationError(_("You cannot validate this receipt until the related delivery is done."))
+                    for line in po.order_line:
+                        delivered_qty = sum(
+                            line.move_ids.filtered(
+                                lambda m: m.state == 'done' and m.picking_id.picking_type_id.code == 'outgoing'
+                            ).mapped('product_uom_qty')
+                        )
+                        received_qty = sum(
+                            line.move_ids.filtered(
+                                lambda m: m.product_id == line.product_id and m.picking_id.picking_type_id.code == 'incoming'
+                            ).mapped('quantity')
+                        )
+                        if received_qty > delivered_qty:
+                            raise ValidationError(_(
+                                "You cannot validate this receipt until the related delivery is done. %s.\n"
+                                "Delivered Quantity: %s, Trying to Receive: %s" % (
+                                    line.product_id.display_name,
+                                    delivered_qty,
+                                    received_qty
+                                )
+                            ))
         return super(StockPicking, self).button_validate()
 
 

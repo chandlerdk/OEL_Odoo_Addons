@@ -74,16 +74,15 @@ class PurchaseOrder(models.Model):
             result['res_id'] = pickings.id
         return result
 
-    def _check_delivery_done(self):
-        for order in self:
-            delivery_pickings = self.env['stock.picking'].search([
-                ('origin', '=', order.name),
-                ('picking_type_id', '=', self.picking_type_id.delivery_generate_id.id),
-                ('state', '!=', 'done')
-            ])
-            if delivery_pickings:
-                return False
-        return True
+    # def _check_delivery_done(self,partial_allowed=False):
+    #     for order in self:
+    #         delivery_pickings = self.env['stock.picking'].search([
+    #             ('origin', '=', order.name),
+    #             ('picking_type_id', '=', self.picking_type_id.delivery_generate_id.id),
+    #             ('state', '!=', 'done')
+    #         ])
+
+    #     return True
 
     def button_approve(self, force=False):
         result = super(PurchaseOrder, self).button_approve(force=force)
@@ -185,6 +184,33 @@ class PurchaseOrderLine(models.Model):
                 qty_to_compute = move.quantity if move.state == 'done' else move.product_uom_qty
                 qty += move.product_uom._compute_quantity(qty_to_compute, self.product_uom, rounding_method='HALF-UP')
         return qty
+
+    @api.depends('move_ids.state', 'move_ids.product_uom', 'move_ids.quantity')
+    def _compute_qty_received(self):
+        from_stock_lines = self.filtered(lambda order_line: order_line.qty_received_method == 'stock_moves')
+        super(PurchaseOrderLine, self - from_stock_lines)._compute_qty_received()
+        for line in self:
+            if line.qty_received_method == 'stock_moves':
+                total = 0.0
+                # In case of a BOM in kit, the products delivered do not correspond to the products in
+                # the PO. Therefore, we can skip them since they will be handled later on.
+                for move in line._get_po_line_moves():
+                    if move.state == 'done':
+                        if move._is_purchase_return():
+                            if move.to_refund:
+                                total -= move.product_uom._compute_quantity(move.quantity, line.product_uom,
+                                                                            rounding_method='HALF-UP')
+                        elif move.origin_returned_move_id and move.origin_returned_move_id._is_dropshipped() and not move._is_dropshipped_returned():
+                            pass
+                        elif move.origin_returned_move_id and move.origin_returned_move_id._is_purchase_return() and not move.to_refund:
+                            pass
+                        else:
+                            if move.picking_id.picking_type_id.code == 'incoming':
+                                total += move.product_uom._compute_quantity(move.quantity, line.product_uom,
+                                                                            rounding_method='HALF-UP')
+
+                line._track_qty_received(total)
+                line.qty_received = total
 
 
 
