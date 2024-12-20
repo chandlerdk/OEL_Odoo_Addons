@@ -282,6 +282,9 @@
                                        t-value="sum(backorders.mapped('move_ids').filtered(lambda m: m.product_id == line.product_id).mapped('product_uom_qty'))"/>
                                     <span t-esc="bo_qty" t-if="bo_qty > 0"></span>
                                 </td>
+                                 <tr>
+                                    <td colspan="4" style="border-top: 2px solid black;"></td>
+                                </tr>
                             </tr>
                         </tbody>
                     </table>
