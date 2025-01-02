@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="res_config_settings_view_form_bcc_cc_field" model="ir.ui.view">
+            <field name="name">res.config.settings.view.form.inherit.bcc.cc.field</field>
+            <field name="model">res.config.settings</field>
+            <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[@id='invite_users']" position="after">
+                    <div id="email_cc_cc">
+                        <h2>Email CC and BCC</h2>
+                        <div class="row mt16 o_settings_container">
+                            <div class="col-12 col-lg-6 o_setting_box" id="cc_partner_activate">
+                                <div class="o_setting_left_pane">
+                                    <field name="enable_cc"/>
+                                </div>
+                                <div class="o_setting_right_pane">
+                                    <label string="Enable Email CC" for="enable_cc"/>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-lg-6 o_setting_box" id="bcc_partners">
+                                <div class="o_setting_left_pane">
+                                    <field name="enable_bcc"/>
+                                </div>
+                                <div class="o_setting_right_pane">
+                                    <label string="Enable Email BCC" for="enable_bcc"/>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-lg-6 o_setting_box">
+                                <div class="o_setting_right_pane">
+<!--                                attrs="{'invisible': [('enable_cc', '=', False)]}">-->
+                                    <label string="Default CC" for="cc_recipient_ids"/>
+                                    <div class="text-muted">
+                                        Select Default CC Recipients
+                                    </div>
+                                    <field name="cc_recipient_ids" widget="many2many_tags"/>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-lg-6 o_setting_box">
+                                <div class="o_setting_right_pane">
+<!--                                    attrs="{'invisible': [('enable_bcc', '=', False)]}">-->
+                                    <label string="Default BCC" for="bcc_recipient_ids"/>
+                                    <div class="text-muted">
+                                        Select Default BCC Recipients
+                                    </div>
+                                    <field name="bcc_recipient_ids" widget="many2many_tags"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="account_invoice_send_ccbcc_field_inherit" model="ir.ui.view">
+            <field name="name">account.invoice.send.new.field.inherit</field>
+            <field name="model">account.move.send</field>
+            <field name="inherit_id" ref="account.account_move_send_form"/>
+            <field name="arch" type="xml">
+                <field name="mail_subject" position="before">
+                    <field name="enable_cc" invisible="1"/>
+                    <field name="enable_bcc" invisible="1"/>
+                    <field name="cc_recipient_ids" widget="many2many_tags" invisible="enable_cc == False"/>
+<!--                           attrs="{'invisible': [('enable_cc', '=', False)]}"/>-->
+                    <field name="bcc_recipient_ids" widget="many2many_tags" invisible="enable_bcc == False"/>
+<!--                           attrs="{'invisible': [('enable_bcc', '=', False)]}"/>-->
+                </field>
+            </field>
+        </record>
+    </data>
+</odoo>
