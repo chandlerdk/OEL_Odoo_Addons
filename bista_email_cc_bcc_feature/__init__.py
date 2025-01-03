@@ -2,7 +2,7 @@
 ##############################################################################
 #
 # Bista Solutions Pvt. Ltd.
-# Copyright (C) 2021 (https://www.bistasolutions.com)
+# Copyright (C) 2024 (https://www.bistasolutions.com)
 #
 ##############################################################################
 

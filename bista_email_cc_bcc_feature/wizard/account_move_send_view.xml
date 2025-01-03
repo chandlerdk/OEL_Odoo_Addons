@@ -10,9 +10,7 @@
                     <field name="enable_cc" invisible="1"/>
                     <field name="enable_bcc" invisible="1"/>
                     <field name="cc_recipient_ids" widget="many2many_tags" invisible="enable_cc == False"/>
-<!--                           attrs="{'invisible': [('enable_cc', '=', False)]}"/>-->
                     <field name="bcc_recipient_ids" widget="many2many_tags" invisible="enable_bcc == False"/>
-<!--                           attrs="{'invisible': [('enable_bcc', '=', False)]}"/>-->
                 </field>
             </field>
         </record>

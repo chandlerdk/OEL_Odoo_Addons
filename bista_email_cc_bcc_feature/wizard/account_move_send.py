@@ -31,3 +31,25 @@ class AccountMoveSend(models.TransientModel):
             partner_ids = literal_eval(vals)
             res.update({'bcc_recipient_ids': [(4, pid) for pid in partner_ids]})
         return res
+
+    # @api.model
+    # def _send_mail(self, move, mail_template, **kwargs):
+    #     res = super(AccountMoveSend, self)._send_mail(move, mail_template, **kwargs)
+    #     if self.enable_cc:
+    #         cc_recipient_ids = self.cc_recipient_ids.ids
+    #         res.update({'cc_recipient_ids': cc_recipient_ids})
+    #     if self.enable_bcc:
+    #         bcc_recipient_ids = self.bcc_recipient_ids.ids
+    #         res.update({'bcc_recipient_ids': bcc_recipient_ids})
+    #     return res
+
+    @api.model
+    def _send_mail(self, move, mail_template, **kwargs):
+        if self.enable_cc:
+            cc_recipient_ids = self.cc_recipient_ids.ids
+            kwargs.update({'cc_recipient_ids': cc_recipient_ids})
+        if self.enable_bcc:
+            bcc_recipient_ids = self.bcc_recipient_ids.ids
+            kwargs.update({'bcc_recipient_ids': bcc_recipient_ids})
+        res = super(AccountMoveSend, self)._send_mail(move, mail_template, **kwargs)
+        return res
