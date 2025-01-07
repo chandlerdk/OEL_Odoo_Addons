@@ -43,29 +43,28 @@ class SaleOrderLine(models.Model):
             #     data['percentage'] = line.commission_percent
             #     line.commission_amount = line.commission_id.calculate_amount(data)
             #     continue
-
-            if line.product_id.detailed_type == 'service':
-                continue
-
             rules = []
             sale_commission = self.env['sale.commission']
+            if line.product_id.detailed_type == 'service':
+                specific_commission_rule = self.env['sale.commission'].search([
+                    ('product_ids', 'in', line.product_template_id.id),('product_ids.detailed_type','=','service')
+                ],limit=1)
+                if specific_commission_rule:
+                    if line.sale_rep_id == specific_commission_rule.sale_rep_id:
+                        line.commission_amount = 0
+                        line.commission_id = specific_commission_rule.id
+                        line.commission_percent = specific_commission_rule.percentage
+                    elif line.user_id.id in specific_commission_rule.user_ids.ids:
+                        line.commission_amount = 0
+                        line.commission_id = specific_commission_rule.id
+                        line.commission_percent = specific_commission_rule.percentage
+                    continue
             if line.sale_rep_id:
                 rules = sale_commission.search([('sale_rep_id', '=', line.sale_rep_id.id)], order='sequence')
             else:
                 user = line.order_id.user_id
                 rules = sale_commission.search([('user_ids', '=', user.id)], order='sequence')
 
-            # if line.sale_rep_id:
-            #     rules = sale_commission.search(
-            #         [('sale_rep_id', '=', line.sale_rep_id.id)],
-            #         order='priority desc'
-            #     )
-            # else:
-            #     user = line.order_id.user_id
-            #     rules = sale_commission.search(
-            #         [('user_ids', '=', user.id)],
-            #         order='priority desc'
-            #     )
             for rule in rules:
                 data['percentage'] = rule.percentage
                 amount = rule.calculate_amount(data)

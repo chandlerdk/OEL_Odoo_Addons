@@ -182,6 +182,10 @@ class ShipStationRequest():
             bill_postal_code = ''
             bill_country_code = ''
 
+        order_lines = picking.sale_id.order_line.filtered(
+            lambda line: line.product_id.type in ['consu', 'product']
+        )
+
         data = {
             "orderNumber": picking.name,
             "orderStatus": "awaiting_shipment",
@@ -200,11 +204,11 @@ class ShipStationRequest():
                     "units": carrier.shipstation_weight_uom_id.id
                 },
                 "quantity": int(line.product_uom_qty),
-                "unitPrice": line.sale_line_id.price_unit,
-                "taxAmount": line.sale_line_id.price_tax,
+                "unitPrice": line.price_unit,
+                "taxAmount": line.price_tax,
                 "shippingAmount": line.product_id.standard_price,
                 "productId": line.product_id.id,
-            } for line in picking.move_ids_without_package if line.product_uom_qty],
+            } for line in order_lines if line.product_uom_qty],
             "internalNotes": None,
             "carrierCode": picking.partner_id.carrier_id.code if picking.partner_id.carrier_id else None,
             "serviceCode": picking.partner_id.service_id.code if picking.partner_id.service_id else None,
