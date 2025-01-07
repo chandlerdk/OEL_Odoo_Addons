@@ -16,6 +16,34 @@ class AccountMove(models.Model):
 
     is_commission_bill = fields.Boolean()
 
+    commission_amount = fields.Monetary(
+        string="Commission Amount",
+        compute="_compute_commission_amount",
+        store=True,
+        currency_field="currency_id",
+    )
+    shipping_city_state = fields.Char(
+        string="Ship To (City, State)",
+        compute="_compute_shipping_city_state",
+        store=True,
+    )
+
+    @api.depends("partner_shipping_id.city", "partner_shipping_id.state_id")
+    def _compute_shipping_city_state(self):
+        for move in self:
+            if move.partner_shipping_id:
+                city = move.partner_shipping_id.city or ""
+                state = move.partner_shipping_id.state_id.name or ""
+                move.shipping_city_state = f"{city}, {state}".strip(", ")
+            else:
+                move.shipping_city_state = ""
+
+    @api.depends("line_ids.commission_amount")
+    def _compute_commission_amount(self):
+        for move in self:
+            move.commission_amount = sum(move.line_ids.mapped("commission_amount"))
+
+
 
     def update_commision_on_invoice(self,records):
         # filtered_invoices = records.filtered(
