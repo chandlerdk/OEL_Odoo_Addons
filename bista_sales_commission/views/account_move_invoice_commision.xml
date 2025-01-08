@@ -11,6 +11,10 @@
                 <field name="partner_id" string="Customer"/>
                 <field name="invoice_date" string="Invoice Date"/>
                 <field name="shipping_city_state" string="Ship To"/>
+                  <field name="payment_state" string="Payment State"/>
+                <field name="commission_move_id" widget="many2onebutton"/>
+                <field name="commission_payment_state"/>
+                <field name="commission_policy"/>
                 <field name="amount_total" string="Amount"/>
                 <field name="commission_amount" string="Commission Amount"/>
             </tree>
@@ -27,6 +31,8 @@
                 <field name="commission_amount"/>
                 <filter string="Commission To Bill" name="to_bill"
                         domain="[('line_ids.commission_to_bill', '=', True)]"/>
+                <filter string="Commission Paid" name="paid_commission"
+                        domain="[('commission_payment_state', 'in', ['paid','in_payment'])]"/>
             </xpath>
         </field>
     </record>

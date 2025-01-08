@@ -10,6 +10,15 @@ TYPE_REVERSE_MAP = {
     'in_receipt': 'in_refund',
 }
 
+PAYMENT_STATE_SELECTION = [
+        ('not_paid', 'Not Paid'),
+        ('in_payment', 'In Payment'),
+        ('paid', 'Paid'),
+        ('partial', 'Partially Paid'),
+        ('reversed', 'Reversed'),
+        ('invoicing_legacy', 'Invoicing App Legacy'),
+]
+
 
 class AccountMove(models.Model):
     _inherit = 'account.move'
@@ -27,6 +36,35 @@ class AccountMove(models.Model):
         compute="_compute_shipping_city_state",
         store=True,
     )
+    commission_move_id = fields.Many2one(
+        'account.move',
+        string="Related Bill",
+        compute="_compute_commission_move_id",
+        store=True
+    )
+
+    payment_state = fields.Selection(
+        selection=PAYMENT_STATE_SELECTION,
+        string="Payment Status",
+        compute='_compute_payment_state', store=True, readonly=True,
+        copy=False,
+        tracking=True,
+    )
+    commission_payment_state = fields.Selection(related="invoice_line_ids.commission_payment_state", store=True, copy=False)
+    commission_policy = fields.Selection([
+        ('invoice', 'Invoice Generated'),
+        ('payment', 'Invoice Fully Paid')
+    ],compute="commission_policy_state", required=True, default="payment", readonly=True, copy=False)
+
+    @api.depends('line_ids.commission_policy')
+    def commission_policy_state(self):
+        for move in self:
+            move.commission_policy = move.line_ids.mapped('commission_policy')[0]
+
+    @api.depends('line_ids.commission_move_id')
+    def _compute_commission_move_id(self):
+        for move in self:
+            move.commission_move_id = move.line_ids.filtered('commission_move_id')[:1].commission_move_id
 
     @api.depends("partner_shipping_id.city", "partner_shipping_id.state_id")
     def _compute_shipping_city_state(self):
