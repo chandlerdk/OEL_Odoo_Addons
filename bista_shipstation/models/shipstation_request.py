@@ -182,9 +182,61 @@ class ShipStationRequest():
             bill_postal_code = ''
             bill_country_code = ''
 
-        order_lines = picking.sale_id.order_line.filtered(
-            lambda line: line.product_id.type in ['consu', 'product']
-        )
+        def get_shipping_lines():
+            shipping_lines = []
+            processed_sale_lines = set()
+
+            for move in picking.move_ids_without_package:
+                sale_line = move.sale_line_id
+
+                if not sale_line or not move.product_uom_qty or sale_line.id in processed_sale_lines:
+                    continue
+
+                processed_sale_lines.add(sale_line.id)
+                if sale_line.product_id.bom_ids and sale_line.product_id.bom_ids[0].type == 'phantom':
+                    bom = sale_line.product_id.bom_ids[0]
+                    total_delivered_qty = 0
+                    for bom_line in bom.bom_line_ids:
+                        component_moves = picking.move_ids_without_package.filtered(
+                            lambda m: m.product_id == bom_line.product_id
+                        )
+                        component_qty_done = sum(component_moves.mapped('quantity'))
+                        kit_qty_done = component_qty_done / bom_line.product_qty if bom_line.product_qty > 0 else 0
+                        total_delivered_qty = kit_qty_done
+
+                    shipping_lines.append({
+                        "lineItemKey": sale_line.product_id.id,
+                        "sku": sale_line.product_id.default_code,
+                        "name": sale_line.product_id.name,
+                        "imageUrl": None,
+                        "weight": {
+                            "value": carrier._shipstation_convert_weight(sale_line.product_id.weight),
+                            "units": carrier.shipstation_weight_uom_id.id
+                        },
+                        "quantity": int(total_delivered_qty),
+                        "unitPrice": sale_line.price_unit,
+                        "taxAmount": sale_line.price_tax,
+                        "shippingAmount": sale_line.product_id.standard_price,
+                        "productId": sale_line.product_id.id,
+                    })
+                else:
+                    shipping_lines.append({
+                        "lineItemKey": move.product_id.id,
+                        "sku": move.product_id.default_code,
+                        "name": move.product_id.name,
+                        "imageUrl": None,
+                        "weight": {
+                            "value": carrier._shipstation_convert_weight(move.product_id.weight),
+                            "units": carrier.shipstation_weight_uom_id.id
+                        },
+                        "quantity": int(move.product_uom_qty),
+                        "unitPrice": sale_line.price_unit,
+                        "taxAmount": sale_line.price_tax,
+                        "shippingAmount": move.product_id.standard_price,
+                        "productId": move.product_id.id,
+                    })
+
+            return shipping_lines
 
         data = {
             "orderNumber": picking.name,
@@ -194,21 +246,7 @@ class ShipStationRequest():
             "customerEmail": recipient.email,
             "billTo": self._prepare_address(recipient),
             "shipTo": self._prepare_address(recipient),
-            "items": [{
-                "lineItemKey": line.product_id.id,
-                "sku": line.product_id.default_code,
-                "name": line.product_id.name,
-                "imageUrl": None,
-                "weight": {
-                    "value": carrier._shipstation_convert_weight(line.product_id.weight),
-                    "units": carrier.shipstation_weight_uom_id.id
-                },
-                "quantity": int(line.product_uom_qty),
-                "unitPrice": line.price_unit,
-                "taxAmount": line.price_tax,
-                "shippingAmount": line.product_id.standard_price,
-                "productId": line.product_id.id,
-            } for line in order_lines if line.product_uom_qty],
+            "items": get_shipping_lines(),
             "internalNotes": None,
             "carrierCode": picking.partner_id.carrier_id.code if picking.partner_id.carrier_id else None,
             "serviceCode": picking.partner_id.service_id.code if picking.partner_id.service_id else None,
