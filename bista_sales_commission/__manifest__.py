@@ -17,6 +17,7 @@
         'views/sale_order.xml',
         'views/res_partner.xml',
         'views/account_move.xml',
+        'views/account_move_invoice_commision.xml',
         'wizard/commission_bill_wizard.xml',
     ],
     "auto_install": False,
