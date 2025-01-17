@@ -195,14 +195,14 @@ class ShipStationRequest():
                 processed_sale_lines.add(sale_line.id)
                 if sale_line.product_id.bom_ids and sale_line.product_id.bom_ids[0].type == 'phantom':
                     bom = sale_line.product_id.bom_ids[0]
-                    total_delivered_qty = 0
+                    total_delivered_qty = float('inf')
                     for bom_line in bom.bom_line_ids:
                         component_moves = picking.move_ids_without_package.filtered(
                             lambda m: m.product_id == bom_line.product_id
                         )
                         component_qty_done = sum(component_moves.mapped('quantity'))
                         kit_qty_done = component_qty_done / bom_line.product_qty if bom_line.product_qty > 0 else 0
-                        total_delivered_qty = kit_qty_done
+                        total_delivered_qty = min(total_delivered_qty, kit_qty_done)
 
                     shipping_lines.append({
                         "lineItemKey": sale_line.product_id.id,
