@@ -7,7 +7,8 @@
             <field name="inherit_id" ref="base.view_users_tree"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='company_id']" position="after">
-                    <button name="impersonate_user" string="Impersonate" type="object" class="oe_highlight"/>
+                    <button name="impersonate_user" string="Impersonate" type="object" class="oe_highlight"
+                            groups="ssq_login_as_user.impersonate_user_group"/>
                 </xpath>
             </field>
         </record>
