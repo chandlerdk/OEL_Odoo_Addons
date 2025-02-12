@@ -12,8 +12,12 @@ class StockMove(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
-            if vals['product_uom_qty']:
-                vals['so_quantity'] =vals['product_uom_qty']
+            if vals.get('product_uom_qty'):
+                vals.update({
+                    'so_quantity': vals.get('product_uom_qty')
+                })
+            # if vals['product_uom_qty']:
+            #     vals['so_quantity'] =vals['product_uom_qty']
         return super().create(vals_list)
 
     def write(self, vals):
