@@ -42,19 +42,25 @@ class AccountMove(models.Model):
         compute="_compute_commission_move_id",
         store=True
     )
-
-    payment_state = fields.Selection(
-        selection=PAYMENT_STATE_SELECTION,
-        string="Payment Status",
-        compute='_compute_payment_state', store=True, readonly=True,
-        copy=False,
-        tracking=True,
-    )
     commission_payment_state = fields.Selection(related="invoice_line_ids.commission_payment_state", store=True, copy=False)
     commission_policy = fields.Selection([
         ('invoice', 'Invoice Generated'),
         ('payment', 'Invoice Fully Paid')
     ],compute="commission_policy_state", required=True, default="payment", readonly=True, copy=False)
+    payment_date = fields.Date(
+        string="Payment Date",
+        compute="compute_payment_date_final",
+    )
+
+    @api.depends('line_ids.matched_debit_ids.debit_move_id', 'line_ids.matched_credit_ids.credit_move_id')
+    def compute_payment_date_final(self):
+        for move in self:
+            reconciled_lines = move.line_ids.mapped('matched_debit_ids.debit_move_id') + \
+                               move.line_ids.mapped('matched_credit_ids.credit_move_id')
+            payment_moves = reconciled_lines.filtered(lambda m: m.payment_id)
+            payment_dates = payment_moves.mapped('payment_id.date')
+            move.payment_date = max(payment_dates) if payment_dates else False
+
 
     @api.depends('line_ids.commission_policy')
     def commission_policy_state(self):
