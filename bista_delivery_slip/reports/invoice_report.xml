@@ -1,0 +1,15 @@
+<odoo>
+    <template id="document_tax_totals_inherit" inherit_id="account.document_tax_totals_template">
+        <xpath expr="//t[@t-foreach=&quot;tax_totals.get('subtotals')&quot;]" position="after">
+            <!-- Add Discount Applied (Only Show If Discount Exists) -->
+            <t t-if="o.discount_total and o.discount_total > 0">
+                <tr>
+                    <td class="text-start"><strong>Discount Applied</strong></td>
+                    <td class="text-end">
+                        <span t-field="o.discount_total"/>
+                    </td>
+                </tr>
+            </t>
+        </xpath>
+    </template>
+</odoo>
