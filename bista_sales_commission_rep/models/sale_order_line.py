@@ -64,7 +64,14 @@ class SaleOrderLine(models.Model):
             else:
                 user = line.order_id.user_id
                 rules = sale_commission.search([('user_ids', '=', user.id)], order='sequence')
-
+            if not rules:
+                print("No commission rule found - Resetting fields")
+                line.write({
+                    'commission_amount': 0,
+                    'commission_id': False,
+                    'commission_percent': 0,
+                })
+                continue
             for rule in rules:
                 data['percentage'] = rule.percentage
                 amount = rule.calculate_amount(data)
@@ -73,3 +80,5 @@ class SaleOrderLine(models.Model):
                     line.commission_id = rule.id if rule else False
                     line.commission_percent = rule.percentage
                     break
+
+
