@@ -17,9 +17,11 @@
     """,
     'depends': ['sale', 'stock','web','bista_shipstation'],
     'data': [
+        'views/account_move_view.xml',
         'reports/report_delivery_slip.xml',
         'reports/report_stock_picking_operations.xml',
         'reports/internal_picking.xml',
+        'reports/invoice_report.xml',
 ],
 
     'installable': True,
