@@ -21,6 +21,111 @@ class RmaClaim(models.Model):
     delivery_count = fields.Integer(compute='_compute_delivery_count')
     receipt_count = fields.Integer(compute='_compute_receipt_count')
 
+    def check_and_create_refund_invoice(self, claim_lines):
+        """
+        This method checks if an invoice is posted and creates the refund invoice accordingly.
+        It ensures kit products are included instead of their subcomponents.
+        """
+        product_process_dict = {}
+        refund_invoice_ids = {}
+        kit_product_quantities = {}  # Track total kit quantities per sale order line
+
+        for line in claim_lines:
+            sale_line = line.move_id.sale_line_id
+            kit_product_id = False
+
+            # Identify if the sale line is a kit
+            if sale_line:
+                bom = self.env['mrp.bom'].search([
+                    ('product_tmpl_id', '=', sale_line.product_id.product_tmpl_id.id),
+                    ('type', '=', 'phantom')
+                ], limit=1)
+
+                if bom:
+                    kit_product = self.env['product.product'].search([
+                        ('product_tmpl_id', '=', sale_line.product_id.product_tmpl_id.id)
+                    ], limit=1)
+
+                    if kit_product:
+                        kit_product_id = kit_product.id
+
+            if kit_product_id:
+                key = (kit_product_id, sale_line.id)
+
+                # Aggregate refund quantities for kit products
+                if key in kit_product_quantities:
+                    kit_product_quantities[key] = line.quantity
+                else:
+                    kit_product_quantities[key] = line.quantity
+
+            else:
+                # Normal product processing
+                if line.id not in product_process_dict:
+                    product_process_dict.update({
+                        line.id: {'total_qty': line.return_qty, 'invoice_line_ids': {}}
+                    })
+
+                invoice_lines = line.move_id.sale_line_id.invoice_lines
+                for invoice_line in invoice_lines.filtered(lambda l: l.move_id.move_type == 'out_invoice'):
+                    if invoice_line.move_id.state != 'posted':
+                        message = _("The invoice was not posted. Please check invoice :"
+                                    "<a href=# data-oe-model=account.move data-oe-id=%d>%s</a>") % (
+                                      invoice_line.move_id.id, invoice_line.move_id.display_name)
+                        self.message_post(body=message)
+                        return False
+
+                    product_line = product_process_dict.get(line.id)
+                    if product_line.get('process_qty', 0) < product_line.get('total_qty', 0):
+                        product_line, process_qty = self.prepare_product_qty_dict(
+                            product_line, invoice_line)
+
+                        product_line.get('invoice_line_ids').update({
+                            invoice_line.id: process_qty,
+                            'invoice_id': invoice_line.move_id.id
+                        })
+
+                        # ✅ Pass **claim line** for normal products
+                        refund_invoice_ids = self.prepare_refund_invoice_dict(
+                            line, refund_invoice_ids, invoice_line, process_qty)
+
+        # Process the aggregated kit product quantities
+        for (kit_product_id, sale_line_id), total_qty in kit_product_quantities.items():
+            sale_line = self.env['sale.order.line'].browse(sale_line_id)
+            invoice_lines = sale_line.invoice_lines.filtered(lambda l: l.move_id.move_type == 'out_invoice')
+
+            for invoice_line in invoice_lines:
+                # ✅ Pass **sale order line** instead of claim line for kits
+                refund_invoice_ids = self.prepare_refund_invoice_dict(
+                    sale_line, refund_invoice_ids, invoice_line, total_qty, is_kit=True, kit_product_id=kit_product_id)
+
+        return refund_invoice_ids
+
+    def prepare_refund_invoice_dict(self, line, refund_invoice_ids, invoice_line, process_qty, is_kit=False,
+                                    kit_product_id=None):
+        """Prepare refund invoice values based on invoice."""
+        print("Processing Line:", line, "Is Kit:", is_kit)
+
+        if is_kit:
+            sale_line = line
+            product_id = kit_product_id
+        else:
+            sale_line = line.move_id.sale_line_id
+            product_id = line.product_id.id
+
+        invoice_id = invoice_line.move_id.id
+        if invoice_id not in refund_invoice_ids:
+            refund_invoice_ids[invoice_id] = []
+
+        refund_invoice_ids[invoice_id].append({
+            product_id: process_qty,
+            'price': invoice_line.price_unit,
+            'tax_id': invoice_line.tax_ids.ids,
+            'discount': invoice_line.discount,
+            'sale_line_id': sale_line.id
+        })
+
+        return refund_invoice_ids
+
     @api.model
     def default_get(self, fields_list):
         defaults = super().default_get(fields_list)
@@ -850,6 +955,8 @@ class RmaClaimLine(models.Model):
     route_id = fields.Many2one(
         'stock.route', string='Route', domain=[('sale_selectable', '=', True)], ondelete='restrict'
     )
+
+    sale_line_id = fields.Many2one('sale.order.line')
 
     def _compute_get_done_quantity(self):
         """
