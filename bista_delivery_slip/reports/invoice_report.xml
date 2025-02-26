@@ -2,7 +2,15 @@
     <template id="document_tax_totals_inherit" inherit_id="account.document_tax_totals_template">
         <xpath expr="//t[@t-foreach=&quot;tax_totals.get('subtotals')&quot;]" position="after">
             <!-- Add Discount Applied (Only Show If Discount Exists) -->
-            <t t-if="o.discount_total and o.discount_total > 0">
+            <t t-if="doc and doc.discount_total and doc.discount_total > 0">
+                <tr>
+                    <td class="text-start"><strong>Discount Applied</strong></td>
+                    <td class="text-end">
+                        <span t-field="doc.discount_total"/>
+                    </td>
+                </tr>
+            </t>
+            <t t-elif="o and o.discount_total and o.discount_total > 0">
                 <tr>
                     <td class="text-start"><strong>Discount Applied</strong></td>
                     <td class="text-end">
