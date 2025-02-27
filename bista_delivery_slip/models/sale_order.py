@@ -20,3 +20,11 @@ class SaleOrder(models.Model):
                 for line in order.order_line if line.discount
             )
             order.discount_total = total_discount
+
+class PurchaseOrder(models.Model):
+    _inherit = 'purchase.order'
+
+    discount_total = fields.Monetary(
+        string="Discount Applied",
+        currency_field='currency_id'
+    )
