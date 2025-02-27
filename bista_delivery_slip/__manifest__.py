@@ -17,6 +17,7 @@
     """,
     'depends': ['sale', 'stock','web','bista_shipstation'],
     'data': [
+        'views/sale_order_view.xml',
         'views/account_move_view.xml',
         'reports/report_delivery_slip.xml',
         'reports/report_stock_picking_operations.xml',
