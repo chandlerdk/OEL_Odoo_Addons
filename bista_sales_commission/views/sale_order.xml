@@ -7,6 +7,8 @@
             <xpath expr="//field[@name='order_line']//tree//field[@name='product_uom_qty']" position="before">
                 <field name="commission_id" column_invisible="1"/>
                 <field name="commission_percent"/>
+                <field name="in_commission_percent"/>
+                <field name="out_commission_percent"/>
                 <field name="commission_amount" column_invisible="1"/>
             </xpath>
             <xpath expr="//field[@name='user_id']" position="attributes">

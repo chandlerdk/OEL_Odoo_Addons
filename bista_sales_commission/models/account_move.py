@@ -31,6 +31,18 @@ class AccountMove(models.Model):
         store=True,
         currency_field="currency_id",
     )
+    in_commission_amount = fields.Monetary(
+        string="Commission Amount",
+        compute="_compute_commission_amount",
+        store=True,
+        currency_field="currency_id",
+    )
+    out_commission_amount = fields.Monetary(
+        string="Commission Amount",
+        compute="_compute_commission_amount",
+        store=True,
+        currency_field="currency_id",
+    )
     shipping_city_state = fields.Char(
         string="Ship To (City, State)",
         compute="_compute_shipping_city_state",
@@ -86,6 +98,8 @@ class AccountMove(models.Model):
     def _compute_commission_amount(self):
         for move in self:
             move.commission_amount = sum(move.line_ids.mapped("commission_amount"))
+            move.in_commission_amount = sum(move.line_ids.mapped("in_commission_amount"))
+            move.out_commission_amount = sum(move.line_ids.mapped("out_commission_amount"))
 
 
 

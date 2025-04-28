@@ -17,6 +17,8 @@
                 <field name="payment_date"/>
                 <field name="amount_total" string="Amount"/>
                 <field name="commission_amount" string="Commission Amount"/>
+                <field name="in_commission_amount" string="Commission Amount"/>
+                <field name="out_commission_amount" string="Commission Amount"/>
             </tree>
         </field>
     </record>
