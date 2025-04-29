@@ -59,14 +59,13 @@ class SaleOrderLine(models.Model):
                         line.commission_id = specific_commission_rule.id
                         line.commission_percent = specific_commission_rule.percentage
                     continue
-            rep_rules = sale_commission.search([('sale_rep_id', '=', line.sale_rep_id.id)],
+            rep_rules = sale_commission.search([('sale_rep_id', '=', line.sale_rep_id.id),('sale_partner_type','=','sale_rep')],
                                                order='sequence') if line.sale_rep_id else sale_commission.browse()
-            user_rules = sale_commission.search([('user_ids', 'in', line.user_id.id)],
+            user_rules = sale_commission.search([('user_ids', 'in', line.user_id.id),('sale_partner_type','=','user')],
                                                 order='sequence') if line.user_id else sale_commission.browse()
-            team_rules = sale_commission.search([('sale_team_ids', 'in', line.team_id.id)],
+            team_rules = sale_commission.search([('sale_team_ids', 'in', line.team_id.id),('sale_partner_type','=','sale_team')],
                                                 order='sequence') if line.team_id else sale_commission.browse()
             if not rep_rules:
-                print("No commission rule found - Resetting fields")
                 line.write({
                     'commission_amount': 0,
                     'commission_id': False,
