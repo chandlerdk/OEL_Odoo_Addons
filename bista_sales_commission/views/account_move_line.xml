@@ -21,9 +21,9 @@
                 <field name="commission_payment_state"/>
                 <field name="commission_policy"/>
                 <field name="commission_user_id" string="Sales Person" widget="many2onebutton"/>
-                <field name="commission_amount" string="Amount"/>
-                <field name="in_commission_amount" string="C% In Amount"/>
-                <field name="out_commission_amount" string="C% Out Amount"/>
+                <field name="commission_amount"/>
+                <field name="in_commission_amount"/>
+                <field name="out_commission_amount"/>
             </tree>
         </field>
     </record>

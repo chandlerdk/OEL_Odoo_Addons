@@ -12,7 +12,6 @@ class AccountMoveLine(models.Model):
     _inherit = 'account.move.line'
 
     sale_rep_id = fields.Many2one('res.partner', string='Sale Rep', related="move_id.sale_rep_id")
-    user_id = fields.Many2one('res.users', related="move_id.invoice_user_id")
 
     @api.depends("sale_person_id", "team_id","user_id",
                  "commission_id",
@@ -37,7 +36,6 @@ class AccountMoveLine(models.Model):
             amount = 0
             if line.commission_id:
                 amount = line.commission_id.calculate_amount(data)
-                print("amountttt",amount)
             # else:
             sale_commission = self.env['sale.commission']
             rules = []
@@ -48,14 +46,13 @@ class AccountMoveLine(models.Model):
             #     user = line.sale_person_id
             #     rules = sale_commission.search([('user_ids', '=', user.id)],
             #                                    order='priority desc')
-            rep_rules = sale_commission.search([('sale_rep_id', '=', line.sale_rep_id.id)],
+            rep_rules = sale_commission.search([('sale_rep_id', '=', line.sale_rep_id.id),('sale_partner_type','=','sale_rep')],
                                                order='sequence') if line.sale_rep_id else sale_commission.browse()
-            user_rules = sale_commission.search([('user_ids', 'in', line.user_id.id)],
+            user_rules = sale_commission.search([('user_ids', 'in', line.user_id.id),('sale_partner_type','=','user')],
                                                 order='sequence') if line.user_id else sale_commission.browse()
-            team_rules = sale_commission.search([('sale_team_ids', 'in', line.team_id.id)],
+            team_rules = sale_commission.search([('sale_team_ids', 'in', line.team_id.id),('sale_partner_type','=','sale_team')],
                                                 order='sequence') if line.team_id else sale_commission.browse()
 
-            print("teamrulesss",team_rules)
             for rule in rep_rules:
                 data['percentage'] = rule.percentage
                 amount = rule.calculate_amount(data)

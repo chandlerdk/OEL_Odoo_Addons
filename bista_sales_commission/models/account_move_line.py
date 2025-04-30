@@ -20,9 +20,9 @@ class AccountMoveLine(models.Model):
     commission_move_line_id = fields.Many2one('account.move.line', string="Commission Bill Line", copy=False)
     commission_reverse_move_line_id = fields.Many2one('account.move.line',
                                                       string="Commission Reverse Move Line", copy=False)
-    commission_amount = fields.Float(compute="_compute_commission_amount", store=True)
-    in_commission_amount = fields.Float(compute="_compute_commission_amount", store=True)
-    out_commission_amount = fields.Float(compute="_compute_commission_amount", store=True)
+    commission_amount = fields.Float(compute="_compute_commission_amount",string="C% Man", store=True)
+    in_commission_amount = fields.Float(compute="_compute_commission_amount",string="C% In", store=True)
+    out_commission_amount = fields.Float(compute="_compute_commission_amount",string="C% Out", store=True)
     commission_percent = fields.Float()
     commission_user_id = fields.Many2one('res.users', copy=False)
     commission_to_bill = fields.Boolean(compute="_get_commission_state", store=True, copy=False)
@@ -42,6 +42,7 @@ class AccountMoveLine(models.Model):
                                                    related="commission_id.payout_account_id",
                                                    store=True)
     current_line_id = fields.Integer()
+    user_id = fields.Many2one('res.users', related="move_id.invoice_user_id")
 
     @api.depends("sale_person_id", "team_id",
                  "commission_id",
