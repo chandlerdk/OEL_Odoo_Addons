@@ -9,6 +9,8 @@
                 <field name="commission_percent"/>
                 <field name="in_commission_percent"/>
                 <field name="out_commission_percent"/>
+                <field name="in_commission_amount" column_invisible="1"/>
+                <field name="out_commission_amount" column_invisible="1"/>
                 <field name="commission_amount" column_invisible="1"/>
             </xpath>
             <xpath expr="//field[@name='user_id']" position="attributes">

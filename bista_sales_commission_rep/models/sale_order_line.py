@@ -86,6 +86,7 @@ class SaleOrderLine(models.Model):
                 amount = user_rule.calculate_amount(data)
                 if amount:
                     line.in_commission_percent = user_rule.percentage
+                    line.in_commission_amount = amount
                     break
             else:
                 line.in_commission_percent = 0
@@ -96,6 +97,7 @@ class SaleOrderLine(models.Model):
                 amount = team_rule.calculate_amount(data)
                 if amount:
                     line.out_commission_percent = team_rule.percentage
+                    line.out_commission_amount = amount
                     break
             else:
                 line.out_commission_percent = 0

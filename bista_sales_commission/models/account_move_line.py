@@ -21,10 +21,14 @@ class AccountMoveLine(models.Model):
     commission_move_line_id = fields.Many2one('account.move.line', string="Commission Bill Line", copy=False)
     commission_reverse_move_line_id = fields.Many2one('account.move.line',
                                                       string="Commission Reverse Move Line", copy=False)
-    commission_amount = fields.Float(compute="_compute_commission_amount",string="C% Man", store=True)
-    in_commission_amount = fields.Float(compute="_compute_commission_amount",string="C% In", store=True)
-    out_commission_amount = fields.Float(compute="_compute_commission_amount",string="C% Out", store=True)
-    commission_percent = fields.Float()
+    commission_amount = fields.Float(compute="_compute_commission_amount",string="C% Man Amount", store=True)
+    in_commission_amount = fields.Float(compute="_compute_commission_amount",string="C% In Amount", store=True)
+    out_commission_amount = fields.Float(compute="_compute_commission_amount",string="C% Out Amount", store=True)
+
+    in_commission_percent = fields.Float(string="C% In")
+    out_commission_percent = fields.Float(string="C% Out")
+    commission_percent = fields.Float(string="C% Man")
+
     commission_user_id = fields.Many2one('res.users', copy=False)
     commission_to_bill = fields.Boolean(compute="_get_commission_state", store=True, copy=False)
     commission_policy = fields.Selection([

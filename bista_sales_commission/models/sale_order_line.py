@@ -18,7 +18,10 @@ class SaleOrderLine(models.Model):
     commission_percent = fields.Float(string="C% Man")
     in_commission_percent = fields.Float(string="C% In")
     out_commission_percent = fields.Float(string="C% Out")
-    commission_amount = fields.Float(compute='_compute_commission_amount', store=True)
+    commission_amount = fields.Float(compute='_compute_commission_amount',string="C% Man Amount", store=True)
+    in_commission_amount = fields.Float(compute="_compute_commission_amount", string="C% In Amount", store=True)
+    out_commission_amount = fields.Float(compute="_compute_commission_amount", string="C% Out Amount", store=True)
+
     user_id = fields.Many2one('res.users', related="order_id.user_id", store=True)
     team_id = fields.Many2one('crm.team', related="order_id.team_id", store=True)
 
