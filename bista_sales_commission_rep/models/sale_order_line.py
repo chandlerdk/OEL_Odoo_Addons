@@ -63,7 +63,7 @@ class SaleOrderLine(models.Model):
                                                order='sequence') if line.sale_rep_id else sale_commission.browse()
             user_rules = sale_commission.search([('user_ids', 'in', line.user_id.id),('sale_partner_type','=','user')],
                                                 order='sequence') if line.user_id else sale_commission.browse()
-            team_rules = sale_commission.search([('sale_team_ids', 'in', line.team_id.id),('sale_partner_type','=','sale_team')],
+            team_rules = sale_commission.search([('sale_team_rep', '=', line.team_id.user_id.id),('sale_partner_type','=','sale_team')],
                                                 order='sequence') if line.team_id else sale_commission.browse()
             if not rep_rules:
                 line.write({

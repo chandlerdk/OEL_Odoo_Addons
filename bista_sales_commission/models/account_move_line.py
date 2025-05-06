@@ -114,7 +114,7 @@ class AccountMoveLine(models.Model):
             ], order='sequence', limit=1) if self.user_id else False,
 
             'team_rule': sale_commission.search([
-                ('sale_team_ids', 'in', self.team_id.id),
+                ('sale_team_rep', '=', self.team_id.user_id.id),
                 ('sale_partner_type', '=', 'sale_team')
             ], order='sequence', limit=1) if self.team_id else False,
         }
@@ -164,7 +164,7 @@ class AccountMoveLine(models.Model):
                     ], order='sequence')
                 elif rule_key == 'team_rule':
                     rep_rules = sale_commission.search([
-                        ('sale_team_ids', 'in', line.team_id.id),
+                        ('sale_team_rep', '=', self.team_id.user_id.id),
                         ('sale_partner_type', '=', 'sale_team')
                     ], order='sequence')
                 else:
