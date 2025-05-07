@@ -66,6 +66,7 @@ class AccountMoveLine(models.Model):
                 data['percentage'] = user_rule.percentage
                 amount = user_rule.calculate_amount(data)
                 if amount:
+                    line.in_commission_id = user_rule.id if user_rule else False
                     line.in_commission_percent = user_rule.percentage
                     line.in_commission_amount = amount
                     break
@@ -74,6 +75,7 @@ class AccountMoveLine(models.Model):
                 data['percentage'] = team_rule.percentage
                 amount = team_rule.calculate_amount(data)
                 if amount:
+                    line.out_commission_id = team_rule.id if team_rule else False
                     line.out_commission_percent = team_rule.percentage
                     line.out_commission_amount = amount
                     break

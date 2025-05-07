@@ -15,6 +15,8 @@ class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
     commission_id = fields.Many2one('sale.commission')
+    in_commission_id = fields.Many2one('sale.commission')
+    out_commission_id = fields.Many2one('sale.commission')
     commission_percent = fields.Float(string="C% Man")
     in_commission_percent = fields.Float(string="C% In")
     out_commission_percent = fields.Float(string="C% Out")

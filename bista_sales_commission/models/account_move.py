@@ -176,13 +176,42 @@ class AccountMove(models.Model):
 
             commission_line_ids = []
             invoice_lien_ids = move.invoice_line_ids.filtered(lambda l: l.commission_id and l.commission_amount)
-            for line in invoice_lien_ids:
-                commission_line_ids.append(
-                    move._get_commission_line_vals(line, line.commission_expense_account_id,
-                                                   debit=line.commission_amount))
-                commission_line_ids.append(
-                    move._get_commission_line_vals(line, line.commission_payout_account_id,
-                                                   credit=line.commission_amount))
+            # for line in invoice_lien_ids:
+            #     commission_line_ids.append(
+            #         move._get_commission_line_vals(line, line.commission_expense_account_id,
+            #                                        debit=line.commission_amount))
+            #     commission_line_ids.append(
+            #         move._get_commission_line_vals(line, line.commission_payout_account_id,
+            #                                        credit=line.commission_amount))
+            # move.line_ids = [(0, 0, commission_line) for commission_line in commission_line_ids]
+
+            for line in move.invoice_line_ids:
+                # 1. Man Commission
+                if line.commission_id and line.commission_amount:
+                    commission_line_ids.append(
+                        move._get_commission_line_vals(line, line.commission_expense_account_id,
+                                                       debit=line.commission_amount))
+                    commission_line_ids.append(
+                        move._get_commission_line_vals(line, line.commission_payout_account_id,
+                                                       credit=line.commission_amount))
+
+                # 2. In Commission
+                if line.in_commission_id and line.in_commission_amount:
+                    commission_line_ids.append(
+                        move._get_commission_line_vals(line, line.commission_expense_account_id,
+                                                       debit=line.in_commission_amount))
+                    commission_line_ids.append(
+                        move._get_commission_line_vals(line, line.commission_payout_account_id,
+                                                       credit=line.in_commission_amount))
+
+                # 3. Out Commission
+                if line.out_commission_id and line.out_commission_amount:
+                    commission_line_ids.append(
+                        move._get_commission_line_vals(line, line.commission_expense_account_id,
+                                                       debit=line.out_commission_amount))
+                    commission_line_ids.append(
+                        move._get_commission_line_vals(line, line.commission_payout_account_id,
+                                                       credit=line.out_commission_amount))
             move.line_ids = [(0, 0, commission_line) for commission_line in commission_line_ids]
 
     def _get_commission_line_vals(self, line, account_id, debit=0.0, credit=0.0):

@@ -15,6 +15,8 @@ class AccountMoveLine(models.Model):
     _inherit = 'account.move.line'
 
     commission_id = fields.Many2one('sale.commission')
+    in_commission_id = fields.Many2one('sale.commission')
+    out_commission_id = fields.Many2one('sale.commission')
     commission_date = fields.Date(copy=False)
     commission_move_id = fields.Many2one('account.move', string="Commission Bill", copy=False)
     reversed_move_id = fields.Many2one('account.move', related="move_id.reversed_entry_id", store=True)
