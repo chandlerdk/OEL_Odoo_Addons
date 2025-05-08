@@ -33,6 +33,7 @@ class SaleOrderLine(models.Model):
                 'percentage': 0
 
             }
+            print("lijneeeee",line)
             # if not line.validate_commission_rule():
             #     continue
             #
@@ -65,13 +66,6 @@ class SaleOrderLine(models.Model):
                                                 order='sequence') if line.user_id else sale_commission.browse()
             team_rules = sale_commission.search([('sale_team_rep', '=', line.team_id.user_id.id),('sale_partner_type','=','sale_team')],
                                                 order='sequence') if line.team_id else sale_commission.browse()
-            if not rep_rules:
-                line.write({
-                    'commission_amount': 0,
-                    'commission_id': False,
-                    'commission_percent': 0,
-                })
-                continue
             for rule in rep_rules:
                 data['percentage'] = rule.percentage
                 amount = rule.calculate_amount(data)
@@ -80,6 +74,8 @@ class SaleOrderLine(models.Model):
                     line.commission_id = rule.id if rule else False
                     line.commission_percent = rule.percentage
                     break
+                else:
+                    line.commission_percent = 0.0
                     # ================= USER COMMISSION =================
             for user_rule in user_rules:
                 data['percentage'] = user_rule.percentage
