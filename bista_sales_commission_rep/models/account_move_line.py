@@ -22,9 +22,9 @@ class AccountMoveLine(models.Model):
                  "product_id")
     def _compute_commission_amount(self):
         for line in self:
-            if not line.commission_percent:
-                line.commission_amount = 0
-                continue
+            # if not line.commission_percent:
+            #     line.commission_amount = 0
+            #     continue
 
             data = {
                 'product_id': line.product_id,
@@ -49,7 +49,7 @@ class AccountMoveLine(models.Model):
             #                                    order='priority desc')
             rep_rules = sale_commission.search([('sale_rep_id', '=', line.sale_rep_id.id),('sale_partner_type','=','sale_rep')],
                                                order='sequence') if line.sale_rep_id else sale_commission.browse()
-            user_rules = sale_commission.search([('user_ids', 'in', line.user_id.id),('sale_partner_type','=','user')],
+            user_rules = sale_commission.search([('user_ids', 'in', line.sale_person_id.id),('sale_partner_type','=','user')],
                                                 order='sequence') if line.user_id else sale_commission.browse()
             team_rules = sale_commission.search([('sale_team_rep', '=', line.team_id.user_id.id),('sale_partner_type','=','sale_team')],
                                                 order='sequence') if line.team_id else sale_commission.browse()
@@ -62,6 +62,11 @@ class AccountMoveLine(models.Model):
                     line.commission_percent = rule.percentage
                     line.commission_amount = amount
                     break
+            else:
+                line.commission_percent = 0.0
+                line.commission_id = False
+                line.commission_amount = 0.0
+
             for user_rule in user_rules:
                 data['percentage'] = user_rule.percentage
                 amount = user_rule.calculate_amount(data)
@@ -70,6 +75,10 @@ class AccountMoveLine(models.Model):
                     line.in_commission_percent = user_rule.percentage
                     line.in_commission_amount = amount
                     break
+            else:
+                line.in_commission_percent = 0
+                line.in_commission_id = False
+                line.in_commission_amount = 0.0
                 # ================= TEAM COMMISSION =================
             for team_rule in team_rules:
                 data['percentage'] = team_rule.percentage
@@ -79,6 +88,10 @@ class AccountMoveLine(models.Model):
                     line.out_commission_percent = team_rule.percentage
                     line.out_commission_amount = amount
                     break
+            else:
+                line.out_commission_percent = 0
+                line.out_commission_id = False
+                line.out_commission_amount = 0.0
 
             # if line.move_id.move_type == 'out_refund':
             #     amount = -amount

@@ -33,7 +33,6 @@ class SaleOrderLine(models.Model):
                 'percentage': 0
 
             }
-            print("lijneeeee",line)
             # if not line.validate_commission_rule():
             #     continue
             #
@@ -74,8 +73,10 @@ class SaleOrderLine(models.Model):
                     line.commission_id = rule.id if rule else False
                     line.commission_percent = rule.percentage
                     break
-                else:
-                    line.commission_percent = 0.0
+            else:
+                line.commission_percent = 0.0
+                line.commission_id = False
+                line.commission_amount = 0.0
                     # ================= USER COMMISSION =================
             for user_rule in user_rules:
                 data['percentage'] = user_rule.percentage
@@ -87,6 +88,8 @@ class SaleOrderLine(models.Model):
                     break
             else:
                 line.in_commission_percent = 0
+                line.in_commission_id = False
+                line.in_commission_amount = 0.0
 
                     # ================= TEAM COMMISSION =================
             for team_rule in team_rules:
@@ -99,6 +102,8 @@ class SaleOrderLine(models.Model):
                     break
             else:
                 line.out_commission_percent = 0
+                line.out_commission_id = False
+                line.out_commission_amount = 0.0
 
 
 
