@@ -15,6 +15,7 @@ class AccountMoveLine(models.Model):
     is_commission_billed = fields.Boolean(string="Commission Billed", default=False)
 
     @api.depends("sale_person_id", "team_id","user_id",
+                 "sale_rep_id",
                  "commission_id",
                  "commission_percent",
                  "price_total",
