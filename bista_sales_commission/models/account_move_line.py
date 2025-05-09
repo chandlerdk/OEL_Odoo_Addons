@@ -6,7 +6,7 @@
 #
 ##############################################################################
 
-from odoo import api, fields, models
+from odoo import api, fields, models,_
 from datetime import date
 from odoo.exceptions import ValidationError, UserError
 
@@ -125,6 +125,7 @@ class AccountMoveLine(models.Model):
     def generate_bill(self):
         grouped_lines = {}
         sale_commission = self.env['sale.commission']
+        billed_partners = {}
 
         for line in self:
             if line.is_commission_billed:
@@ -143,11 +144,11 @@ class AccountMoveLine(models.Model):
                     amount_field = 'commission_amount'
 
                 elif rule_key == 'user_rule' and line.sale_person_id and line.in_commission_amount:
-                    partner = self.env['res.partner'].search([('name', '=', line.sale_person_id.name)], limit=1)
+                    partner = line.sale_person_id.partner_id
                     amount_field = 'in_commission_amount'
 
                 elif rule_key == 'team_rule' and line.team_id and line.out_commission_amount:
-                    partner = self.env['res.partner'].search([('name', '=', line.team_id.user_id.name)], limit=1)
+                    partner = line.team_id.user_id.partner_id
                     amount_field = 'out_commission_amount'
 
                 if not partner or not amount_field:
@@ -171,7 +172,6 @@ class AccountMoveLine(models.Model):
                     ], order='sequence')
                 else:
                     rep_rules = sale_commission.browse()
-
                 data = {
                     'percentage': 0,
                     'quantity': line.quantity,
@@ -218,6 +218,7 @@ class AccountMoveLine(models.Model):
                 existing_bill.write({
                     'invoice_line_ids': invoice_lines
                 })
+                billed_partners[partner_id] = existing_bill.partner_id.name
                 return existing_bill
             else:
                 move_vals = {
@@ -225,12 +226,37 @@ class AccountMoveLine(models.Model):
                     'partner_id': partner_id,
                     'invoice_line_ids': invoice_lines,
                 }
-                return self.env['account.move'].create(move_vals)
+                bill = self.env['account.move'].create(move_vals)
+
+                billed_partners[partner_id] = bill.partner_id.name
+                return bill
 
         for (partner_id, rule_id, amount_field), lines in grouped_lines.items():
             create_bill(partner_id, rule_id, amount_field, lines)
 
-        return True
+        if billed_partners:
+            partner_names = ", ".join(billed_partners.values())
+            message = _("Vendor Bills created successfully for: %s") % partner_names
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Vendor Bill(s) Created'),
+                    'message': message,
+                    'sticky': False,
+                    'type': 'success',
+                }
+            }
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('No Vendor Bills Created'),
+                'message': _('No eligible lines found or all commissions already billed.'),
+                'sticky': False,
+                'type': 'warning',
+            }
+        }
 
     @api.depends("invoice_payment_state", "commission_payment_state", "commission_policy")
     def _get_commission_state(self):

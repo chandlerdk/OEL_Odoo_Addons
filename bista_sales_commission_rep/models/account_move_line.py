@@ -12,7 +12,7 @@ class AccountMoveLine(models.Model):
     _inherit = 'account.move.line'
 
     sale_rep_id = fields.Many2one('res.partner', string='Sale Rep', related="move_id.sale_rep_id")
-    is_commission_billed = fields.Boolean(string="Commission Billed", default=False)
+    is_commission_billed = fields.Boolean(string="Commission Billed", default=False,copy=False)
 
     @api.depends("sale_person_id", "team_id","user_id",
                  "sale_rep_id",
