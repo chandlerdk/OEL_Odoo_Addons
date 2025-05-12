@@ -223,6 +223,7 @@ class AccountMoveLine(models.Model):
             else:
                 move_vals = {
                     'move_type': 'in_invoice',
+                    'is_commission_bill': True,
                     'partner_id': partner_id,
                     'invoice_line_ids': invoice_lines,
                 }
