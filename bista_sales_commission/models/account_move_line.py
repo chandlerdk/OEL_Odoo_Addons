@@ -218,7 +218,7 @@ class AccountMoveLine(models.Model):
                 existing_bill.write({
                     'invoice_line_ids': invoice_lines
                 })
-                billed_partners[partner_id] = existing_bill.partner_id.name
+                billed_partners[partner_id] = existing_bill.name
                 return existing_bill
             else:
                 move_vals = {
@@ -227,8 +227,8 @@ class AccountMoveLine(models.Model):
                     'invoice_line_ids': invoice_lines,
                 }
                 bill = self.env['account.move'].create(move_vals)
-
-                billed_partners[partner_id] = bill.partner_id.name
+                bill._set_next_sequence()
+                billed_partners[partner_id] = bill.name
                 return bill
 
         for (partner_id, rule_id, amount_field), lines in grouped_lines.items():
