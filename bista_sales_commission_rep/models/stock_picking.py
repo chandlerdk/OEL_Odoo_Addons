@@ -21,7 +21,7 @@ class StockPicking(models.Model):
                 picking.write({'location_id': 4})
                 svl = picking.move_ids._create_in_svl()
                 svl._validate_accounting_entries()
-            if picking.picking_type_id.id == 2 and picking.location_id.id == 35 and picking.state == 'done':
+            if picking.picking_type_id.id == 2 and picking.location_dest_id.id == 13 and picking.state == 'done':
                 picking.move_ids.write({'is_force_accounting': True})
                 picking.move_line_ids.write({'is_force_accounting': True, 'location_dest_id': 5})
                 picking.write({'location_dest_id': 5})
