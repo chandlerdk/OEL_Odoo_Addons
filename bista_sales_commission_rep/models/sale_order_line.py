@@ -38,7 +38,7 @@ class SaleOrderLine(models.Model):
     def _compute_commission_amount(self):
         for line in self:
             data = {
-                'product_id': line.product_id,
+                'product_id': line.product_template_id,
                 'partner_id': line.order_id.partner_id,
                 'quantity': line.product_uom_qty,
                 'amount_after_tax': line.price_total,
@@ -62,16 +62,74 @@ class SaleOrderLine(models.Model):
                 specific_commission_rule = self.env['sale.commission'].search([
                     ('product_ids', 'in', line.product_template_id.id),('product_ids.detailed_type','=','service')
                 ],limit=1)
-                if specific_commission_rule:
-                    if line.sale_rep_id == specific_commission_rule.sale_rep_id:
-                        line.commission_amount = 0
-                        line.commission_id = specific_commission_rule.id
-                        line.commission_percent = specific_commission_rule.percentage
-                    elif line.user_id.id in specific_commission_rule.user_ids.ids:
-                        line.commission_amount = 0
-                        line.commission_id = specific_commission_rule.id
-                        line.commission_percent = specific_commission_rule.percentage
-                    continue
+
+                rep_rules = sale_commission.search(
+                    [('sale_rep_id', '=', line.sale_rep_id.id), ('sale_partner_type', '=', 'sale_rep'),
+                     ('product_ids', 'in', line.product_template_id.id),('product_ids.detailed_type','=','service')],
+                    order='sequence') if line.sale_rep_id else sale_commission.browse()
+                user_rules = sale_commission.search(
+                    [('user_ids', 'in', line.user_id.id), ('sale_partner_type', '=', 'user'),
+                    ('product_ids', 'in', line.product_template_id.id), ('product_ids.detailed_type', '=', 'service')
+                     ],
+                    order='sequence') if line.user_id else sale_commission.browse()
+                team_rules = sale_commission.search(
+                    [('sale_team_rep', '=', line.team_id.user_id.id), ('sale_partner_type', '=', 'sale_team'),
+                     ('product_ids', 'in', line.product_template_id.id), ('product_ids.detailed_type', '=', 'service')
+                     ],
+                    order='sequence') if line.team_id else sale_commission.browse()
+
+
+                for rule in rep_rules:
+                    data['percentage'] = rule.percentage if not line.manual_commission else line.commission_percent
+                    amount = rule.calculate_amount(data)
+                    if amount:
+                        line.commission_amount = amount
+                        line.commission_id = rule.id if rule else False
+                        line.commission_percent = rule.percentage if not line.manual_commission else line.commission_percent
+                        break
+                else:
+                    line.commission_percent = 0.0
+                    line.commission_id = False
+                    line.commission_amount = 0.0
+                    # ================= USER COMMISSION =================
+                for user_rule in user_rules:
+                    data['percentage'] = user_rule.percentage if not line.manual_in_commission else line.in_commission_percent
+                    amount = user_rule.calculate_amount(data)
+                    if amount:
+                        line.in_commission_id = user_rule.id if user_rule else False
+                        line.in_commission_percent = user_rule.percentage if not line.manual_in_commission else line.in_commission_percent
+                        line.in_commission_amount = amount
+                        break
+                else:
+                    line.in_commission_percent = 0
+                    line.in_commission_id = False
+                    line.in_commission_amount = 0.0
+
+                    # ================= TEAM COMMISSION =================
+                for team_rule in team_rules:
+                    data['percentage'] = team_rule.percentage if not line.manual_out_commission else line.out_commission_percent
+                    amount = team_rule.calculate_amount(data)
+                    if amount:
+                        line.out_commission_id = team_rule.id if team_rule else False
+                        line.out_commission_percent = team_rule.percentage if not line.manual_out_commission else line.out_commission_percent
+                        line.out_commission_amount = amount
+                        break
+                else:
+                    line.out_commission_percent = 0
+                    line.out_commission_id = False
+                    line.out_commission_amount = 0.0
+
+                # if specific_commission_rule:
+                #     if line.sale_rep_id == specific_commission_rule.sale_rep_id:
+                #         line.commission_amount = 0
+                #         line.commission_id = specific_commission_rule.id
+                #         line.commission_percent = specific_commission_rule.percentage
+                #     elif line.user_id.id in specific_commission_rule.user_ids.ids:
+                #         line.commission_amount = 0
+                #         line.commission_id = specific_commission_rule.id
+                #         line.commission_percent = specific_commission_rule.percentage
+                #     continue
+
             rep_rules = sale_commission.search([('sale_rep_id', '=', line.sale_rep_id.id),('sale_partner_type','=','sale_rep')],
                                                order='sequence') if line.sale_rep_id else sale_commission.browse()
             user_rules = sale_commission.search([('user_ids', 'in', line.user_id.id),('sale_partner_type','=','user')],
