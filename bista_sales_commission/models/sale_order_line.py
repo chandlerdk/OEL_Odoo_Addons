@@ -26,6 +26,12 @@ class SaleOrderLine(models.Model):
 
     user_id = fields.Many2one('res.users', related="order_id.user_id", store=True)
     team_id = fields.Many2one('crm.team', related="order_id.team_id", store=True)
+    is_invoiced = fields.Boolean(string="Invoiced", compute="_compute_is_invoiced", store=False)
+
+    @api.depends('invoice_lines')
+    def _compute_is_invoiced(self):
+        for line in self:
+            line.is_invoiced = bool(line.invoice_lines)
 
     @api.depends("user_id", "team_id",
                  "commission_id",

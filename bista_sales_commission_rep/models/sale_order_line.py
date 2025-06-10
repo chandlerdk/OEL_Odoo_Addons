@@ -14,6 +14,19 @@ class SaleOrderLine(models.Model):
 
     sale_rep_id = fields.Many2one('res.partner', related="order_id.sale_rep_id", store=True)
 
+    manual_commission = fields.Boolean(string="Manual C% Man Amount",copy=False)
+    manual_in_commission = fields.Boolean(string="Manual C% In Amount",copy=False)
+    manual_out_commission = fields.Boolean(string="Manual C% Out Amount",copy=False)
+
+    def write(self, vals):
+        if 'commission_percent' in vals:
+            vals['manual_commission'] = True
+        if 'in_commission_percent' in vals:
+            vals['manual_in_commission'] = True
+        if 'out_commission_percent' in vals:
+            vals['manual_out_commission'] = True
+        return super(SaleOrderLine, self).write(vals)
+
     @api.depends("user_id",
                  "sale_rep_id",
                  "team_id",
@@ -64,14 +77,14 @@ class SaleOrderLine(models.Model):
             user_rules = sale_commission.search([('user_ids', 'in', line.user_id.id),('sale_partner_type','=','user')],
                                                 order='sequence') if line.user_id else sale_commission.browse()
             team_rules = sale_commission.search([('sale_team_rep', '=', line.team_id.user_id.id),('sale_partner_type','=','sale_team')],
-                                                order='sequence') if line.team_id else sale_commission.browse()
+                                                    order='sequence') if line.team_id else sale_commission.browse()
             for rule in rep_rules:
-                data['percentage'] = rule.percentage
+                data['percentage'] = rule.percentage if not line.manual_commission else line.commission_percent
                 amount = rule.calculate_amount(data)
                 if amount:
                     line.commission_amount = amount
                     line.commission_id = rule.id if rule else False
-                    line.commission_percent = rule.percentage
+                    line.commission_percent = rule.percentage if not line.manual_commission else line.commission_percent
                     break
             else:
                 line.commission_percent = 0.0
@@ -79,11 +92,11 @@ class SaleOrderLine(models.Model):
                 line.commission_amount = 0.0
                     # ================= USER COMMISSION =================
             for user_rule in user_rules:
-                data['percentage'] = user_rule.percentage
+                data['percentage'] = user_rule.percentage if not line.manual_in_commission else line.in_commission_percent
                 amount = user_rule.calculate_amount(data)
                 if amount:
                     line.in_commission_id = user_rule.id if user_rule else False
-                    line.in_commission_percent = user_rule.percentage
+                    line.in_commission_percent = user_rule.percentage if not line.manual_in_commission else line.in_commission_percent
                     line.in_commission_amount = amount
                     break
             else:
@@ -93,11 +106,11 @@ class SaleOrderLine(models.Model):
 
                     # ================= TEAM COMMISSION =================
             for team_rule in team_rules:
-                data['percentage'] = team_rule.percentage
+                data['percentage'] = team_rule.percentage if not line.manual_out_commission else line.out_commission_percent
                 amount = team_rule.calculate_amount(data)
                 if amount:
                     line.out_commission_id = team_rule.id if team_rule else False
-                    line.out_commission_percent = team_rule.percentage
+                    line.out_commission_percent = team_rule.percentage if not line.manual_out_commission else line.out_commission_percent
                     line.out_commission_amount = amount
                     break
             else:
@@ -105,5 +118,17 @@ class SaleOrderLine(models.Model):
                 line.out_commission_id = False
                 line.out_commission_amount = 0.0
 
-
-
+    def _prepare_invoice_line(self, **optional_values):
+        res = super()._prepare_invoice_line(**optional_values)
+        res.update({
+            'commission_percent': self.commission_percent,
+            'in_commission_percent': self.in_commission_percent,
+            'out_commission_percent': self.out_commission_percent,
+            'manual_commission': self.manual_commission,
+            'manual_in_commission': self.manual_in_commission,
+            'manual_out_commission': self.manual_out_commission,
+            'commission_id': self.commission_id.id,
+            'in_commission_id': self.in_commission_id.id,
+            'out_commission_id': self.out_commission_id.id,
+        })
+        return res

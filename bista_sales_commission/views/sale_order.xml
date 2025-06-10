@@ -6,9 +6,11 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='order_line']//tree//field[@name='product_uom_qty']" position="before">
                 <field name="commission_id" column_invisible="1"/>
-                <field name="commission_percent"/>
-                <field name="in_commission_percent"/>
-                <field name="out_commission_percent"/>
+                <field name="is_invoiced" column_invisible="1"/>
+                <field name="commission_percent" readonly="is_invoiced == True"/>
+                <field name="in_commission_percent" readonly="is_invoiced == True"/>
+                <field name="out_commission_percent" readonly="is_invoiced == True"/>
+
                 <field name="in_commission_amount" column_invisible="1"/>
                 <field name="out_commission_amount" column_invisible="1"/>
                 <field name="commission_amount" column_invisible="1"/>

@@ -13,6 +13,9 @@ class AccountMoveLine(models.Model):
 
     sale_rep_id = fields.Many2one('res.partner', string='Sale Rep', related="move_id.sale_rep_id")
     is_commission_billed = fields.Boolean(string="Commission Billed", default=False,copy=False)
+    manual_commission = fields.Boolean(string="Manual C% Man", copy=False)
+    manual_in_commission = fields.Boolean(string="Manual C% In", copy=False)
+    manual_out_commission = fields.Boolean(string="Manual C% Out", copy=False)
 
     @api.depends("sale_person_id", "team_id","user_id",
                  "sale_rep_id",
@@ -56,11 +59,11 @@ class AccountMoveLine(models.Model):
                                                 order='sequence') if line.team_id else sale_commission.browse()
 
             for rule in rep_rules:
-                data['percentage'] = rule.percentage
+                data['percentage'] = line.commission_percent if line.manual_commission else rule.percentage
                 amount = rule.calculate_amount(data)
                 if amount:
                     line.commission_id = rule.id if rule else False
-                    line.commission_percent = rule.percentage
+                    line.commission_percent = line.commission_percent if line.manual_commission else rule.percentage
                     line.commission_amount = amount
                     break
             else:
@@ -69,11 +72,11 @@ class AccountMoveLine(models.Model):
                 line.commission_amount = 0.0
 
             for user_rule in user_rules:
-                data['percentage'] = user_rule.percentage
+                data['percentage'] = line.in_commission_percent if line.manual_in_commission else user_rule.percentage
                 amount = user_rule.calculate_amount(data)
                 if amount:
                     line.in_commission_id = user_rule.id if user_rule else False
-                    line.in_commission_percent = user_rule.percentage
+                    line.in_commission_percent = line.in_commission_percent if line.manual_in_commission else user_rule.percentage
                     line.in_commission_amount = amount
                     break
             else:
@@ -82,11 +85,11 @@ class AccountMoveLine(models.Model):
                 line.in_commission_amount = 0.0
                 # ================= TEAM COMMISSION =================
             for team_rule in team_rules:
-                data['percentage'] = team_rule.percentage
+                data['percentage'] = line.out_commission_percent if line.manual_out_commission else team_rule.percentage
                 amount = team_rule.calculate_amount(data)
                 if amount:
                     line.out_commission_id = team_rule.id if team_rule else False
-                    line.out_commission_percent = team_rule.percentage
+                    line.out_commission_percent = line.out_commission_percent if line.manual_out_commission else team_rule.percentage
                     line.out_commission_amount = amount
                     break
             else:
