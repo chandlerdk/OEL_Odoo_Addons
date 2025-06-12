@@ -104,7 +104,12 @@ class SaleCommission(models.Model):
             'price_total': data.get("amount_after_tax", 0),
         }
 
-        value = data['policy'][self.tax_policy]
+        # value = data['policy'][self.tax_policy]
+        # if not value:
+        #     return 0
+
+        tax_policy = self.tax_policy or 'price_subtotal'  # default fallback
+        value = data['policy'].get(tax_policy)
         if not value:
             return 0
 

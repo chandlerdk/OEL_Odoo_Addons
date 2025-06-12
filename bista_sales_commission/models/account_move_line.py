@@ -54,7 +54,6 @@ class AccountMoveLine(models.Model):
 
     @api.depends("sale_person_id", "team_id",
                  "commission_id",
-                 "commission_percent",
                  "price_total",
                  "partner_id",
                  "product_id")

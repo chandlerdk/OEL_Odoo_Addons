@@ -14,6 +14,7 @@ from odoo.exceptions import UserError
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
+    sale_rep_id = fields.Many2one('res.partner', domain=[('is_sale_rep', '=', True)])
 
     def update_commision_old_order(self,records):
         for order in records:

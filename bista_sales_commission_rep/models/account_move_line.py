@@ -19,8 +19,6 @@ class AccountMoveLine(models.Model):
 
     @api.depends("sale_person_id", "team_id","user_id",
                  "sale_rep_id",
-                 "commission_id",
-                 "commission_percent",
                  "price_total",
                  "partner_id",
                  "product_id")
@@ -44,13 +42,6 @@ class AccountMoveLine(models.Model):
             # else:
             sale_commission = self.env['sale.commission']
             rules = []
-            # if line.sale_rep_id:
-            #     rules = sale_commission.search([('sale_rep_id', '=', line.sale_rep_id.id)],
-            #                                    order='priority desc')
-            # elif line.sale_percent:
-            #     user = line.sale_person_id
-            #     rules = sale_commission.search([('user_ids', '=', user.id)],
-            #                                    order='priority desc')
             rep_rules = sale_commission.search([('sale_rep_id', '=', line.sale_rep_id.id),('sale_partner_type','=','sale_rep')],
                                                order='sequence') if line.sale_rep_id else sale_commission.browse()
             user_rules = sale_commission.search([('user_ids', 'in', line.sale_person_id.id),('sale_partner_type','=','user')],
@@ -67,9 +58,15 @@ class AccountMoveLine(models.Model):
                     line.commission_amount = amount
                     break
             else:
-                line.commission_percent = 0.0
-                line.commission_id = False
-                line.commission_amount = 0.0
+                if line.manual_commission and line.commission_percent:
+                    data['percentage'] = line.commission_percent
+                    amount = line.env['sale.commission'].calculate_amount(data)
+                    line.out_commission_id = False
+                    line.out_commission_amount = amount
+                else:
+                    line.commission_percent = 0.0
+                    line.commission_id = False
+                    line.commission_amount = 0.0
 
             for user_rule in user_rules:
                 data['percentage'] = line.in_commission_percent if line.manual_in_commission else user_rule.percentage
@@ -80,9 +77,15 @@ class AccountMoveLine(models.Model):
                     line.in_commission_amount = amount
                     break
             else:
-                line.in_commission_percent = 0
-                line.in_commission_id = False
-                line.in_commission_amount = 0.0
+                if line.manual_in_commission and line.in_commission_percent:
+                    data['percentage'] = line.in_commission_percent
+                    amount = line.env['sale.commission'].calculate_amount(data)
+                    line.out_commission_id = False
+                    line.out_commission_amount = amount
+                else:
+                    line.in_commission_percent = 0
+                    line.in_commission_id = False
+                    line.in_commission_amount = 0.0
                 # ================= TEAM COMMISSION =================
             for team_rule in team_rules:
                 data['percentage'] = line.out_commission_percent if line.manual_out_commission else team_rule.percentage
@@ -93,9 +96,16 @@ class AccountMoveLine(models.Model):
                     line.out_commission_amount = amount
                     break
             else:
-                line.out_commission_percent = 0
-                line.out_commission_id = False
-                line.out_commission_amount = 0.0
+                # Fallback logic if manual_out_commission is True but no rule is found
+                if line.manual_out_commission and line.out_commission_percent:
+                    data['percentage'] = line.out_commission_percent
+                    amount = line.env['sale.commission'].calculate_amount(data)
+                    line.out_commission_id = False
+                    line.out_commission_amount = amount
+                else:
+                    line.out_commission_percent = 0
+                    line.out_commission_id = False
+                    line.out_commission_amount = 0.0
 
             # if line.move_id.move_type == 'out_refund':
             #     amount = -amount
