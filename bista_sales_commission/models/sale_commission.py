@@ -33,7 +33,7 @@ class SaleCommission(models.Model):
     related_partners = fields.Boolean(string="Include Related Partners")
     related_partner_ids = fields.One2many('res.partner', related="partner_ids.child_ids")
 
-    product_ids = fields.Many2many('product.template')
+    product_ids = fields.Many2many('product.product')
     product_category_ids = fields.Many2many('product.category')
 
     sale_partner_type = fields.Selection([
@@ -65,6 +65,7 @@ class SaleCommission(models.Model):
 
     tax_policy = fields.Selection([('price_subtotal', 'Before Tax'), ('price_total', 'After Tax')],
                                   default="price_subtotal")
+    is_default = fields.Boolean(string="Default Commission", default=False)
 
     @api.depends("sale_team_ids")
     def _onchange_sale_team_ids(self):

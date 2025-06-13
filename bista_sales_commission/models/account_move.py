@@ -1,4 +1,5 @@
-from odoo import api, fields, models, Command
+from odoo import api, fields, models, Command,_
+from odoo.exceptions import UserError, ValidationError
 
 TYPE_REVERSE_MAP = {
     'entry': 'entry',
@@ -11,12 +12,12 @@ TYPE_REVERSE_MAP = {
 }
 
 PAYMENT_STATE_SELECTION = [
-        ('not_paid', 'Not Paid'),
-        ('in_payment', 'In Payment'),
-        ('paid', 'Paid'),
-        ('partial', 'Partially Paid'),
-        ('reversed', 'Reversed'),
-        ('invoicing_legacy', 'Invoicing App Legacy'),
+    ('not_paid', 'Not Paid'),
+    ('in_payment', 'In Payment'),
+    ('paid', 'Paid'),
+    ('partial', 'Partially Paid'),
+    ('reversed', 'Reversed'),
+    ('invoicing_legacy', 'Invoicing App Legacy'),
 ]
 
 
@@ -54,11 +55,12 @@ class AccountMove(models.Model):
         compute="_compute_commission_move_id",
         store=True
     )
-    commission_payment_state = fields.Selection(related="invoice_line_ids.commission_payment_state", store=True, copy=False)
+    commission_payment_state = fields.Selection(related="invoice_line_ids.commission_payment_state", store=True,
+                                                copy=False)
     commission_policy = fields.Selection([
         ('invoice', 'Invoice Generated'),
         ('payment', 'Invoice Fully Paid')
-    ],compute="commission_policy_state", required=True, default="payment", readonly=True, copy=False)
+    ], compute="commission_policy_state", required=True, default="payment", readonly=True, copy=False)
     payment_date = fields.Date(
         string="Payment Date",
         compute="compute_payment_date_final",
@@ -72,7 +74,6 @@ class AccountMove(models.Model):
             payment_moves = reconciled_lines.filtered(lambda m: m.payment_id)
             payment_dates = payment_moves.mapped('payment_id.date')
             move.payment_date = max(payment_dates) if payment_dates else False
-
 
     @api.depends('line_ids.commission_policy')
     def commission_policy_state(self):
@@ -101,9 +102,7 @@ class AccountMove(models.Model):
             move.in_commission_amount = sum(move.line_ids.mapped("in_commission_amount"))
             move.out_commission_amount = sum(move.line_ids.mapped("out_commission_amount"))
 
-
-
-    def update_commision_on_invoice(self,records):
+    def update_commision_on_invoice(self, records):
         # filtered_invoices = records.filtered(
         #     lambda inv: any(not line.commission_id for line in inv.invoice_line_ids)
         # )
@@ -170,6 +169,12 @@ class AccountMove(models.Model):
             moves = self.env['account.move.line'].browse(active_ids).mapped("move_id")
         elif not moves and active_model == 'account.move':
             moves = self.env['account.move'].browse(active_ids)
+
+        default_commission = self.env['sale.commission'].search([('is_default', '=', True)], limit=1)
+        if not default_commission:
+            raise ValidationError(_(
+                "There is no Default Commission Found for the no commission id."
+            ))
         for move in moves:
             if move.state == 'posted':
                 continue
@@ -187,31 +192,35 @@ class AccountMove(models.Model):
 
             for line in move.invoice_line_ids:
                 # 1. Man Commission
-                if line.commission_id and line.commission_amount:
+                if line.commission_amount:
+                    commission = line.commission_id or default_commission
                     commission_line_ids.append(
-                        move._get_commission_line_vals(line, line.commission_expense_account_id,
+                        move._get_commission_line_vals(line, commission.expense_account_id,
                                                        debit=line.commission_amount))
                     commission_line_ids.append(
-                        move._get_commission_line_vals(line, line.commission_payout_account_id,
+                        move._get_commission_line_vals(line, commission.payout_account_id,
                                                        credit=line.commission_amount))
 
                 # 2. In Commission
-                if line.in_commission_id and line.in_commission_amount:
+                if line.in_commission_amount:
+                    in_commission = line.in_commission_id or default_commission
                     commission_line_ids.append(
-                        move._get_commission_line_vals(line, line.commission_expense_account_id,
+                        move._get_commission_line_vals(line, in_commission.expense_account_id,
                                                        debit=line.in_commission_amount))
                     commission_line_ids.append(
-                        move._get_commission_line_vals(line, line.commission_payout_account_id,
+                        move._get_commission_line_vals(line, in_commission.payout_account_id,
                                                        credit=line.in_commission_amount))
 
                 # 3. Out Commission
-                if line.out_commission_id and line.out_commission_amount:
+                if line.out_commission_amount:
+                    out_commission = line.out_commission_id or default_commission
                     commission_line_ids.append(
-                        move._get_commission_line_vals(line, line.commission_expense_account_id,
+                        move._get_commission_line_vals(line, out_commission.expense_account_id,
                                                        debit=line.out_commission_amount))
                     commission_line_ids.append(
-                        move._get_commission_line_vals(line, line.commission_payout_account_id,
+                        move._get_commission_line_vals(line, out_commission.payout_account_id,
                                                        credit=line.out_commission_amount))
+
             move.line_ids = [(0, 0, commission_line) for commission_line in commission_line_ids]
 
     def _get_commission_line_vals(self, line, account_id, debit=0.0, credit=0.0):

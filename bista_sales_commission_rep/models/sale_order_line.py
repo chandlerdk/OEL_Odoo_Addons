@@ -42,7 +42,7 @@ class SaleOrderLine(models.Model):
     def _compute_commission_amount(self):
         for line in self:
             data = {
-                'product_id': line.product_template_id,
+                'product_id': line.product_id,
                 'partner_id': line.order_id.partner_id,
                 'quantity': line.product_uom_qty,
                 'amount_after_tax': line.price_total,
@@ -65,16 +65,16 @@ class SaleOrderLine(models.Model):
             if line.product_id.detailed_type == 'service':
                 rep_rules = sale_commission.search(
                     [('sale_rep_id', '=', line.sale_rep_id.id), ('sale_partner_type', '=', 'sale_rep'),
-                     ('product_ids', 'in', line.product_template_id.id),('product_ids.detailed_type','=','service')],
+                     ('product_ids', 'in', line.product_id.id),('product_ids.detailed_type','=','service')],
                     order='sequence') if line.sale_rep_id else sale_commission.browse()
                 user_rules = sale_commission.search(
                     [('user_ids', 'in', line.user_id.id), ('sale_partner_type', '=', 'user'),
-                    ('product_ids', 'in', line.product_template_id.id), ('product_ids.detailed_type', '=', 'service')
+                    ('product_ids', 'in', line.product_id.id), ('product_ids.detailed_type', '=', 'service')
                      ],
                     order='sequence') if line.user_id else sale_commission.browse()
                 team_rules = sale_commission.search(
                     [('sale_team_rep', '=', line.team_id.user_id.id), ('sale_partner_type', '=', 'sale_team'),
-                     ('product_ids', 'in', line.product_template_id.id), ('product_ids.detailed_type', '=', 'service')
+                     ('product_ids', 'in', line.product_id.id), ('product_ids.detailed_type', '=', 'service')
                      ],
                     order='sequence') if line.team_id else sale_commission.browse()
 
@@ -188,5 +188,8 @@ class SaleOrderLine(models.Model):
             'commission_id': self.commission_id.id,
             'in_commission_id': self.in_commission_id.id,
             'out_commission_id': self.out_commission_id.id,
+            'commission_amount':self.commission_amount,
+            'in_commission_amount':self.in_commission_amount,
+            'out_commission_amount':self.out_commission_amount,
         })
         return res

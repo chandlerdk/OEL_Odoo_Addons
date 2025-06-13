@@ -121,6 +121,164 @@ class AccountMoveLine(models.Model):
         }
 
 
+    # def generate_bill(self):
+    #     grouped_lines = {}
+    #     sale_commission = self.env['sale.commission']
+    #     billed_partners = {}
+    #
+    #     for line in self:
+    #         if line.is_commission_billed:
+    #             continue
+    #         rules = line.get_commission_rules()
+    #
+    #         for rule_key, rule in rules.items():
+    #             # if not rule:
+    #             #     continue
+    #
+    #             partner = None
+    #             amount_field = None
+    #
+    #             if rule_key == 'rep_rule' and line.sale_rep_id and line.commission_amount:
+    #                 partner = line.sale_rep_id
+    #                 amount_field = 'commission_amount'
+    #
+    #             elif rule_key == 'user_rule' and line.sale_person_id and line.in_commission_amount:
+    #                 partner = line.sale_person_id.partner_id
+    #                 amount_field = 'in_commission_amount'
+    #
+    #             elif rule_key == 'team_rule' and line.team_id and line.out_commission_amount:
+    #                 partner = line.team_id.user_id.partner_id
+    #                 amount_field = 'out_commission_amount'
+    #
+    #             if not partner or not amount_field:
+    #                 continue
+    #
+    #             # Assign the exact commission rule to the line (based on partner type)
+    #             if rule_key == 'rep_rule':
+    #                 rep_rules = sale_commission.search([
+    #                     ('sale_rep_id', '=', line.sale_rep_id.id),
+    #                     ('sale_partner_type', '=', 'sale_rep')
+    #                 ], order='sequence')
+    #             elif rule_key == 'user_rule':
+    #                 rep_rules = sale_commission.search([
+    #                     ('user_ids', 'in', line.user_id.id),
+    #                     ('sale_partner_type', '=', 'user')
+    #                 ], order='sequence')
+    #             elif rule_key == 'team_rule':
+    #                 rep_rules = sale_commission.search([
+    #                     ('sale_team_rep', '=', self.team_id.user_id.id),
+    #                     ('sale_partner_type', '=', 'sale_team')
+    #                 ], order='sequence')
+    #             else:
+    #                 rep_rules = sale_commission.browse()
+    #             data = {
+    #                 'percentage': 0,
+    #                 'quantity': line.quantity,
+    #                 'amount_after_tax': line.price_total,
+    #                 'amount_before_tax': line.price_subtotal,
+    #                 'product_id': line.product_id,
+    #                 'partner_id': partner,
+    #             }
+    #
+    #             used_rule = None
+    #             for commission_rule in rep_rules:
+    #                 data['percentage'] = commission_rule.percentage
+    #                 amount = commission_rule.calculate_amount(data)
+    #                 if amount:
+    #                     line.commission_id = commission_rule.id
+    #                     used_rule = commission_rule
+    #                     break
+    #
+    #             # If no rule applied, but amount exists => use default commission
+    #             if not used_rule and getattr(line, amount_field):
+    #                 default_commission = sale_commission.search([('is_default', '=', True)], limit=1)
+    #                 if default_commission:
+    #                     used_rule = default_commission
+    #                     line.commission_id = default_commission.id
+    #
+    #             if used_rule:
+    #                 key = (partner.id, used_rule.id, amount_field)
+    #                 grouped_lines.setdefault(key, []).append(line)
+    #                 line.is_commission_billed = True
+    #
+    #             # for commission_rule in rep_rules:
+    #             #     data['percentage'] = commission_rule.percentage
+    #             #     amount = commission_rule.calculate_amount(data)
+    #             #     if amount:
+    #             #         line.commission_id = commission_rule.id
+    #             #         key = (partner.id, commission_rule.id, amount_field)
+    #             #         grouped_lines.setdefault(key, []).append(line)
+    #             #         break
+    #             # line.is_commission_billed = True
+    #
+    #     def create_bill(partner_id, rule_id, amount_field, lines):
+    #         rule = self.env['sale.commission'].browse(rule_id)
+    #         payout_account = rule.payout_account_id
+    #
+    #         if not payout_account:
+    #             raise UserError(f"Payout account not set on commission rule '{rule.name}'.")
+    #
+    #         existing_bill = self.env['account.move'].search([
+    #             ('partner_id', '=', partner_id),
+    #             ('move_type', '=', 'in_invoice'),
+    #             ('state', '=', 'draft'),
+    #         ], limit=1)
+    #
+    #         invoice_lines = []
+    #         for line in lines:
+    #             invoice_lines.append((0, 0, {
+    #                 'name': f"Com: {line.move_id.name}/{line.name}",
+    #                 'quantity': 1,
+    #                 'price_unit': getattr(line, amount_field),
+    #                 'account_id': payout_account.id,
+    #                 'commission_reverse_move_line_id': line.id,
+    #             }))
+    #
+    #         if existing_bill:
+    #             existing_bill.write({
+    #                 'invoice_line_ids': invoice_lines
+    #             })
+    #             billed_partners[partner_id] = existing_bill.name
+    #             return existing_bill
+    #         else:
+    #             move_vals = {
+    #                 'move_type': 'in_invoice',
+    #                 'is_commission_bill': True,
+    #                 'partner_id': partner_id,
+    #                 'invoice_line_ids': invoice_lines,
+    #             }
+    #             bill = self.env['account.move'].create(move_vals)
+    #             bill._set_next_sequence()
+    #             billed_partners[partner_id] = bill.name
+    #             return bill
+    #
+    #     for (partner_id, rule_id, amount_field), lines in grouped_lines.items():
+    #         create_bill(partner_id, rule_id, amount_field, lines)
+    #
+    #     if billed_partners:
+    #         partner_names = ", ".join(billed_partners.values())
+    #         message = _("Vendor Bills created successfully for: %s") % partner_names
+    #         return {
+    #             'type': 'ir.actions.client',
+    #             'tag': 'display_notification',
+    #             'params': {
+    #                 'title': _('Vendor Bill(s) Created'),
+    #                 'message': message,
+    #                 'sticky': False,
+    #                 'type': 'success',
+    #             }
+    #         }
+    #     return {
+    #         'type': 'ir.actions.client',
+    #         'tag': 'display_notification',
+    #         'params': {
+    #             'title': _('No Vendor Bills Created'),
+    #             'message': _('No eligible lines found or all commissions already billed.'),
+    #             'sticky': False,
+    #             'type': 'warning',
+    #         }
+    #     }
+
     def generate_bill(self):
         grouped_lines = {}
         sale_commission = self.env['sale.commission']
@@ -132,9 +290,6 @@ class AccountMoveLine(models.Model):
             rules = line.get_commission_rules()
 
             for rule_key, rule in rules.items():
-                if not rule:
-                    continue
-
                 partner = None
                 amount_field = None
 
@@ -153,7 +308,7 @@ class AccountMoveLine(models.Model):
                 if not partner or not amount_field:
                     continue
 
-                # Assign the exact commission rule to the line (based on partner type)
+                # Try finding the exact commission rule
                 if rule_key == 'rep_rule':
                     rep_rules = sale_commission.search([
                         ('sale_rep_id', '=', line.sale_rep_id.id),
@@ -171,6 +326,7 @@ class AccountMoveLine(models.Model):
                     ], order='sequence')
                 else:
                     rep_rules = sale_commission.browse()
+
                 data = {
                     'percentage': 0,
                     'quantity': line.quantity,
@@ -180,15 +336,26 @@ class AccountMoveLine(models.Model):
                     'partner_id': partner,
                 }
 
+                used_rule = None
                 for commission_rule in rep_rules:
                     data['percentage'] = commission_rule.percentage
                     amount = commission_rule.calculate_amount(data)
                     if amount:
+                        used_rule = commission_rule
                         line.commission_id = commission_rule.id
-                        key = (partner.id, commission_rule.id, amount_field)
-                        grouped_lines.setdefault(key, []).append(line)
                         break
-                line.is_commission_billed = True
+
+                # If no matching rule found but amount exists, use default
+                if not used_rule and getattr(line, amount_field):
+                    default_commission = sale_commission.search([('is_default', '=', True)], limit=1)
+                    if default_commission:
+                        used_rule = default_commission
+                        line.commission_id = default_commission.id
+
+                if used_rule:
+                    key = (partner.id, used_rule.id, amount_field)
+                    grouped_lines.setdefault(key, []).append(line)
+                    line.is_commission_billed = True
 
         def create_bill(partner_id, rule_id, amount_field, lines):
             rule = self.env['sale.commission'].browse(rule_id)
