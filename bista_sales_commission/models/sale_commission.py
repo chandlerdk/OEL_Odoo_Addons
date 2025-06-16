@@ -65,7 +65,6 @@ class SaleCommission(models.Model):
 
     tax_policy = fields.Selection([('price_subtotal', 'Before Tax'), ('price_total', 'After Tax')],
                                   default="price_subtotal")
-    is_default = fields.Boolean(string="Default Commission", default=False)
 
     @api.depends("sale_team_ids")
     def _onchange_sale_team_ids(self):

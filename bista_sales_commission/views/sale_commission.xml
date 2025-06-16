@@ -11,7 +11,6 @@
                             <field name="name" placeholder="Give it a name"/>
                             <field name="expense_account_id"/>
                             <field name="payout_account_id"/>
-                            <field name="is_default"/>
                         </group>
                         <group string="Partner">
                             <field name="partner_ids" widget="many2many_tags"/>

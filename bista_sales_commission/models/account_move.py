@@ -169,12 +169,6 @@ class AccountMove(models.Model):
             moves = self.env['account.move.line'].browse(active_ids).mapped("move_id")
         elif not moves and active_model == 'account.move':
             moves = self.env['account.move'].browse(active_ids)
-
-        default_commission = self.env['sale.commission'].search([('is_default', '=', True)], limit=1)
-        if not default_commission:
-            raise ValidationError(_(
-                "There is no Default Commission Found for the no commission id."
-            ))
         for move in moves:
             if move.state == 'posted':
                 continue
@@ -192,8 +186,8 @@ class AccountMove(models.Model):
 
             for line in move.invoice_line_ids:
                 # 1. Man Commission
-                if line.commission_amount:
-                    commission = line.commission_id or default_commission
+                if line.commission_id:
+                    commission = line.commission_id
                     commission_line_ids.append(
                         move._get_commission_line_vals(line, commission.expense_account_id,
                                                        debit=line.commission_amount))
@@ -202,8 +196,8 @@ class AccountMove(models.Model):
                                                        credit=line.commission_amount))
 
                 # 2. In Commission
-                if line.in_commission_amount:
-                    in_commission = line.in_commission_id or default_commission
+                if line.in_commission_id:
+                    in_commission = line.in_commission_id
                     commission_line_ids.append(
                         move._get_commission_line_vals(line, in_commission.expense_account_id,
                                                        debit=line.in_commission_amount))
@@ -212,8 +206,8 @@ class AccountMove(models.Model):
                                                        credit=line.in_commission_amount))
 
                 # 3. Out Commission
-                if line.out_commission_amount:
-                    out_commission = line.out_commission_id or default_commission
+                if line.out_commission_id:
+                    out_commission = line.out_commission_id
                     commission_line_ids.append(
                         move._get_commission_line_vals(line, out_commission.expense_account_id,
                                                        debit=line.out_commission_amount))
