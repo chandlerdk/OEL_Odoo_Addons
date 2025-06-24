@@ -20,18 +20,15 @@ class SaleOrderLine(models.Model):
 
     @api.onchange('commission_percent')
     def _onchange_commission_percent(self):
-        if self.commission_percent :
-            self.write({'manual_commission' : True })
+        self.write({'manual_commission' : True })
 
     @api.onchange('in_commission_percent')
     def _onchange_in_commission_percent(self):
-        if self.in_commission_percent:
-            self.write({'manual_in_commission': True})
+        self.write({'manual_in_commission': True})
 
     @api.onchange('out_commission_percent')
     def _onchange_out_commission_percent(self):
-        if self.out_commission_percent :
-            self.write({'manual_out_commission': True})
+        self.write({'manual_out_commission': True})
 
     @api.depends("user_id",
                  "sale_rep_id",
