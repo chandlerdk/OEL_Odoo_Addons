@@ -1,0 +1,20 @@
+<odoo>
+  <record id="view_sale_order_confirm_date_wizard_form" model="ir.ui.view">
+    <field name="name">sale.order.confirm.date.wizard.form</field>
+    <field name="model">sale.order.confirm.date.wizard</field>
+    <field name="arch" type="xml">
+      <form string="Confirm Order Date">
+        <group>
+          <field name="original_date_order" readonly="1"/>
+          <field name="keep_original"/>
+          <field name="update_to_today"/>
+        </group>
+        <footer>
+          <button string="Cancel" special="cancel" class="btn-secondary"/>
+          <button string="Confirm" type="object" name="confirm" class="btn-primary"/>
+        </footer>
+      </form>
+    </field>
+  </record>
+</odoo>
+
