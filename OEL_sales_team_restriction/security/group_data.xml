@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+    <!--
+      Defines the “Sales Team Manager” group.
+      We use the existing “Hidden” category to avoid missing-XMLID errors.
+    -->
+    <record id="group_sale_team_manager" model="res.groups">
+      <field name="name">Sales Team Manager</field>
+      <field name="category_id" ref="base.module_category_hidden"/>
+    </record>
+  </data>
+</odoo>
