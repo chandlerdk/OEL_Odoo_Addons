@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="view_order_form_restrict_team" model="ir.ui.view">
-        <field name="name">sale.order.form.restrict.team</field>
-        <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale.view_order_form"/>
-        <field name="arch" type="xml">
-		<xpath expr="//field[@name='team_id']" position="replace">
-			<field name="team_id" groups="OEL_sales_team_restriction.group_sale_team_manager"/>
-			<field name="team_id" groups="base.group_user,!OEL_sales_team_restriction.group_sale_team_manager" readonly="1"/>
-		</xpath>
-        </field>
-    </record>
+  <record id="view_order_form_restrict_team" model="ir.ui.view">
+    <field name="name">sale.order.form.restrict.team</field>
+    <field name="model">sale.order</field>
+    <field name="inherit_id" ref="sale.view_order_form"/>
+    <field name="priority" eval="99"/>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='team_id']" position="replace">
+        <!-- Editable for managers -->
+        <field name="team_id" groups="OEL_sales_team_restriction.group_sale_team_manager"/>
+        <!-- Read-only for everyone else -->
+        <field name="team_id" groups="base.group_user" readonly="1"/>
+      </xpath>
+    </field>
+  </record>
 </odoo>
+

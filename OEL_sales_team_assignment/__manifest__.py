@@ -13,7 +13,9 @@
     'license': 'LGPL-3',
 
     'depends': [
-        'sale','OEL_sales_team_restriction',  # ensure restriction logic is available
+        'sale',
+        'sale_management',
+        'OEL_sales_team_restriction',# ensure restriction logic is available
     ],
 
     'data': [],  # no XML views or security needed for auto-assignment

@@ -10,7 +10,8 @@
     'license': 'LGPL-3',
 
     'depends': [
-        'sale'],
+        'sale',
+        'sale_management'],
 
     'data': [
         'security/group_data.xml',
