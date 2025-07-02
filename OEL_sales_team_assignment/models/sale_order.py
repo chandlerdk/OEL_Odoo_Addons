@@ -1,39 +1,46 @@
-# -*- coding: utf-8 -*-
-from odoo import api, models
+#  -- coding: utf-8 --
+#
+#
+###########################################
+#
+#
+
+from odoo import models, api
 
 class SaleOrderAssignment(models.Model):
     _inherit = 'sale.order'
 
+
     @api.model_create_multi
     def create(self, vals_list):
-        # 1. Create orders normally
+        # First, Create the records normally
         orders = super(SaleOrderAssignment, self).create(vals_list)
-        # 2. Assign (or clear) team for each
+        # Assign team after creation (using sudo to bypass restrictions)
         for order in orders:
             addr = order.partner_shipping_id
-            team = addr.team_id or order.partner_id.team_id
-            order.sudo().write({'team_id': team.id if team else False})
+            team = addr.team_id if addr and addr.team_id else order.partner_id.team_id
+            if team:
+                order.sudo().write({'team_id': team.id})
         return orders
 
+
     def write(self, vals):
-        # 1. Perform the normal write
+        # If the delivery address is changed on a draft, reassign team
         res = super(SaleOrderAssignment, self).write(vals)
-        # 2. If shipping address changed on drafts, reassign (or clear) team
         if 'partner_shipping_id' in vals:
-            drafts = self.filtered(lambda o: o.state == 'draft')
-            for order in drafts:
+            for order in self.filtered(lambda o: o.state == 'draft'):
                 addr = order.partner_shipping_id
-                team = addr.team_id or order.partner_id.team_id
-                order.sudo().write({'team_id': team.id if team else False})
+                team = addr.team_id if addr and addr.team_id else order.partner_id.team_id
+                if team:
+                    order.sudo().write({'team_id': team.id})
         return res
 
     def action_confirm(self):
-        # 1. Confirm the order
         res = super(SaleOrderAssignment, self).action_confirm()
-        # 2. After confirmation, reassign (or clear) team based on final addresses
+        # Reassign team on confirmation using current shipping/fallback logic
         for order in self:
             addr = order.partner_shipping_id
-            team = addr.team_id or order.partner_id.team_id
-            order.sudo().write({'team_id': team.id if team else False})
+            team = addr.team_id if addr and addr.team_id else order.partner_id.team_id
+            if team:
+                order.sudo().write({'team_id': team.id})
         return res
-

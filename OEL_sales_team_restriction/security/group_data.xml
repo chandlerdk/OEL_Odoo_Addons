@@ -1,24 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
   <data>
-    <!-- Sales Team Manager group -->
+    <!--
+      Defines the “Sales Team Manager” group.
+      We use the existing “Hidden” category to avoid missing-XMLID errors.
+    -->
     <record id="group_sale_team_manager" model="res.groups">
       <field name="name">Sales Team Manager</field>
       <field name="category_id" ref="base.module_category_hidden"/>
     </record>
-
-    <!-- Grant full CRUD on sale.order.line to Sales Team Managers -->
-    <record id="rule_order_line_manager" model="ir.rule">
-      <field name="name">Order Lines: full access for Sales Team Managers</field>
-      <field name="model_id" ref="sale.model_sale_order_line"/>
-      <!-- Always true: matches all order lines -->
-      <field name="domain_force">[(1, '=', 1)]</field>
-      <field name="groups" eval="[(4, ref('OEL_sales_team_restriction.group_sale_team_manager'))]"/>
-      <field name="perm_read" eval="True"/>
-      <field name="perm_write" eval="True"/>
-      <field name="perm_create" eval="True"/>
-      <field name="perm_unlink" eval="True"/>
-    </record>
   </data>
 </odoo>
-
