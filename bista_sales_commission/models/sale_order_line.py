@@ -69,7 +69,7 @@ class SaleOrderLine(models.Model):
             for rule in rules:
                 data['percentage'] = rule.percentage
                 amount = rule.calculate_amount(data)
-                if amount:
+                if amount is not None:
                     line.commission_amount = amount
                     line.commission_id = rule.id if rule else False
                     line.commission_percent = rule.percentage

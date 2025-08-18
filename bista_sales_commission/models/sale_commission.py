@@ -111,10 +111,10 @@ class SaleCommission(models.Model):
         tax_policy = self.tax_policy or 'price_subtotal'  # default fallback
         value = data['policy'].get(tax_policy)
         if not value:
-            return 0
+            return None
 
         if not self.validate_rules(data):
-            return 0
+            return None
 
         product_id = data['product_id']
         percentage = data['percentage']
