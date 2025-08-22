@@ -37,7 +37,6 @@ class CommissionBillWizard(models.TransientModel):
 
     def confirm(self):
         moves_by_user = self._get_moves_by_user()
-        print("move by user ", moves_by_user)
         bill = self.env['account.move']
         bill_ids = []
         for user in moves_by_user:

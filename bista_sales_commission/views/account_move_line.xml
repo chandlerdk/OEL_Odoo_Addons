@@ -21,7 +21,9 @@
                 <field name="commission_payment_state"/>
                 <field name="commission_policy"/>
                 <field name="commission_user_id" string="Sales Person" widget="many2onebutton"/>
-                <field name="commission_amount" string="Amount"/>
+                <field name="commission_amount"/>
+                <field name="in_commission_amount"/>
+                <field name="out_commission_amount"/>
             </tree>
         </field>
     </record>
@@ -53,11 +55,17 @@
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">account.move.line</field>
         <field name="view_mode">tree</field>
-       <field name="domain">[('commission_id', '!=', False), ('commission_amount', '>', 0)]</field>
+        <field name="domain">['|','|',('commission_amount','!=', False),('in_commission_amount','!=',
+            False),('in_commission_amount','!=', False),('display_type', 'in', ['product', 'line_section',
+            'line_note'])]
+        </field>
+
         <field name="context">{'create': 0, 'delete': 0, 'edit': 0, 'search_default_to_bill': 1,
             'search_group_commission_user_id': 1}
         </field>
     </record>
+
+    <!--     context="{'default_move_type': context.get('default_move_type'),'journal_id': journal_id,'default_partner_id': commercial_partner_id,'default_currency_id': currency_id or company_currency_id,'default_display_type': 'product','quick_encoding_vals': quick_encoding_vals,}"-->
 
     <record id="account_move_line_commission_action_tree_view" model="ir.actions.act_window.view">
         <field name="sequence">1</field>

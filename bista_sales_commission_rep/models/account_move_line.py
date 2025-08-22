@@ -12,18 +12,104 @@ class AccountMoveLine(models.Model):
     _inherit = 'account.move.line'
 
     sale_rep_id = fields.Many2one('res.partner', string='Sale Rep', related="move_id.sale_rep_id")
+    is_commission_billed = fields.Boolean(string="Commission Billed", default=False,copy=False)
+    manual_commission = fields.Boolean(string="Manual C% Man", copy=False)
+    manual_in_commission = fields.Boolean(string="Manual C% In", copy=False)
+    manual_out_commission = fields.Boolean(string="Manual C% Out", copy=False)
 
-    @api.depends("sale_person_id", "team_id",
-                 "commission_id",
-                 "commission_percent",
+    @api.onchange('commission_percent')
+    def _onchange_commission_percent(self):
+        self.write({'manual_commission': True})
+        sale_commission = self.env['sale.commission']
+        for line in self:
+            data = {
+                'product_id': line.product_id,
+                'partner_id': line.partner_id,
+                'quantity': line.quantity,
+                'amount_after_tax': line.price_total,
+                'amount_before_tax': line.price_subtotal,
+                'percentage': line.commission_percent
+            }
+            rep_rules = sale_commission.search(
+                [('sale_rep_id', '=', line.sale_rep_id.id), ('sale_partner_type', '=', 'sale_rep')],
+                order='sequence') if line.sale_rep_id else sale_commission.browse()
+
+            data['percentage'] = line.commission_percent if line.manual_commission else rule.percentage
+            for rule in rep_rules:
+                data['percentage'] = line.commission_percent if line.manual_commission else rule.percentage
+                amount = rule.calculate_amount(data)
+                if amount:
+                    line.commission_id = rule.id if rule else False
+                    line.commission_percent = line.commission_percent if line.manual_commission else rule.percentage
+                    line.commission_amount = amount
+                    break
+
+    @api.onchange('in_commission_percent')
+    def _onchange_in_commission_percent(self):
+        self.write({'manual_in_commission': True})
+        sale_commission = self.env['sale.commission']
+        for line in self:
+            data = {
+                'product_id': line.product_id,
+                'partner_id': line.partner_id,
+                'quantity': line.quantity,
+                'amount_after_tax': line.price_total,
+                'amount_before_tax': line.price_subtotal,
+                'percentage': line.commission_percent
+            }
+            user_rules = sale_commission.search(
+                [('user_ids', 'in', line.sale_person_id.id), ('sale_partner_type', '=', 'user')],
+                order='sequence') if line.user_id else sale_commission.browse()
+            for user_rule in user_rules:
+                data['percentage'] = line.in_commission_percent if line.manual_in_commission else user_rule.percentage
+                amount = user_rule.calculate_amount(data)
+                if amount:
+                    line.in_commission_id = user_rule.id if user_rule else False
+                    line.in_commission_percent = line.in_commission_percent if line.manual_in_commission else user_rule.percentage
+                    line.in_commission_amount = amount
+                    break
+
+
+    @api.onchange('out_commission_percent')
+    def _onchange_out_commission_percent(self):
+        self.write({'manual_out_commission': True})
+        sale_commission = self.env['sale.commission']
+        for line in self:
+            data = {
+                'product_id': line.product_id,
+                'partner_id': line.partner_id,
+                'quantity': line.quantity,
+                'amount_after_tax': line.price_total,
+                'amount_before_tax': line.price_subtotal,
+                'percentage': line.commission_percent
+            }
+            team_rules = sale_commission.search(
+                [('sale_team_rep', '=', line.team_id.user_id.id), ('sale_partner_type', '=', 'sale_team')],
+                order='sequence') if line.team_id else sale_commission.browse()
+            for team_rule in team_rules:
+                data['percentage'] = line.out_commission_percent if line.manual_out_commission else team_rule.percentage
+                amount = team_rule.calculate_amount(data)
+                if amount:
+                    line.out_commission_id = team_rule.id if team_rule else False
+                    line.out_commission_percent = line.out_commission_percent if line.manual_out_commission else team_rule.percentage
+                    line.out_commission_amount = amount
+                    break
+
+    def _inverse_commission_amount(self):
+        pass
+
+
+
+    @api.depends("sale_person_id", "team_id","user_id",
+                 "sale_rep_id",
                  "price_total",
                  "partner_id",
                  "product_id")
     def _compute_commission_amount(self):
         for line in self:
-            if not line.commission_percent:
-                line.commission_amount = 0
-                continue
+            # if not line.commission_percent:
+            #     line.commission_amount = 0
+            #     continue
 
             data = {
                 'product_id': line.product_id,
@@ -36,24 +122,152 @@ class AccountMoveLine(models.Model):
             amount = 0
             if line.commission_id:
                 amount = line.commission_id.calculate_amount(data)
-            else:
-                sale_commission = self.env['sale.commission']
-                rules = []
-                if line.sale_rep_id:
-                    rules = sale_commission.search([('sale_rep_id', '=', line.sale_rep_id.id)],
-                                                   order='priority desc')
-                elif line.sale_percent:
-                    user = line.sale_person_id
-                    rules = sale_commission.search([('user_ids', '=', user.id)],
-                                                   order='priority desc')
+            # else:
+            sale_commission = self.env['sale.commission']
+            rules = []
+            if line.product_id.detailed_type == 'service':
+                rep_rules = sale_commission.search(
+                    [('sale_rep_id', '=', line.sale_rep_id.id), ('sale_partner_type', '=', 'sale_rep'),
+                     ('product_ids', 'in', line.product_id.id),('product_ids.detailed_type','=','service')],
+                    order='sequence') if line.sale_rep_id else sale_commission.browse()
+                user_rules = sale_commission.search(
+                    [('user_ids', 'in', line.user_id.id), ('sale_partner_type', '=', 'user'),
+                    ('product_ids', 'in', line.product_id.id), ('product_ids.detailed_type', '=', 'service')
+                     ],
+                    order='sequence') if line.user_id else sale_commission.browse()
+                team_rules = sale_commission.search(
+                    [('sale_team_rep', '=', line.team_id.user_id.id), ('sale_partner_type', '=', 'sale_team'),
+                     ('product_ids', 'in', line.product_id.id), ('product_ids.detailed_type', '=', 'service')
+                     ],
+                    order='sequence') if line.team_id else sale_commission.browse()
 
-                for rule in rules:
-                    data['percentage'] = rule.percentage
+                for rule in rep_rules:
+                    data['percentage'] = line.commission_percent if line.manual_commission else rule.percentage
                     amount = rule.calculate_amount(data)
                     if amount:
                         line.commission_id = rule.id if rule else False
-                        line.commission_percent = rule.percentage
+                        line.commission_percent = line.commission_percent if line.manual_commission else rule.percentage
+                        line.commission_amount = amount
                         break
-            if line.move_id.move_type == 'out_refund':
-                amount = -amount
-            line.commission_amount = amount
+                else:
+                    if line.manual_commission and line.commission_percent:
+                        data['percentage'] = line.commission_percent
+                        amount = line.env['sale.commission'].calculate_amount(data)
+                        line.commission_id = False
+                        line.commission_amount = amount
+                    else:
+                        line.commission_percent = 0.0
+                        line.commission_id = False
+                        line.commission_amount = 0.0
+
+                for user_rule in user_rules:
+                    data[
+                        'percentage'] = line.in_commission_percent if line.manual_in_commission else user_rule.percentage
+                    amount = user_rule.calculate_amount(data)
+                    if amount:
+                        line.in_commission_id = user_rule.id if user_rule else False
+                        line.in_commission_percent = line.in_commission_percent if line.manual_in_commission else user_rule.percentage
+                        line.in_commission_amount = amount
+                        break
+                else:
+                    if line.manual_in_commission and line.in_commission_percent:
+                        data['percentage'] = line.in_commission_percent
+                        amount = line.env['sale.commission'].calculate_amount(data)
+                        line.in_commission_id = False
+                        line.in_commission_amount = amount
+                    else:
+                        line.in_commission_percent = 0
+                        line.in_commission_id = False
+                        line.in_commission_amount = 0.0
+                    # ================= TEAM COMMISSION =================
+                for team_rule in team_rules:
+                    data[
+                        'percentage'] = line.out_commission_percent if line.manual_out_commission else team_rule.percentage
+                    amount = team_rule.calculate_amount(data)
+                    if amount:
+                        line.out_commission_id = team_rule.id if team_rule else False
+                        line.out_commission_percent = line.out_commission_percent if line.manual_out_commission else team_rule.percentage
+                        line.out_commission_amount = amount
+                        break
+                else:
+                    # Fallback logic if manual_out_commission is True but no rule is found
+                    if line.manual_out_commission and line.out_commission_percent:
+                        data['percentage'] = line.out_commission_percent
+                        amount = line.env['sale.commission'].calculate_amount(data)
+                        line.out_commission_id = False
+                        line.out_commission_amount = amount
+                    else:
+                        line.out_commission_percent = 0
+                        line.out_commission_id = False
+                        line.out_commission_amount = 0.0
+
+
+            else:
+                rep_rules = sale_commission.search([('sale_rep_id', '=', line.sale_rep_id.id),('sale_partner_type','=','sale_rep')],
+                                                   order='sequence') if line.sale_rep_id else sale_commission.browse()
+                user_rules = sale_commission.search([('user_ids', 'in', line.sale_person_id.id),('sale_partner_type','=','user')],
+                                                    order='sequence') if line.user_id else sale_commission.browse()
+                team_rules = sale_commission.search([('sale_team_rep', '=', line.team_id.user_id.id),('sale_partner_type','=','sale_team')],
+                                                    order='sequence') if line.team_id else sale_commission.browse()
+
+                for rule in rep_rules:
+                    data['percentage'] = line.commission_percent if line.manual_commission else rule.percentage
+                    amount = rule.calculate_amount(data)
+                    if amount:
+                        line.commission_id = rule.id if rule else False
+                        line.commission_percent = line.commission_percent if line.manual_commission else rule.percentage
+                        line.commission_amount = amount
+                        break
+                else:
+                    if line.manual_commission and line.commission_percent:
+                        data['percentage'] = line.commission_percent
+                        amount = line.env['sale.commission'].calculate_amount(data)
+                        line.commission_id = False
+                        line.commission_amount = amount
+                    else:
+                        line.commission_percent = 0.0
+                        line.commission_id = False
+                        line.commission_amount = 0.0
+
+                for user_rule in user_rules:
+                    data['percentage'] = line.in_commission_percent if line.manual_in_commission else user_rule.percentage
+                    amount = user_rule.calculate_amount(data)
+                    if amount:
+                        line.in_commission_id = user_rule.id if user_rule else False
+                        line.in_commission_percent = line.in_commission_percent if line.manual_in_commission else user_rule.percentage
+                        line.in_commission_amount = amount
+                        break
+                else:
+                    if line.manual_in_commission and line.in_commission_percent:
+                        data['percentage'] = line.in_commission_percent
+                        amount = line.env['sale.commission'].calculate_amount(data)
+                        line.in_commission_id = False
+                        line.in_commission_amount = amount
+                    else:
+                        line.in_commission_percent = 0
+                        line.in_commission_id = False
+                        line.in_commission_amount = 0.0
+                    # ================= TEAM COMMISSION =================
+                for team_rule in team_rules:
+                    data['percentage'] = line.out_commission_percent if line.manual_out_commission else team_rule.percentage
+                    amount = team_rule.calculate_amount(data)
+                    if amount:
+                        line.out_commission_id = team_rule.id if team_rule else False
+                        line.out_commission_percent = line.out_commission_percent if line.manual_out_commission else team_rule.percentage
+                        line.out_commission_amount = amount
+                        break
+                else:
+                    # Fallback logic if manual_out_commission is True but no rule is found
+                    if line.manual_out_commission and line.out_commission_percent:
+                        data['percentage'] = line.out_commission_percent
+                        amount = line.env['sale.commission'].calculate_amount(data)
+                        line.out_commission_id = False
+                        line.out_commission_amount = amount
+                    else:
+                        line.out_commission_percent = 0
+                        line.out_commission_id = False
+                        line.out_commission_amount = 0.0
+
+            # if line.move_id.move_type == 'out_refund':
+            #     amount = -amount
+            # line.commission_amount = amount

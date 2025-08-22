@@ -9,8 +9,12 @@
             <xpath expr="//field[@name='invoice_line_ids']//tree//field[@name='name']" position="after">
                 <field name="move_id" column_invisible="1"/>
                 <field name="commission_id" column_invisible="1"/>
-                <field name="commission_percent" groups="bista_sales_commission.group_sales_commission"/>
+                <field name="commission_percent"/>
+                <field name="in_commission_percent"/>
+                <field name="out_commission_percent"/>
                 <field name="commission_amount" optional="hide" groups="bista_sales_commission.group_sales_commission"/>
+                <field name="in_commission_amount" optional="hide" groups="bista_sales_commission.group_sales_commission"/>
+                <field name="out_commission_amount" optional="hide" groups="bista_sales_commission.group_sales_commission"/>
             </xpath>
             <xpath expr="//field[@name='invoice_user_id']" position="attributes">
                 <attribute name="domain">[]</attribute>

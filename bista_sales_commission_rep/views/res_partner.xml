@@ -10,6 +10,10 @@
                 <field name="is_sale_rep"/>
                 <field name="sale_rep_id"/>
             </xpath>
+
+            <xpath expr="//field[@name='team_id'][@groups='base.group_no_one']" position="replace">
+                <field name="team_id"/>
+            </xpath>
         </field>
     </record>
 

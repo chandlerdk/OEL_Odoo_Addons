@@ -33,7 +33,7 @@ class SaleCommission(models.Model):
     related_partners = fields.Boolean(string="Include Related Partners")
     related_partner_ids = fields.One2many('res.partner', related="partner_ids.child_ids")
 
-    product_ids = fields.Many2many('product.template')
+    product_ids = fields.Many2many('product.product')
     product_category_ids = fields.Many2many('product.category')
 
     sale_partner_type = fields.Selection([
@@ -104,12 +104,17 @@ class SaleCommission(models.Model):
             'price_total': data.get("amount_after_tax", 0),
         }
 
-        value = data['policy'][self.tax_policy]
+        # value = data['policy'][self.tax_policy]
+        # if not value:
+        #     return 0
+
+        tax_policy = self.tax_policy or 'price_subtotal'  # default fallback
+        value = data['policy'].get(tax_policy)
         if not value:
-            return 0
+            return None
 
         if not self.validate_rules(data):
-            return 0
+            return None
 
         product_id = data['product_id']
         percentage = data['percentage']

@@ -15,14 +15,30 @@ class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
     commission_id = fields.Many2one('sale.commission')
-    commission_percent = fields.Float()
-    commission_amount = fields.Float(compute='_compute_commission_amount', store=True)
+    in_commission_id = fields.Many2one('sale.commission')
+    out_commission_id = fields.Many2one('sale.commission')
+    commission_percent = fields.Float(string="C% Man")
+    in_commission_percent = fields.Float(string="C% In")
+    out_commission_percent = fields.Float(string="C% Out")
+    commission_amount = fields.Float(compute='_compute_commission_amount',inverse='_inverse_commission_amount',string="C% Man Amount", store=True)
+    in_commission_amount = fields.Float(compute="_compute_commission_amount",inverse='_inverse_commission_amount', string="C% In Amount", store=True)
+    out_commission_amount = fields.Float(compute="_compute_commission_amount",inverse='_inverse_commission_amount', string="C% Out Amount", store=True)
+
     user_id = fields.Many2one('res.users', related="order_id.user_id", store=True)
     team_id = fields.Many2one('crm.team', related="order_id.team_id", store=True)
+    is_invoiced = fields.Boolean(string="Invoiced", compute="_compute_is_invoiced", store=False)
+    sale_rep_id = fields.Many2one('res.partner', domain=[('is_sale_rep', '=', True)])
+
+    def _inverse_commission_amount(self):
+        pass
+
+
+    @api.depends('invoice_lines')
+    def _compute_is_invoiced(self):
+        for line in self:
+            line.is_invoiced = bool(line.invoice_lines)
 
     @api.depends("user_id", "team_id",
-                 "commission_id",
-                 "commission_percent",
                  "price_total",
                  "order_id.partner_id",
                  "product_id")
@@ -53,7 +69,7 @@ class SaleOrderLine(models.Model):
             for rule in rules:
                 data['percentage'] = rule.percentage
                 amount = rule.calculate_amount(data)
-                if amount:
+                if amount is not None:
                     line.commission_amount = amount
                     line.commission_id = rule.id if rule else False
                     line.commission_percent = rule.percentage

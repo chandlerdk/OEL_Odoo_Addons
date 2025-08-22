@@ -11,12 +11,14 @@
                 <field name="partner_id" string="Customer"/>
                 <field name="invoice_date" string="Invoice Date"/>
                 <field name="shipping_city_state" string="Ship To"/>
-                <field name="payment_date" string="Payment Date"/>
                 <field name="commission_move_id" widget="many2onebutton"/>
                 <field name="commission_payment_state"/>
                 <field name="commission_policy"/>
+                <field name="payment_date"/>
                 <field name="amount_total" string="Amount"/>
                 <field name="commission_amount" string="Commission Amount"/>
+                <field name="in_commission_amount" string="Commission Amount"/>
+                <field name="out_commission_amount" string="Commission Amount"/>
             </tree>
         </field>
     </record>

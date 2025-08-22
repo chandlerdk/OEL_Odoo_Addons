@@ -4,8 +4,29 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
+             <xpath expr="//field[@name='order_line']//tree//field[@name='product_uom_qty']" position="before">
+                     <field name="manual_commission" column_invisible="1"/>
+                     <field name="manual_in_commission" column_invisible="1"/>
+                     <field name="manual_out_commission" column_invisible="1"/>
+             </xpath>
             <xpath expr="//field[@name='user_id']" position="after">
                 <field name="sale_rep_id"/>
+            </xpath>
+            <xpath expr="//field[@name='user_id']" position="attributes">
+                <attribute name="string">Inside Salesperson</attribute>
+            </xpath>
+            <xpath expr="//field[@name='user_id']" position="after">
+                <xpath expr="//field[@name='team_id']" position="move"/>
+            </xpath>
+
+            <xpath expr="//field[@name='sale_rep_id']" position="attributes">
+                <attribute name="string">Manu. Rep</attribute>
+            </xpath>
+            <xpath expr="//field[@name='team_id']" position="attributes">
+                <attribute name="force_save">1</attribute>
+                <attribute name="options">{"no_create":true,"no_open":true}</attribute>
+                <attribute name="readonly">False</attribute>
+                <attribute name="string">Outside Salesperson</attribute>
             </xpath>
         </field>
     </record>
