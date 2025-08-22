@@ -9,14 +9,16 @@
     """,
     'category': 'Sales',
     'author': 'OEL Worldwide',
-    'website': 'https://www.oelworldwide.com',
+    'website': 'https://www.oelsales.com',
     'license': 'LGPL-3',
 
     'depends': [
-        'sale','OEL_sales_team_restriction',  # ensure restriction logic is available
+        'sale','base'
     ],
 
-    'data': [],  # no XML views or security needed for auto-assignment
+    'data': [
+#        'views/res_partner_view.xml'   
+        ],
 
     'installable': True,
     'application': False,

@@ -1,0 +1,56 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <!-- Global Search Field Views -->
+    <record id="view_global_search_field_tree" model="ir.ui.view">
+        <field name="name">global search field tree view</field>
+        <field name="model">global.search.field</field>
+        <field name="arch" type="xml">
+            <tree string="Global Search Fields">
+                <field name="name"/>
+                <field name="model_id"/>
+                <field name="ttype"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_global_search_field" model="ir.actions.act_window">
+        <field name="name">Global Search Fields</field>
+        <field name="res_model">global.search.field</field>
+        <field name="view_id" ref="view_global_search_field_tree"/>
+    </record>
+
+    <!-- Global Search Model Views -->
+    <record id="view_global_search_tree" model="ir.ui.view">
+        <field name="name">global search tree view</field>
+        <field name="model">global.search.model</field>
+        <field name="arch" type="xml">
+            <tree string="Global Search" editable="bottom">
+                <field name="model_id" required="1"/>
+                <field name="field_ids"
+                       domain="[('model_id', '=', model_id)]"
+                       widget="many2many_tags" required="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_global_search" model="ir.actions.act_window">
+        <field name="name">Global Search</field>
+        <field name="res_model">global.search.model</field>
+        <field name="view_id" ref="view_global_search_tree"/>
+    </record>
+
+    <!-- Server Action to Update Search Fields Cache -->
+    <record id="action_update_search_fields_cache" model="ir.actions.server">
+        <field name="name">Update Search Fields Cache</field>
+        <field name="model_id" ref="model_global_search_field"/>
+        <field name="state">code</field>
+        <field name="code">model.update_search_fields_cache()</field>
+    </record>
+
+    <!-- Menu Items -->
+    <menuitem id="menu_global_search_root" name="Global Search" parent="base.menu_administration" sequence="100"/>
+    <menuitem action="action_global_search" id="menu_global_search" parent="menu_global_search_root" sequence="10"/>
+    <menuitem action="action_global_search_field" id="menu_global_search_field" parent="menu_global_search_root" sequence="20"/>
+    <menuitem action="action_update_search_fields_cache" id="menu_update_search_fields_cache" parent="menu_global_search_root" sequence="30"/>
+
+</odoo>

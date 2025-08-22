@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="sr_global_search">
+        <div style="border-bottom: 2px solid grey; padding: 0px 5px; display: flex; margin-bottom: 3px;">
+            <AutoComplete
+                value="''"
+                sources="sources"
+                onSelect.bind="onSelect"
+                placeholder="placeholder"
+                class="''"
+            />
+        </div>
+    </t>
+
+    <t t-name="GlobalSearchDropdownOption">
+        <div class="o_globalsearch_autocomplete_info">
+            <t t-if="option.icon">
+                <i t-att-class="option.icon" style="margin-right: 6px; color: #007bff;"/>
+            </t>
+            <span t-if="option.model" t-esc="'    ' + option.label or ' '"/>
+            <strong t-else="" t-esc="option.label or ' '"/>
+        </div>
+    </t>
+
+</templates>
