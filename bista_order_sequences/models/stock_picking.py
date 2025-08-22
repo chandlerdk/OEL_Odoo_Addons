@@ -8,8 +8,6 @@ _logger = logging.getLogger(__name__)
 class StockPicking(models.Model):
     _inherit = "stock.picking"
 
-    sale_channel = fields.Many2one('shopify.channel', string="Channel")
-
     @api.model_create_multi
     def create(self, vals_list):
         """Picking'name must have PO or SO name in it."""
