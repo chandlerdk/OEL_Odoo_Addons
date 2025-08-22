@@ -85,7 +85,7 @@ class AccountMoveLine(models.Model):
                         line.commission_percent = rule.percentage
                         break
             if line.move_id.move_type == 'out_refund':
-                amount = -amount
+                amount = -(amount or 0.0)
             line.commission_amount = amount
 
     # def generate_bill(self):
