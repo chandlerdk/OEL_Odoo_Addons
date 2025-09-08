@@ -16,20 +16,33 @@ class SaleOrderAssignment(models.Model):
         return orders
 
     def write(self, vals):
-        """Override write to handle team assignment and prevent changes on confirmed orders"""
-        # Prevent team_id changes on confirmed/done orders
+        """
+        Prevent team_id changes on confirmed/done orders
+        EXCEPT for users in the Sales Manager group.
+        Re-run assignment when shipping address changes.
+        """
         if 'team_id' in vals:
-            locked = self.filtered(lambda o: o.state in ('sale', 'done'))
-            if locked:
-                _logger.info(f"Preventing team_id change on confirmed/done orders: {locked.mapped('name')}")
-                vals = vals.copy()
-                vals.pop('team_id', None)
+            # Sales Managers can always change Sales Team
+            is_sales_manager = self.env.user.has_group('OEL_sales_team_restriction.group_sale_team_manager')
+
+            if not is_sales_manager:
+                locked = self.filtered(lambda o: o.state in ('sale', 'done'))
+                if locked:
+                    _logger.info(
+                        "Preventing team_id change on confirmed/done orders: %s",
+                        locked.mapped('name')
+                    )
+                    vals = vals.copy()
+                    vals.pop('team_id', None)
 
         res = super().write(vals)
 
         # Always reassign team when shipping address changes, regardless of order state
         if 'partner_shipping_id' in vals:
-            _logger.info(f"Reassigning teams for orders after shipping address change: {self.mapped('name')}")
+            _logger.info(
+                "Reassigning teams for orders after shipping address change: %s",
+                self.mapped('name')
+            )
             for order in self:
                 self._assign_team_from_address(order)
 
@@ -46,7 +59,10 @@ class SaleOrderAssignment(models.Model):
             self._assign_team_from_address(order)
             new_team = order.team_id.name if order.team_id else 'None'
             if old_team != new_team:
-                _logger.info(f"Order {order.name}: Team changed from '{old_team}' to '{new_team}' on confirmation")
+                _logger.info(
+                    "Order %s: Team changed from '%s' to '%s' on confirmation",
+                    order.name, old_team, new_team
+                )
         
         return res
 
@@ -63,7 +79,10 @@ class SaleOrderAssignment(models.Model):
         try:
             # Check if customer has "No Ship To Assignment" checkbox enabled
             if hasattr(order.partner_id, 'x_studio_no_ship_to_assignment') and order.partner_id.x_studio_no_ship_to_assignment:
-                _logger.debug(f"Order {order.name}: Skipping custom team assignment - customer has 'No Ship To Assignment' enabled.")
+                _logger.debug(
+                    "Order %s: Skipping custom team assignment - customer has 'No Ship To Assignment' enabled.",
+                    order.name
+                )
                 return  # Skip custom assignment, use standard Odoo behavior
 
             # Get delivery address
@@ -80,9 +99,12 @@ class SaleOrderAssignment(models.Model):
             if current_team_id != new_team_id:
                 order.sudo().write({'team_id': new_team_id})
                 team_name = team.name if team else 'None'
-                _logger.debug(f"Order {order.name}: Team assigned to '{team_name}' based on delivery address")
+                _logger.debug(
+                    "Order %s: Team assigned to '%s' based on delivery address",
+                    order.name, team_name
+                )
             else:
-                _logger.debug(f"Order {order.name}: Team assignment unchanged")
+                _logger.debug("Order %s: Team assignment unchanged", order.name)
                 
         except Exception as e:
-            _logger.error(f"Error assigning team for order {order.name}: {str(e)}")
+            _logger.error("Error assigning team for order %s: %s", order.name, str(e))
