@@ -6,7 +6,7 @@
 #
 ##############################################################################
 
-from odoo import api, fields, models
+from odoo import api, fields, models,_
 from dateutil import relativedelta
 from odoo.exceptions import UserError
 
@@ -28,6 +28,9 @@ class SaleOrderLine(models.Model):
     team_id = fields.Many2one('crm.team', related="order_id.team_id", store=True)
     is_invoiced = fields.Boolean(string="Invoiced", compute="_compute_is_invoiced", store=False)
     sale_rep_id = fields.Many2one('res.partner', domain=[('is_sale_rep', '=', True)])
+    manual_commission = fields.Boolean(string="Manual C% Man Amount",copy=False)
+    manual_in_commission = fields.Boolean(string="Manual C% In Amount",copy=False)
+    manual_out_commission = fields.Boolean(string="Manual C% Out Amount",copy=False)
 
     def _inverse_commission_amount(self):
         pass
