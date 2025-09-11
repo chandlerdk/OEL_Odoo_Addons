@@ -12,7 +12,7 @@ from odoo import api, fields, models
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    sale_rep_id = fields.Many2one('res.partner', domain=[('is_sale_rep', '=', True)])
+    sale_rep_id = fields.Many2one('res.partner', domain=[('is_sale_rep', '=', True)],tracking=True)
 
     @api.onchange("partner_id")
     def _get_sale_rep_id(self):

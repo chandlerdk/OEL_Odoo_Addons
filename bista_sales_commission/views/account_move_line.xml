@@ -39,7 +39,7 @@
                 <field name="commission_user_id"/>
                 <field name="commission_amount"/>
                 <filter string="Commission To Bill" name="to_bill"
-                        domain="[('commission_to_bill', '=', True)]"/>
+                        domain="[('commission_to_bill', '=', True), ('is_commission_billed', '=', False)]"/>
             </xpath>
             <xpath expr="//group" position="inside">
                 <filter string="Commission Date" name="group_commission_date" domain="[]"
