@@ -218,6 +218,11 @@ class AccountMoveLine(models.Model):
                     'invoice_line_ids': invoice_lines
                 })
                 billed_partners[partner_id] = existing_bill.name
+                for rec in existing_bill.invoice_line_ids:
+                    rec.commission_reverse_move_line_id.write({
+                        'commission_move_line_id': rec.id,
+                        'commission_move_id': existing_bill.id
+                    })
                 return existing_bill
             else:
                 move_vals = {
@@ -229,6 +234,11 @@ class AccountMoveLine(models.Model):
                 bill = self.env['account.move'].create(move_vals)
                 bill._set_next_sequence()
                 billed_partners[partner_id] = bill.name
+                for rec in bill.invoice_line_ids:
+                    rec.commission_reverse_move_line_id.write({
+                        'commission_move_line_id': rec.id,
+                        'commission_move_id': bill.id
+                    })
                 return bill
 
         for (partner_id, rule_id, amount_field), lines in grouped_lines.items():
