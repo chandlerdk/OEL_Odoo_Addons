@@ -1,0 +1,18 @@
+<odoo>
+  <record id="view_partner_form_inherit_partner_discount" model="ir.ui.view">
+    <field name="name">res.partner.form.partner.discount</field>
+    <field name="model">res.partner</field>
+    <field name="inherit_id" ref="base.view_partner_form"/>
+    <field name="arch" type="xml">
+      <!-- Place under the Accounting tab -->
+      <xpath expr="//sheet//page[@name='accounting']" position="inside">
+        <group string="Partner Discount">
+          <field name="x_has_global_discount"/>
+          <field name="x_global_discount_type"/>
+          <field name="x_global_discount_value"/>
+          <field name="x_global_discount_product_id"/>
+        </group>
+      </xpath>
+    </field>
+  </record>
+</odoo>

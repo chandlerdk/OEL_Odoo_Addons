@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+    <!-- Email Template: Invoice (No-Reply) -->
+    <record id="mail_template_account_invoice_oel" model="mail.template">
+      <field name="name">Accounting: Invoice Sent (OEL)</field>
+      <field name="model_id" ref="account.model_account_move"/>
+      <field name="subject">Invoice ${object.name or object.ref} — ${object.company_id.name}</field>
+      <field name="email_from">No Reply &lt;no-reply@oelsales.com&gt;</field>
+      <field name="reply_to">no-reply@oelsales.com</field>
+      <field name="email_to">${object.partner_id.email}</field>
+      <field name="auto_delete" eval="True"/>
+      <field name="body_html" type="html">
+        <div style="margin:0; padding:0; font-family:Arial, Helvetica, sans-serif;">
+          <table border="0" cellpadding="0" cellspacing="0" style="padding-top:16px; background-color:#F1F2F3; color:#454748; width:100%; border-collapse:separate;">
+            <tr>
+              <td align="center">
+                <table border="0" cellpadding="0" cellspacing="0" width="590" style="padding:16px; background-color:#ffffff; color:#111; border-collapse:separate; border-radius:6px;">
+                  <tbody>
+                    <tr>
+                      <td style="font-size:14px; line-height:1.6;">
+                        <h3 style="margin:0 0 8px 0; color:#875A7B; font-size:20px;">Your Invoice</h3>
+                        <p style="margin:0 0 12px 0;">Dear ${object.partner_id and object.partner_id.name or 'Customer'},</p>
+                        <p style="margin:0 0 12px 0;">Thank you for your business. Please find your invoice details below.</p>
+
+                        <div style="margin:18px 0; padding:12px; background:#F8FAFC; border:1px solid #E5E7EB; border-radius:6px;">
+                          <div style="font-weight:600; margin-bottom:8px;">Invoice Details</div>
+                          <div style="color:#374151;">
+                            • Invoice Number: ${object.name or object.ref}<br/>
+                            • Invoice Date: ${object.invoice_date and object.invoice_date.strftime('%Y-%m-%d') or '—'}<br/>
+                            • Due Date: ${object.invoice_date_due and object.invoice_date_due.strftime('%Y-%m-%d') or '—'}<br/>
+                            • Amount Due: ${format_amount(object.amount_residual if object.amount_residual else object.amount_total, object.currency_id)}<br/>
+                            • Sales Contact: ${(object.invoice_user_id and object.invoice_user_id.name) or (object.user_id and object.user_id.name) or 'Sales Team'} / ${(object.invoice_user_id and object.invoice_user_id.email) or (object.user_id and object.user_id.email) or 'accounting@oelsales.com'}
+                          </div>
+                        </div>
+
+                        <p style="margin:0 0 12px 0;">If you have already made payment, please disregard this message. For billing questions, contact <a href="mailto:accounting@oelsales.com" style="color:#2563EB; text-decoration:none;">accounting@oelsales.com</a> or call (800) 818-2244.</p>
+                        <p style="margin:0 0 18px 0;">You can view your documents and payment status anytime in your customer portal.</p>
+
+                        <hr style="border:none; border-top:1px solid #E5E7EB; margin:16px 0;"/>
+                        <div style="color:#6B7280; font-size:12px;">
+                          This email was sent from a no-reply address. Please do not reply to this message.
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <div style="color:#6B7280; font-size:12px; margin-top:12px;">
+                  <div>${object.company_id.name}</div>
+                  <div><t t-esc="object.company_id.phone or ''"/> · <t t-esc="object.company_id.email or ''"/></div>
+                  <div><t t-esc="object.company_id.website or ''"/></div>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </field>
+    </record>
+  </data>
+</odoo>

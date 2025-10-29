@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+#-*- coding: utf-8 -*-
 ################################################################################
 #
 #    Cybrosys Technologies Pvt. Ltd.
@@ -20,6 +20,7 @@
 #
 ################################################################################
 from . import account_move
+from . import mail_thread
 from . import purchase_order
 from . import res_config_settings
 from . import sale_order

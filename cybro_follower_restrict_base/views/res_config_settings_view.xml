@@ -1,5 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
-    <!-- Extend Settings View -->
+    <!--View to add fields in settings-->
     <record id="res_config_settings_view_form" model="ir.ui.view">
         <field name="name">res.config.settings.view.form.inherit.follower.restrict</field>
         <field name="model">res.config.settings</field>
@@ -8,6 +9,18 @@
             <xpath expr="//div[@id='contacts_settings']" position="after">
                 <h2>Follower Restrictions</h2>
                 <div class="row mt16 o_settings_container">
+                    <!-- Global Email Auto-Subscribe -->
+                    <div class="col-12 col-lg-6 o_setting_box">
+                        <div class="o_setting_left_pane">
+                            <field name="disable_global_email_subscribe"/>
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="disable_global_email_subscribe"/>
+                            <div class="text-muted">
+                                Prevent auto-followers from being added when sending emails from any document.
+                            </div>
+                        </div>
+                    </div>
                     <!-- Sales -->
                     <div class="col-12 col-lg-6 o_setting_box">
                         <div class="o_setting_left_pane">
@@ -16,7 +29,7 @@
                         <div class="o_setting_right_pane">
                             <label for="disable_sale_followers"/>
                             <div class="text-muted">
-                                Disable external followers when confirming Sales Orders.
+                                Remove external followers when confirming Sales Orders.
                             </div>
                         </div>
                     </div>
@@ -28,7 +41,7 @@
                         <div class="o_setting_right_pane">
                             <label for="disable_purchase_followers"/>
                             <div class="text-muted">
-                                Disable external followers when confirming Purchase Orders.
+                                Remove external followers when confirming Purchase Orders.
                             </div>
                         </div>
                     </div>
@@ -40,7 +53,7 @@
                         <div class="o_setting_right_pane">
                             <label for="disable_invoice_followers"/>
                             <div class="text-muted">
-                                Disable external followers when confirming Invoices.
+                                Remove external followers when confirming Invoices.
                             </div>
                         </div>
                     </div>

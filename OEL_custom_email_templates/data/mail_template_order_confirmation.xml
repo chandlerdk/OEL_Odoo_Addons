@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+    <!-- Email Template: Sales Order Confirmation (No-Reply) -->
+    <record id="mail_template_sale_order_confirm_oel" model="mail.template">
+      <field name="name">Sales: Order Confirmation (OEL)</field>
+      <field name="model_id" ref="sale.model_sale_order"/>
+      <field name="subject">Order Confirmation ${object.name} — ${object.company_id.name}</field>
+      <field name="email_from">No Reply &lt;no-reply@oelsales.com&gt;</field>
+      <field name="reply_to">no-reply@oelsales.com</field>
+      <field name="email_to">${object.partner_id.email}</field>
+      <field name="auto_delete" eval="True"/>
+      <field name="body_html" type="html">
+        <div style="margin:0; padding:0; font-family:Arial, Helvetica, sans-serif;">
+          <table border="0" cellpadding="0" cellspacing="0" style="padding-top:16px; background-color:#F1F2F3; color:#454748; width:100%; border-collapse:separate;">
+            <tr>
+              <td align="center">
+                <table border="0" cellpadding="0" cellspacing="0" width="590" style="padding:16px; background-color:#ffffff; color:#111; border-collapse:separate; border-radius:6px;">
+                  <tbody>
+                    <tr>
+                      <td style="font-size:14px; line-height:1.6;">
+                        <h3 style="margin:0 0 8px 0; color:#875A7B; font-size:20px;">Order Confirmed</h3>
+                        <p style="margin:0 0 12px 0;">Dear ${object.partner_id and object.partner_id.name or 'Customer'},</p>
+                        <p style="margin:0 0 12px 0;">Thank you for your order with OEL Worldwide Industries. Your order has been confirmed and entered into our system for processing. Our fulfillment team is preparing your products for shipment and will provide tracking information once your order has been dispatched.</p>
+
+                        <div style="margin:18px 0; padding:12px; background:#F8FAFC; border:1px solid #E5E7EB; border-radius:6px;">
+                          <div style="font-weight:600; margin-bottom:8px;">Order Confirmation Details</div>
+                          <div style="color:#374151;">
+                            • Sales Order Number: ${object.name}<br/>
+                            <t t-set="cdate" t-value="object.confirmation_date or object.date_order"/>
+                            • Order Date: <t t-if="cdate">${format_datetime(cdate, tz='UTC')[:10]}</t><t t-else="">—</t><br/>
+                            • Customer PO: ${object.client_order_ref or '—'}<br/>
+                            • Estimated Ship Date: ${object.commitment_date and object.commitment_date.strftime('%Y-%m-%d') or '—'}<br/>
+                            • Sales Contact: ${object.user_id and object.user_id.name or 'Sales Team'} / ${(object.user_id and object.user_id.email) or 'sales@oelsales.com'}
+                          </div>
+                        </div>
+
+                        <p style="margin:0 0 12px 0;">You’ll receive a separate email with shipping details and tracking information as soon as your order leaves our facility.</p>
+                        <p style="margin:0 0 12px 0;">If you have any questions about your order or need further assistance, please reach out to our team at <a href="mailto:customerservice@oelsales.com" style="color:#2563EB; text-decoration:none;">customerservice@oelsales.com</a> or call (800) 818-2244.</p>
+                        <p style="margin:0 0 18px 0;">We appreciate your business and your continued trust in OEL’s American-made electrical safety products.</p>
+
+                        <hr style="border:none; border-top:1px solid #E5E7EB; margin:16px 0;"/>
+                        <div style="color:#6B7280; font-size:12px;">
+                          This email was sent from a no-reply address. Please do not reply to this message.
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <div style="color:#6B7280; font-size:12px; margin-top:12px;">
+                  <div>${object.company_id.name}</div>
+                  <div><t t-esc="object.company_id.phone or ''"/> · <t t-esc="object.company_id.email or ''"/></div>
+                  <div><t t-esc="object.company_id.website or ''"/></div>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </field>
+    </record>
+  </data>
+</odoo>

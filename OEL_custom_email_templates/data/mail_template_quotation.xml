@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+    <!-- Email Template: Quotation (No-Reply) -->
+    <record id="mail_template_sale_quotation_oel" model="mail.template">
+      <field name="name">Sales: Quotation Sent (OEL)</field>
+      <field name="model_id" ref="sale.model_sale_order"/>
+      <field name="subject">Quotation ${object.name} — ${object.company_id.name}</field>
+      <field name="email_from">No Reply &lt;no-reply@oelsales.com&gt;</field>
+      <field name="reply_to">no-reply@oelsales.com</field>
+      <field name="email_to">${object.partner_id.email}</field>
+      <field name="auto_delete" eval="True"/>
+      <field name="body_html" type="html">
+        <div style="margin:0; padding:0; font-family:Arial, Helvetica, sans-serif;">
+          <table border="0" cellpadding="0" cellspacing="0" style="padding-top:16px; background-color:#F1F2F3; color:#454748; width:100%; border-collapse:separate;">
+            <tr>
+              <td align="center">
+                <table border="0" cellpadding="0" cellspacing="0" width="590" style="padding:16px; background-color:#ffffff; color:#111; border-collapse:separate; border-radius:6px;">
+                  <tbody>
+                    <tr>
+                      <td style="font-size:14px; line-height:1.6;">
+                        <h3 style="margin:0 0 8px 0; color:#875A7B; font-size:20px;">Your Quotation</h3>
+                        <p style="margin:0 0 12px 0;">Dear ${object.partner_id and object.partner_id.name or 'Customer'},</p>
+                        <p style="margin:0 0 12px 0;">Thank you for your interest in OEL Worldwide Industries’ products. Attached below is your custom quote for the requested products.</p>
+
+                        <div style="margin:18px 0; padding:12px; background:#F8FAFC; border:1px solid #E5E7EB; border-radius:6px;">
+                          <div style="font-weight:600; margin-bottom:8px;">Quote Details</div>
+                          <div style="color:#374151;">
+                            • Quote Number: ${object.name}<br/>
+                            • Date Issued: ${object.date_order and format_datetime(object.date_order, tz='UTC')[:10] or '—'}<br/>
+                            • Prepared By: ${object.user_id and object.user_id.name or 'Sales Team'} / ${object.user_id and object.user_id.function or 'Territory Manager'}<br/>
+                            • Valid Until: ${object.validity_date and object.validity_date.strftime('%Y-%m-%d') or '—'}
+                          </div>
+                        </div>
+
+                        <p style="margin:0 0 12px 0;">If you’d like to proceed with this quote, simply reply to this email or send your purchase order referencing the quote number above. Our team will promptly confirm and process your order.</p>
+                        <p style="margin:0 0 12px 0;">Please don’t hesitate to reach out if you have any questions or would like to discuss product options, lead times, or customizations.</p>
+                        <p style="margin:0 0 18px 0;">Thank you for choosing OEL — your trusted partner in electrical safety.</p>
+
+                        <hr style="border:none; border-top:1px solid #E5E7EB; margin:16px 0;"/>
+                        <div style="color:#6B7280; font-size:12px;">
+                          This email was sent from a no-reply address. Please do not reply to this message.
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <div style="color:#6B7280; font-size:12px; margin-top:12px;">
+                  <div>${object.company_id.name}</div>
+                  <div><t t-esc="object.company_id.phone or ''"/> · <t t-esc="object.company_id.email or ''"/></div>
+                  <div><t t-esc="object.company_id.website or ''"/></div>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </field>
+    </record>
+  </data>
+</odoo>

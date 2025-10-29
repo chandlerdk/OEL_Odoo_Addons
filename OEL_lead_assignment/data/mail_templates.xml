@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Email Template: Salesperson Assignment Notification -->
+        <record id="mail_template_notify_salesperson" model="mail.template">
+            <field name="name">Lead Assignment Notification</field>
+            <field name="model_id" ref="crm.model_crm_lead"/>
+            <field name="subject">New Lead Assigned: ${object.name}</field>
+            <field name="email_from">System &lt;noreply@yourcompany.com&gt;</field>
+            <field name="email_to">${object.user_id.email}</field>
+            <field name="reply_to">${object.user_id.email or ''}</field>
+            <field name="body_html" type="html">
+<div style="margin: 0px; padding: 0px; font-family: Arial, sans-serif;">
+    <table border="0" cellpadding="0" cellspacing="0" style="padding-top: 16px; background-color: #F1F2F3; color: #454748; width: 100%; border-collapse: separate;">
+        <tr>
+            <td align="center">
+                <table border="0" cellpadding="0" cellspacing="0" width="590" style="padding: 16px; background-color: white; color: #454748; border-collapse: separate;">
+                    <tbody>
+                        <tr>
+                            <td align="center" style="min-height: 590px;">
+                                <table border="0" cellpadding="0" cellspacing="0" width="590" style="min-height: 590px; padding: 0px 8px 0px 8px; border-collapse: separate;">
+                                    <tr>
+                                        <td valign="top" style="font-size: 14px; line-height: 1.6;">
+                                            <div>
+                                                <h3 style="margin-top: 0px; color: #875A7B;">New Lead Assigned to You</h3>
+                                                
+                                                <p>Hello <strong>${object.user_id.name}</strong>,</p>
+                                                
+                                                <p>A new lead has been assigned to you. Please review the details below and follow up accordingly.</p>
+                                                
+                                                <div style="margin: 20px 0px; padding: 20px; background-color: #f8f9fa; border-left: 4px solid #875A7B; border-radius: 5px;">
+                                                    <table style="width: 100%; font-size: 14px;">
+                                                        <tr>
+                                                            <td style="padding: 5px 0; width: 30%; font-weight: bold;">Lead Name:</td>
+                                                            <td style="padding: 5px 0;">${object.name}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="padding: 5px 0; font-weight: bold;">Contact:</td>
+                                                            <td style="padding: 5px 0;">${object.contact_name or 'N/A'}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="padding: 5px 0; font-weight: bold;">Company:</td>
+                                                            <td style="padding: 5px 0;">${object.partner_name or 'N/A'}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="padding: 5px 0; font-weight: bold;">Job Position:</td>
+                                                            <td style="padding: 5px 0;">${object.function or 'N/A'}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="padding: 5px 0; font-weight: bold;">Email:</td>
+                                                            <td style="padding: 5px 0;">${object.email_from or 'N/A'}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="padding: 5px 0; font-weight: bold;">Phone:</td>
+                                                            <td style="padding: 5px 0;">${object.phone or 'N/A'}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="padding: 5px 0; font-weight: bold;">Expected Revenue:</td>
+                                                            <td style="padding: 5px 0;">${'${:,.2f}'.format(object.expected_revenue) if object.expected_revenue else 'N/A'}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="padding: 5px 0; font-weight: bold;">Stage:</td>
+                                                            <td style="padding: 5px 0;">${object.stage_id.name if object.stage_id else 'N/A'}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="padding: 5px 0; font-weight: bold;">Related Event:</td>
+                                                            <td style="padding: 5px 0;">${object.x_studio_related_event.name if object.x_studio_related_event else 'N/A'}</td>
+                                                        </tr>
+                                                        <tr t-if="object.description">
+                                                            <td style="padding: 15px 0 5px 0; font-weight: bold; vertical-align: top;">Description:</td>
+                                                            <td style="padding: 15px 0 5px 0; background-color: #fff; padding: 10px; border-radius: 3px; border: 1px solid #ddd;">
+                                                                ${object.description | safe}
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                                
+                                                <p style="text-align: center; margin: 30px 0;">
+                                                    <a t-att-href="object.get_base_url() + '/web#id=%s&amp;model=crm.lead' % object.id"
+                                                       style="background-color: #875A7B; padding: 12px 24px; text-decoration: none; color: white; border-radius: 5px; font-weight: bold; display: inline-block;">
+                                                        🔗 View Lead in Odoo
+                                                    </a>
+                                                </p>
+                                                
+                                                <p>Best regards,<br/>Your CRM System</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    </table>
+</div>
+            </field>
+        </record>
+
+        <!-- Email Template: Customer Welcome Email -->
+        <record id="mail_template_welcome_lead" model="mail.template">
+            <field name="name">Customer Welcome Email</field>
+            <field name="model_id" ref="crm.model_crm_lead"/>
+            <field name="subject">Thank you for visiting us at ${object.x_studio_related_event.name if object.x_studio_related_event else 'the show'}!</field>
+            <field name="email_from">${object.user_id.name} &lt;${object.user_id.email or ''}&gt;</field>
+            <field name="email_to">${object.email_from}</field>
+            <field name="reply_to">${object.user_id.email or ''}</field>
+            <field name="body_html" type="html">
+<div style="margin: 0px; padding: 0px; font-family: Arial, sans-serif;">
+    <table border="0" cellpadding="0" cellspacing="0" style="padding-top: 16px; background-color: #F1F2F3; color: #454748; width: 100%; border-collapse: separate;">
+        <tr>
+            <td align="center">
+                <table border="0" cellpadding="0" cellspacing="0" width="590" style="padding: 16px; background-color: white; color: #454748; border-collapse: separate;">
+                    <tbody>
+                        <tr>
+                            <td align="center" style="min-height: 590px;">
+                                <table border="0" cellpadding="0" cellspacing="0" width="590" style="min-height: 590px; padding: 0px 8px 0px 8px; border-collapse: separate;">
+                                    <tr>
+                                        <td valign="top" style="font-size: 14px; line-height: 1.6;">
+                                            <div>
+                                                <p>Hi <strong>${object.contact_name or 'there'}</strong>,</p>
+                                                
+                                                <p>It was a pleasure connecting with you at <strong>${object.x_studio_related_event.name if object.x_studio_related_event else '[Show Name]'}</strong>. We appreciate you taking the time to stop by our booth.</p>
+                                                
+                                                <p>If you'd like a quote on any of our arc flash PPE items, or if you have additional questions, please don't hesitate to reach out. You can also browse our entire catalog anytime at <a href="https://yourwebsite.com" style="color: #875A7B;">our website</a>.</p>
+                                                
+                                                <p><strong>Below is a recap of your contact information and notes from our conversation:</strong></p>
+                                                
+                                                <div style="margin: 20px 0px; padding: 20px; background-color: #f8f9fa; border-left: 4px solid #875A7B; border-radius: 5px;">
+                                                    <table style="width: 100%; font-size: 14px;">
+                                                        <tr>
+                                                            <td style="padding: 5px 0; width: 30%; font-weight: bold;">Name:</td>
+                                                            <td style="padding: 5px 0;">${object.contact_name or 'N/A'}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="padding: 5px 0; font-weight: bold;">Company:</td>
+                                                            <td style="padding: 5px 0;">${object.partner_name or 'N/A'}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="padding: 5px 0; font-weight: bold;">Job Position:</td>
+                                                            <td style="padding: 5px 0;">${object.function or 'N/A'}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="padding: 5px 0; font-weight: bold;">Email:</td>
+                                                            <td style="padding: 5px 0;">${object.email_from or 'N/A'}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="padding: 5px 0; font-weight: bold;">Phone:</td>
+                                                            <td style="padding: 5px 0;">${object.phone or 'N/A'}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="padding: 5px 0; font-weight: bold; vertical-align: top;">Address:</td>
+                                                            <td style="padding: 5px 0;">
+                                                                ${object.street or ''}<br t-if="object.street"/>
+                                                                ${object.street2 or ''}<br t-if="object.street2"/>
+                                                                ${object.city or ''}<span t-if="object.city and object.state_id">, </span>${object.state_id.name if object.state_id else ''} ${object.zip or ''}<br t-if="object.city or object.state_id or object.zip"/>
+                                                                ${object.country_id.name if object.country_id else ''}
+                                                            </td>
+                                                        </tr>
+                                                        <tr t-if="object.description">
+                                                            <td style="padding: 15px 0 5px 0; font-weight: bold; vertical-align: top;">Notes:</td>
+                                                            <td style="padding: 15px 0 5px 0; background-color: #fff; padding: 10px; border-radius: 3px; border: 1px solid #ddd;">
+                                                                ${object.description | safe}
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                                
+                                                <p>We look forward to helping you strengthen safety and compliance across your electrical operations.</p>
+                                                
+                                                <p>Best regards,<br/>
+                                                <strong>${object.user_id.name if object.user_id else 'Sales Team'}</strong><br/>
+                                                ${object.user_id.email if object.user_id else ''}<br/>
+                                                ${object.user_id.phone if object.user_id and object.user_id.phone else ''}</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    </table>
+</div>
+            </field>
+        </record>
+    </data>
+</odoo>

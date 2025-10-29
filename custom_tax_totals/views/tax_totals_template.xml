@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+    <template id="account_document_tax_totals_simple" 
+              inherit_id="account.document_tax_totals_template" 
+              priority="20">
+      <xpath expr="." position="replace">
+        <t t-name="account.document_tax_totals_template">
+          <!-- Loop Subtotals -->
+          <t t-foreach="tax_totals.get('subtotals')" t-as="subtotal">
+            <tr class="border-black o_subtotal">
+              <td><strong t-out="subtotal['name']">Untaxed Amount</strong></td>
+              <td class="text-end">
+                <span t-out="subtotal['formatted_amount']"/>
+              </td>
+            </tr>
+            
+            <!-- Taxes (SIMPLE VERSION - just use formatted calculation) -->
+            <tr class="o_taxes">
+              <td><strong>Taxes</strong></td>
+              <td class="text-end">
+                <t t-set="tax_amount" t-value="tax_totals['amount_total'] - tax_totals['amount_untaxed']"/>
+                <t t-set="formatted_tax" t-value="'{:,.2f}'.format(tax_amount)"/>
+                <span t-out="formatted_tax"/>
+              </td>
+            </tr>
+          </t>
+
+          <!-- Rounding -->
+          <tr t-if="'formatted_rounding_amount' in tax_totals and tax_totals.get('rounding_amount') != 0">
+            <td>Rounding</td>
+            <td class="text-end">
+              <span t-out="tax_totals['formatted_rounding_amount']"/>
+            </td>
+          </tr>
+
+          <!-- Spacer -->
+          <tr>
+            <td colspan="2" style="height:6px; border:none;"></td>
+          </tr>
+
+          <!-- Total -->
+          <tr class="border-black o_total">
+            <td><strong>Total</strong></td>
+            <td class="text-end">
+              <span t-out="tax_totals['formatted_amount_total']"/>
+            </td>
+          </tr>
+        </t>
+      </xpath>
+    </template>
+  </data>
+</odoo>

@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+####
+#    Cybrosys Technologies Pvt. Ltd.
+#    Copyright (C) 2024
+####
 from odoo import fields, models
 
 
@@ -22,4 +26,10 @@ class ResConfigSettings(models.TransientModel):
         "Disable Followers for Invoices",
         config_parameter="follower_restrict.disable_invoice_followers",
         help="Automatically remove customers as followers when confirming invoices."
+    )
+
+    disable_global_email_subscribe = fields.Boolean(
+        "Disable Auto Followers on Email",
+        config_parameter="follower_restrict.disable_global_email_subscribe",
+        help="Prevents auto-adding recipients as followers when sending emails from any document."
     )

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Server action to open "Add Touched Contact" in a modal -->
+    <record id="action_add_contact_manually_window" model="ir.actions.act_window">
+        <field name="name">Add Touched Contact</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">sale.order.contact.log</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_sale_order_id': active_id, 'default_source': 'manual'}</field>
+    </record>
+
+    <!-- Sales Order Form View Extension -->
+    <record id="view_order_form_inherit_contact_tracker" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.contact.tracker</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/notebook" position="inside">
+                <page string="Touched Contacts" name="touched_contacts">
+                    <div class="oe_button_box" name="button_box_contacts">
+                        <button class="oe_stat_button btn-link"
+                                type="action"
+                                name="%(action_add_contact_manually_window)d"
+                                icon="fa-user-plus">
+                            <field string="Contacts" name="contact_log_count" widget="statinfo"/>
+                        </button>
+                    </div>
+
+                    <field name="contact_log_ids" nolabel="1">
+                        <tree string="Touched Contacts" create="true" delete="true">
+                            <field name="partner_id"/>
+                            <field name="email"/>
+                            <field name="source"/>
+                            <field name="date_touched" readonly="1"/>
+                            <field name="notes"/>
+                        </tree>
+                        <form string="Touched Contact">
+                            <group>
+                                <group>
+                                    <field name="sale_order_id" readonly="1"/>
+                                    <field name="partner_id" options="{'no_create': False}"/>
+                                    <field name="email"/>
+                                </group>
+                                <group>
+                                    <field name="source"/>
+                                    <field name="date_touched" readonly="1"/>
+                                </group>
+                            </group>
+                            <group>
+                                <field name="notes" placeholder="Add any notes about this contact interaction..."/>
+                            </group>
+                        </form>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Standalone Contact Log Form View -->
+    <record id="view_sale_order_contact_log_form" model="ir.ui.view">
+        <field name="name">sale.order.contact.log.form</field>
+        <field name="model">sale.order.contact.log</field>
+        <field name="arch" type="xml">
+            <form string="Touched Contact">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="sale_order_id" readonly="1"/>
+                            <field name="partner_id" options="{'no_create': False}"/>
+                            <field name="email"/>
+                        </group>
+                        <group>
+                            <field name="source"/>
+                            <field name="date_touched" readonly="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="notes" placeholder="Add any notes about this contact interaction..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Standalone Contact Log Tree View -->
+    <record id="view_sale_order_contact_log_tree" model="ir.ui.view">
+        <field name="name">sale.order.contact.log.tree</field>
+        <field name="model">sale.order.contact.log</field>
+        <field name="arch" type="xml">
+            <tree string="Touched Contacts">
+                <field name="sale_order_id"/>
+                <field name="partner_id"/>
+                <field name="email"/>
+                <field name="source"/>
+                <field name="date_touched" readonly="1"/>
+                <field name="notes"/>
+            </tree>
+        </field>
+    </record>
+</odoo>

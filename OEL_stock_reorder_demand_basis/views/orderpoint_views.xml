@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <!-- Add demand_basis field to reordering rule form -->
+  <record id="view_orderpoint_form_inherit_demand_basis" model="ir.ui.view">
+    <field name="name">stock.warehouse.orderpoint.form.demand.basis</field>
+    <field name="model">stock.warehouse.orderpoint</field>
+    <field name="inherit_id" ref="stock.view_warehouse_orderpoint_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//group" position="inside">
+        <field name="demand_basis"/>
+      </xpath>
+    </field>
+  </record>
+
+  <!-- Add demand_basis field to reordering rule tree -->
+  <record id="view_orderpoint_tree_inherit_demand_basis" model="ir.ui.view">
+    <field name="name">stock.warehouse.orderpoint.tree.demand.basis</field>
+    <field name="model">stock.warehouse.orderpoint</field>
+    <field name="inherit_id" ref="stock.view_warehouse_orderpoint_tree_editable"/>
+    <field name="arch" type="xml">
+      <xpath expr="//tree" position="inside">
+        <field name="demand_basis"/>
+      </xpath>
+    </field>
+  </record>
+</odoo>
