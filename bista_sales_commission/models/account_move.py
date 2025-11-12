@@ -28,19 +28,19 @@ class AccountMove(models.Model):
 
     commission_amount = fields.Monetary(
         string="Commission Amount",
-        compute="_compute_commission_amount",
+        compute="_compute_commissions_total",
         store=True,
         currency_field="currency_id",
     )
     in_commission_amount = fields.Monetary(
         string="Commission Amount",
-        compute="_compute_commission_amount",
+        compute="_compute_commissions_total",
         store=True,
         currency_field="currency_id",
     )
     out_commission_amount = fields.Monetary(
         string="Commission Amount",
-        compute="_compute_commission_amount",
+        compute="_compute_commissions_total",
         store=True,
         currency_field="currency_id",
     )
@@ -95,12 +95,12 @@ class AccountMove(models.Model):
             else:
                 move.shipping_city_state = ""
 
-    @api.depends("line_ids.commission_amount")
-    def _compute_commission_amount(self):
+    @api.depends("invoice_line_ids.commission_amount", "invoice_line_ids.in_commission_amount","invoice_line_ids.out_commission_amount")
+    def _compute_commissions_total(self):
         for move in self:
-            move.commission_amount = sum(move.line_ids.mapped("commission_amount"))
-            move.in_commission_amount = sum(move.line_ids.mapped("in_commission_amount"))
-            move.out_commission_amount = sum(move.line_ids.mapped("out_commission_amount"))
+            move.commission_amount = sum(move.invoice_line_ids.mapped("commission_amount"))
+            move.in_commission_amount = sum(move.invoice_line_ids.mapped("in_commission_amount"))
+            move.out_commission_amount = sum(move.invoice_line_ids.mapped("out_commission_amount"))
 
     def update_commision_on_invoice(self, records):
         # filtered_invoices = records.filtered(

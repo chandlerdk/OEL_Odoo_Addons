@@ -40,7 +40,6 @@
                 <field name="commission_amount"/>
                 <filter string="Commission To Bill" name="to_bill"
                         domain="[('commission_to_bill', '=', True), ('is_commission_billed', '=', False)]"/>
-
             </xpath>
             <xpath expr="//group" position="inside">
                 <filter string="Commission Date" name="group_commission_date" domain="[]"
@@ -56,10 +55,11 @@
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">account.move.line</field>
         <field name="view_mode">tree</field>
-        <field name="domain">['|','|',('commission_amount','!=', False),('in_commission_amount','!=',
-            False),('in_commission_amount','!=', False),('display_type', 'in', ['product', 'line_section',
+        <field name="domain">['|','|',('commission_amount','>', 0),('in_commission_amount','>',
+            0),('out_commission_amount','>', 0),('display_type', 'in', ['product', 'line_section',
             'line_note'])]
         </field>
+
 
         <field name="context">{'create': 0, 'delete': 0, 'edit': 0, 'search_default_to_bill': 1,
             'search_group_commission_user_id': 1}

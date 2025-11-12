@@ -50,7 +50,7 @@ class AccountMoveLine(models.Model):
                                                    store=True)
     current_line_id = fields.Integer()
     user_id = fields.Many2one('res.users', related="move_id.invoice_user_id")
-    is_commission_billed = fields.Boolean(string="Commission Billed", default=False,copy=False)
+    is_commission_billed = fields.Boolean(string="Commission Billed", default=False, copy=False)
 
 
     @api.depends("sale_person_id", "team_id",
@@ -86,7 +86,7 @@ class AccountMoveLine(models.Model):
                         line.commission_percent = rule.percentage
                         break
             if line.move_id.move_type == 'out_refund':
-                amount = -amount
+                amount = -(amount or 0.0)
             line.commission_amount = amount
 
     # def generate_bill(self):
