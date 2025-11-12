@@ -45,7 +45,9 @@
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">account.move</field>
         <field name="view_mode">tree</field>
-        <field name="domain">[('line_ids.commission_amount', '>', 0)]</field>
+         <field name="domain">['|','|',('commission_amount','>', 0),('in_commission_amount','>',
+            0),('out_commission_amount','>', 0)])]
+        </field>
         <field name="context">{'create': 0, 'delete': 0, 'edit': 0, 'search_default_to_bill': 1,
             'search_group_partner_id': 1}
         </field>
