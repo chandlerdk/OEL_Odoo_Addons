@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_move_form_inherit_shipping_info" model="ir.ui.view">
+        <field name="name">account.move.form.inherit.shipping.info</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='other_info']" position="inside">
+                <group string="Shipping Information" name="shipping_information" class="oe_group">
+                    <field name="delivery_reference" readonly="1"/>
+                    <field name="tracking_reference" readonly="1"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>
