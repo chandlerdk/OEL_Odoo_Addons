@@ -18,6 +18,9 @@ class SaleOrderLine(models.Model):
     manual_in_commission = fields.Boolean(string="Manual C% In Amount",copy=False)
     manual_out_commission = fields.Boolean(string="Manual C% Out Amount",copy=False)
 
+    def _get_generic_commission(self):
+        return self.env['sale.commission'].search([('name', '=', 'Generic Commission')], limit=1)
+
     @api.onchange('commission_percent')
     def _onchange_commission_percent(self):
         self.write({'manual_commission': True})
@@ -30,21 +33,55 @@ class SaleOrderLine(models.Model):
                 'amount_after_tax': line.price_total,
                 'amount_before_tax': line.price_subtotal,
                 'percentage': line.commission_percent
-
             }
-            rep_rules = sale_commission.search(
-                [('sale_rep_id', '=', line.sale_rep_id.id), ('sale_partner_type', '=', 'sale_rep')],
-                order='sequence') if line.sale_rep_id else sale_commission.browse()
+            if line.product_id.detailed_type == 'service':
+                rep_rules = sale_commission.search(
+                    [('sale_rep_id', '=', line.sale_rep_id.id), ('sale_partner_type', '=', 'sale_rep'),
+                     ('product_ids', 'in', line.product_id.id), ('product_ids.detailed_type', '=', 'service')],
+                    order='sequence') if line.sale_rep_id else sale_commission.browse()
 
-            data['percentage'] = line.commission_percent if line.manual_commission else rule.percentage
-            for rule in rep_rules:
+                for rule in rep_rules:
+                    data['percentage'] = line.commission_percent if line.manual_commission else rule.percentage
+                    amount = rule.calculate_amount(data)
+                    if amount:
+                        line.commission_id = rule.id if rule else False
+                        line.commission_percent = line.commission_percent if line.manual_commission else rule.percentage
+                        line.commission_amount = amount
+                        break
+                else:
+                    generic = self._get_generic_commission()
+                    if generic:
+                        percentage = line.commission_percent if line.manual_commission else generic.percentage
+                        data['percentage'] = percentage
+                        amount = generic.calculate_amount(data)
+
+                        line.commission_id = generic.id
+                        line.commission_percent = percentage
+                        line.commission_amount = amount
+
+            else:
+                rep_rules = sale_commission.search(
+                    [('sale_rep_id', '=', line.sale_rep_id.id), ('sale_partner_type', '=', 'sale_rep')],
+                    order='sequence') if line.sale_rep_id else sale_commission.browse()
                 data['percentage'] = line.commission_percent if line.manual_commission else rule.percentage
-                amount = rule.calculate_amount(data)
-                if amount:
-                    line.commission_id = rule.id if rule else False
-                    line.commission_percent = line.commission_percent if line.manual_commission else rule.percentage
-                    line.commission_amount = amount
-                    break
+                for rule in rep_rules:
+                    data['percentage'] = line.commission_percent if line.manual_commission else rule.percentage
+                    amount = rule.calculate_amount(data)
+                    if amount:
+                        line.commission_id = rule.id if rule else False
+                        line.commission_percent = line.commission_percent if line.manual_commission else rule.percentage
+                        line.commission_amount = amount
+                        break
+                else:
+                    generic = self._get_generic_commission()
+                    if generic:
+                        percentage = line.commission_percent if line.manual_commission else generic.percentage
+                        data['percentage'] = percentage
+                        amount = generic.calculate_amount(data)
+
+                        line.commission_id = generic.id
+                        line.commission_percent = percentage
+                        line.commission_amount = amount
 
     @api.onchange('in_commission_percent')
     def _onchange_in_commission_percent(self):
@@ -57,20 +94,57 @@ class SaleOrderLine(models.Model):
                 'quantity': line.product_uom_qty,
                 'amount_after_tax': line.price_total,
                 'amount_before_tax': line.price_subtotal,
-                'percentage': line.in_commission_percent
-
+                'percentage': line.commission_percent
             }
-            user_rules = sale_commission.search(
-                [('user_ids', 'in', line.user_id.id), ('sale_partner_type', '=', 'user')],
-                order='sequence') if line.user_id else sale_commission.browse()
-            for user_rule in user_rules:
-                data['percentage'] = line.in_commission_percent if line.manual_in_commission else user_rule.percentage
-                amount = user_rule.calculate_amount(data)
-                if amount:
-                    line.in_commission_id = user_rule.id if user_rule else False
-                    line.in_commission_percent = line.in_commission_percent if line.manual_in_commission else user_rule.percentage
-                    line.in_commission_amount = amount
-                    break
+            if line.product_id.detailed_type == 'service':
+                user_rules = sale_commission.search(
+                    [('user_ids', 'in', line.user_id.id), ('sale_partner_type', '=', 'user'),
+                     ('product_ids', 'in', line.product_id.id), ('product_ids.detailed_type', '=', 'service')
+                     ],
+                    order='sequence') if line.user_id else sale_commission.browse()
+
+                for user_rule in user_rules:
+                    data[
+                        'percentage'] = line.in_commission_percent if line.manual_in_commission else user_rule.percentage
+                    amount = user_rule.calculate_amount(data)
+                    if amount:
+                        line.in_commission_id = user_rule.id if user_rule else False
+                        line.in_commission_percent = line.in_commission_percent if line.manual_in_commission else user_rule.percentage
+                        line.in_commission_amount = amount
+                        break
+                else:
+                    generic = self._get_generic_commission()
+                    if generic:
+                        percentage = line.in_commission_percent if line.manual_in_commission else generic.percentage
+                        data['percentage'] = percentage
+                        amount = generic.calculate_amount(data)
+
+                        line.in_commission_id = generic.id
+                        line.in_commission_percent = percentage
+                        line.in_commission_amount = amount
+            else:
+                user_rules = sale_commission.search(
+                    [('user_ids', 'in',  line.user_id.id), ('sale_partner_type', '=', 'user')],
+                    order='sequence') if line.user_id else sale_commission.browse()
+                for user_rule in user_rules:
+                    data[
+                        'percentage'] = line.in_commission_percent if line.manual_in_commission else user_rule.percentage
+                    amount = user_rule.calculate_amount(data)
+                    if amount:
+                        line.in_commission_id = user_rule.id if user_rule else False
+                        line.in_commission_percent = line.in_commission_percent if line.manual_in_commission else user_rule.percentage
+                        line.in_commission_amount = amount
+                        break
+                else:
+                    generic = self._get_generic_commission()
+                    if generic:
+                        percentage = line.in_commission_percent if line.manual_in_commission else generic.percentage
+                        data['percentage'] = percentage
+                        amount = generic.calculate_amount(data)
+
+                        line.in_commission_id = generic.id
+                        line.in_commission_percent = percentage
+                        line.in_commission_amount = amount
 
     @api.onchange('out_commission_percent')
     def _onchange_out_commission_percent(self):
@@ -83,21 +157,57 @@ class SaleOrderLine(models.Model):
                 'quantity': line.product_uom_qty,
                 'amount_after_tax': line.price_total,
                 'amount_before_tax': line.price_subtotal,
-                'percentage': line.in_commission_percent
-
+                'percentage': line.commission_percent
             }
-            team_rules = sale_commission.search(
-                [('sale_team_rep', '=', line.team_id.user_id.id), ('sale_partner_type', '=', 'sale_team')],
-                order='sequence') if line.team_id else sale_commission.browse()
-            for team_rule in team_rules:
-                data['percentage'] = line.out_commission_percent if line.manual_out_commission else team_rule.percentage
-                amount = team_rule.calculate_amount(data)
-                if amount:
-                    line.out_commission_id = team_rule.id if team_rule else False
-                    line.out_commission_percent = line.out_commission_percent if line.manual_out_commission else team_rule.percentage
-                    line.out_commission_amount = amount
-                    break
+            if line.product_id.detailed_type == 'service':
+                team_rules = sale_commission.search(
+                    [('sale_team_rep', '=', line.team_id.user_id.id), ('sale_partner_type', '=', 'sale_team'),
+                     ('product_ids', 'in', line.product_id.id), ('product_ids.detailed_type', '=', 'service')
+                     ],
+                    order='sequence') if line.team_id else sale_commission.browse()
+                for team_rule in team_rules:
+                    data[
+                        'percentage'] = line.out_commission_percent if line.manual_out_commission else team_rule.percentage
+                    amount = team_rule.calculate_amount(data)
+                    if amount:
+                        line.out_commission_id = team_rule.id if team_rule else False
+                        line.out_commission_percent = line.out_commission_percent if line.manual_out_commission else team_rule.percentage
+                        line.out_commission_amount = amount
+                        break
+                else:
+                    generic = self._get_generic_commission()
+                    if generic:
+                        percentage = line.out_commission_percent if line.manual_out_commission else generic.percentage
+                        data['percentage'] = percentage
+                        amount = generic.calculate_amount(data)
 
+                        line.out_commission_id = generic.id
+                        line.out_commission_percent = percentage
+                        line.out_commission_amount = amount
+
+            else:
+                team_rules = sale_commission.search(
+                    [('sale_team_rep', '=', line.team_id.user_id.id), ('sale_partner_type', '=', 'sale_team')],
+                    order='sequence') if line.team_id else sale_commission.browse()
+                for team_rule in team_rules:
+                    data[
+                        'percentage'] = line.out_commission_percent if line.manual_out_commission else team_rule.percentage
+                    amount = team_rule.calculate_amount(data)
+                    if amount:
+                        line.out_commission_id = team_rule.id if team_rule else False
+                        line.out_commission_percent = line.out_commission_percent if line.manual_out_commission else team_rule.percentage
+                        line.out_commission_amount = amount
+                        break
+                else:
+                    generic = self._get_generic_commission()
+                    if generic:
+                        percentage = line.out_commission_percent if line.manual_out_commission else generic.percentage
+                        data['percentage'] = percentage
+                        amount = generic.calculate_amount(data)
+
+                        line.out_commission_id = generic.id
+                        line.out_commission_percent = percentage
+                        line.out_commission_amount = amount
 
     @api.depends("user_id",
                  "sale_rep_id",
