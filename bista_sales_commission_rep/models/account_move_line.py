@@ -22,7 +22,7 @@ class AccountMoveLine(models.Model):
 
     @api.onchange('commission_percent')
     def _onchange_commission_percent(self):
-        self.write({'manual_commission': True})
+        self.manual_commission = True
         sale_commission = self.env['sale.commission']
         for line in self:
             data = {
@@ -84,7 +84,7 @@ class AccountMoveLine(models.Model):
 
     @api.onchange('in_commission_percent')
     def _onchange_in_commission_percent(self):
-        self.write({'manual_in_commission': True})
+        self.manual_in_commission = True
         sale_commission = self.env['sale.commission']
         for line in self:
             data = {
@@ -147,7 +147,7 @@ class AccountMoveLine(models.Model):
 
     @api.onchange('out_commission_percent')
     def _onchange_out_commission_percent(self):
-        self.write({'manual_out_commission': True})
+        self.manual_out_commission = True
         sale_commission = self.env['sale.commission']
         for line in self:
             data = {
