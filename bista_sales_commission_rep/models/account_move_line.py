@@ -22,9 +22,11 @@ class AccountMoveLine(models.Model):
 
     @api.onchange('commission_percent')
     def _onchange_commission_percent(self):
-        self.manual_commission = True
         sale_commission = self.env['sale.commission']
         for line in self:
+            if not line._origin or not line._origin.id:
+                return
+            self.manual_commission = True
             data = {
                 'product_id': line.product_id,
                 'partner_id': line.partner_id,
@@ -84,9 +86,11 @@ class AccountMoveLine(models.Model):
 
     @api.onchange('in_commission_percent')
     def _onchange_in_commission_percent(self):
-        self.manual_in_commission = True
         sale_commission = self.env['sale.commission']
         for line in self:
+            if not line._origin or not line._origin.id:
+                return
+            self.manual_in_commission = True
             data = {
                 'product_id': line.product_id,
                 'partner_id': line.partner_id,
@@ -147,9 +151,11 @@ class AccountMoveLine(models.Model):
 
     @api.onchange('out_commission_percent')
     def _onchange_out_commission_percent(self):
-        self.manual_out_commission = True
         sale_commission = self.env['sale.commission']
         for line in self:
+            if not line._origin or not line._origin.id:
+                return
+            self.manual_out_commission = True
             data = {
                 'product_id': line.product_id,
                 'partner_id': line.partner_id,
