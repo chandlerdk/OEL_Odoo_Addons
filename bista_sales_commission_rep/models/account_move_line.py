@@ -271,9 +271,10 @@ class AccountMoveLine(models.Model):
                         break
                 else:
                     if line.manual_commission and line.commission_percent:
+                        generic = line._get_generic_commission()
                         data['percentage'] = line.commission_percent
                         amount = line.env['sale.commission'].calculate_amount(data)
-                        # line.commission_id = False
+                        line.commission_id = generic.id if generic else False
                         line.commission_amount = amount
                     else:
                         line.commission_percent = 0.0
@@ -291,9 +292,10 @@ class AccountMoveLine(models.Model):
                         break
                 else:
                     if line.manual_in_commission and line.in_commission_percent:
+                        generic = line._get_generic_commission()
                         data['percentage'] = line.in_commission_percent
                         amount = line.env['sale.commission'].calculate_amount(data)
-                        # line.in_commission_id = False
+                        line.in_commission_id = generic.id if generic else False
                         line.in_commission_amount = amount
                     else:
                         line.in_commission_percent = 0
@@ -312,9 +314,10 @@ class AccountMoveLine(models.Model):
                 else:
                     # Fallback logic if manual_out_commission is True but no rule is found
                     if line.manual_out_commission and line.out_commission_percent:
+                        generic = line._get_generic_commission()
                         data['percentage'] = line.out_commission_percent
                         amount = line.env['sale.commission'].calculate_amount(data)
-                        # line.out_commission_id = False
+                        line.out_commission_id = generic.id if generic else False
                         line.out_commission_amount = amount
                     else:
                         line.out_commission_percent = 0
@@ -340,9 +343,10 @@ class AccountMoveLine(models.Model):
                         break
                 else:
                     if line.manual_commission and line.commission_percent:
+                        generic = line._get_generic_commission()
                         data['percentage'] = line.commission_percent
                         amount = line.env['sale.commission'].calculate_amount(data)
-                        # line.commission_id = False
+                        line.commission_id = generic.id if generic else False
                         line.commission_amount = amount
                     else:
                         line.commission_percent = 0.0
@@ -359,9 +363,10 @@ class AccountMoveLine(models.Model):
                         break
                 else:
                     if line.manual_in_commission and line.in_commission_percent:
+                        generic = line._get_generic_commission()
                         data['percentage'] = line.in_commission_percent
                         amount = line.env['sale.commission'].calculate_amount(data)
-                        # line.in_commission_id = False
+                        line.in_commission_id = generic.id if generic else False
                         line.in_commission_amount = amount
                     else:
                         line.in_commission_percent = 0
@@ -379,9 +384,10 @@ class AccountMoveLine(models.Model):
                 else:
                     # Fallback logic if manual_out_commission is True but no rule is found
                     if line.manual_out_commission and line.out_commission_percent:
+                        generic = line._get_generic_commission()
                         data['percentage'] = line.out_commission_percent
                         amount = line.env['sale.commission'].calculate_amount(data)
-                        # line.out_commission_id = False
+                        line.out_commission_id = generic.id if generic else False
                         line.out_commission_amount = amount
                     else:
                         line.out_commission_percent = 0

@@ -269,9 +269,16 @@ class SaleOrderLine(models.Model):
                         line.commission_percent = rule.percentage
                         break
                 else:
-                    line.commission_percent = 0.0
-                    line.commission_id = False
-                    line.commission_amount = 0.0
+                    if line.manual_commission and line.commission_percent:
+                        generic = line._get_generic_commission()
+                        data['percentage'] = line.commission_percent
+                        amount = line.env['sale.commission'].calculate_amount(data)
+                        line.commission_id = generic.id if generic else False
+                        line.commission_amount = amount
+                    else:
+                        line.commission_percent = 0.0
+                        line.commission_id = False
+                        line.commission_amount = 0.0
                     # ================= USER COMMISSION =================
                 for user_rule in user_rules:
                     data['percentage'] = user_rule.percentage
@@ -282,9 +289,16 @@ class SaleOrderLine(models.Model):
                         line.in_commission_amount = amount
                         break
                 else:
-                    line.in_commission_percent = 0
-                    line.in_commission_id = False
-                    line.in_commission_amount = 0.0
+                    if line.manual_in_commission and line.in_commission_percent:
+                        generic = line._get_generic_commission()
+                        data['percentage'] = line.in_commission_percent
+                        amount = line.env['sale.commission'].calculate_amount(data)
+                        line.in_commission_id = generic.id if generic else False
+                        line.in_commission_amount = amount
+                    else:
+                        line.in_commission_percent = 0
+                        line.in_commission_id = False
+                        line.in_commission_amount = 0.0
 
                     # ================= TEAM COMMISSION =================
                 for team_rule in team_rules:
@@ -296,20 +310,16 @@ class SaleOrderLine(models.Model):
                         line.out_commission_amount = amount
                         break
                 else:
-                    line.out_commission_percent = 0
-                    line.out_commission_id = False
-                    line.out_commission_amount = 0.0
-
-                # if specific_commission_rule:
-                #     if line.sale_rep_id == specific_commission_rule.sale_rep_id:
-                #         line.commission_amount = 0
-                #         line.commission_id = specific_commission_rule.id
-                #         line.commission_percent = specific_commission_rule.percentage
-                #     elif line.user_id.id in specific_commission_rule.user_ids.ids:
-                #         line.commission_amount = 0
-                #         line.commission_id = specific_commission_rule.id
-                #         line.commission_percent = specific_commission_rule.percentage
-                #     continue
+                    if line.manual_out_commission and line.out_commission_percent:
+                        generic = line._get_generic_commission()
+                        data['percentage'] = line.out_commission_percent
+                        amount = line.env['sale.commission'].calculate_amount(data)
+                        line.out_commission_id = generic.id if generic else False
+                        line.out_commission_amount = amount
+                    else:
+                        line.out_commission_percent = 0
+                        line.out_commission_id = False
+                        line.out_commission_amount = 0.0
 
             else:
                 rep_rules = sale_commission.search([('sale_rep_id', '=', line.sale_rep_id.id),('sale_partner_type','=','sale_rep')],
@@ -327,9 +337,16 @@ class SaleOrderLine(models.Model):
                         line.commission_percent = rule.percentage
                         break
                 else:
-                    line.commission_percent = 0.0
-                    line.commission_id = False
-                    line.commission_amount = 0.0
+                    if line.manual_commission and line.commission_percent:
+                        generic = line._get_generic_commission()
+                        data['percentage'] = line.commission_percent
+                        amount = line.env['sale.commission'].calculate_amount(data)
+                        line.commission_id = generic.id if generic else False
+                        line.commission_amount = amount
+                    else:
+                        line.commission_percent = 0.0
+                        line.commission_id = False
+                        line.commission_amount = 0.0
                         # ================= USER COMMISSION =================
                 for user_rule in user_rules:
                     data['percentage'] = user_rule.percentage
@@ -340,9 +357,16 @@ class SaleOrderLine(models.Model):
                         line.in_commission_amount = amount
                         break
                 else:
-                    line.in_commission_percent = 0
-                    line.in_commission_id = False
-                    line.in_commission_amount = 0.0
+                    if line.manual_in_commission and line.in_commission_percent:
+                        generic = line._get_generic_commission()
+                        data['percentage'] = line.in_commission_percent
+                        amount = line.env['sale.commission'].calculate_amount(data)
+                        line.in_commission_id = generic.id if generic else False
+                        line.in_commission_amount = amount
+                    else:
+                        line.in_commission_percent = 0
+                        line.in_commission_id = False
+                        line.in_commission_amount = 0.0
 
                         # ================= TEAM COMMISSION =================
                 for team_rule in team_rules:
@@ -354,9 +378,16 @@ class SaleOrderLine(models.Model):
                         line.out_commission_amount = amount
                         break
                 else:
-                    line.out_commission_percent = 0
-                    line.out_commission_id = False
-                    line.out_commission_amount = 0.0
+                    if line.manual_out_commission and line.out_commission_percent:
+                        generic = line._get_generic_commission()
+                        data['percentage'] = line.out_commission_percent
+                        amount = line.env['sale.commission'].calculate_amount(data)
+                        line.out_commission_id = generic.id if generic else False
+                        line.out_commission_amount = amount
+                    else:
+                        line.out_commission_percent = 0
+                        line.out_commission_id = False
+                        line.out_commission_amount = 0.0
 
     def _prepare_invoice_line(self, **optional_values):
         res = super()._prepare_invoice_line(**optional_values)

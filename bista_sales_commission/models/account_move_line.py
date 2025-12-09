@@ -6,7 +6,7 @@
 #
 ##############################################################################
 
-from odoo import api, fields, models,_
+from odoo import api, fields, models, _
 from datetime import date
 from odoo.exceptions import ValidationError, UserError
 
@@ -21,11 +21,29 @@ class AccountMoveLine(models.Model):
     commission_move_id = fields.Many2one('account.move', string="Commission Bill", copy=False)
     reversed_move_id = fields.Many2one('account.move', related="move_id.reversed_entry_id", store=True)
     commission_move_line_id = fields.Many2one('account.move.line', string="Commission Bill Line", copy=False)
-    commission_reverse_move_line_id = fields.Many2one('account.move.line',
-                                                      string="Commission Reverse Move Line", copy=False)
-    commission_amount = fields.Float(compute="_compute_commission_amount",inverse='_inverse_commission_amount',string="C Man Amount", store=True)
-    in_commission_amount = fields.Float(compute="_compute_commission_amount",inverse='_inverse_commission_amount',string="C In Amount", store=True)
-    out_commission_amount = fields.Float(compute="_compute_commission_amount",inverse='_inverse_commission_amount',string="C Out Amount", store=True)
+    commission_reverse_move_line_id = fields.Many2one(
+        'account.move.line',
+        string="Commission Reverse Move Line",
+        copy=False
+    )
+    commission_amount = fields.Float(
+        compute="_compute_commission_amount",
+        inverse="_inverse_commission_amount",
+        string="C Man Amount",
+        store=True
+    )
+    in_commission_amount = fields.Float(
+        compute="_compute_commission_amount",
+        inverse="_inverse_commission_amount",
+        string="C In Amount",
+        store=True
+    )
+    out_commission_amount = fields.Float(
+        compute="_compute_commission_amount",
+        inverse="_inverse_commission_amount",
+        string="C Out Amount",
+        store=True
+    )
 
     in_commission_percent = fields.Float(string="C% In")
     out_commission_percent = fields.Float(string="C% Out")
@@ -42,21 +60,27 @@ class AccountMoveLine(models.Model):
     sale_person_id = fields.Many2one('res.users', related="move_id.invoice_user_id", store=True)
     team_id = fields.Many2one('crm.team', related="move_id.team_id", store=True)
     is_commission_entry = fields.Boolean()
-    commission_expense_account_id = fields.Many2one('account.account',
-                                                    related="commission_id.expense_account_id",
-                                                    store=True)
-    commission_payout_account_id = fields.Many2one('account.account',
-                                                   related="commission_id.payout_account_id",
-                                                   store=True)
+    commission_expense_account_id = fields.Many2one(
+        'account.account',
+        related="commission_id.expense_account_id",
+        store=True
+    )
+    commission_payout_account_id = fields.Many2one(
+        'account.account',
+        related="commission_id.payout_account_id",
+        store=True
+    )
     current_line_id = fields.Integer()
     user_id = fields.Many2one('res.users', related="move_id.invoice_user_id")
     is_commission_billed = fields.Boolean(string="Commission Billed", default=False, copy=False)
 
-
-    @api.depends("sale_person_id", "team_id",
-                 "price_total",
-                 "partner_id",
-                 "product_id")
+    @api.depends(
+        "sale_person_id",
+        "team_id",
+        "price_total",
+        "partner_id",
+        "product_id"
+    )
     def _compute_commission_amount(self):
         for line in self:
             # Assuming invoice created from sales order always have percentage
@@ -77,7 +101,10 @@ class AccountMoveLine(models.Model):
                 amount = line.commission_id.calculate_amount(data)
             else:
                 user = line.sale_person_id
-                rules = self.env['sale.commission'].search([('user_ids', '=', user.id)], order='priority desc')
+                rules = self.env['sale.commission'].search(
+                    [('user_ids', '=', user.id)],
+                    order='priority desc'
+                )
                 for rule in rules:
                     data['percentage'] = rule.percentage
                     amount = rule.calculate_amount(data)
@@ -88,15 +115,6 @@ class AccountMoveLine(models.Model):
             if line.move_id.move_type == 'out_refund':
                 amount = -(amount or 0.0)
             line.commission_amount = amount
-
-    # def generate_bill(self):
-    #     return {
-    #         "name": "Generate Bill",
-    #         "type": "ir.actions.act_window",
-    #         "res_model": "commission.bill.wizard",
-    #         "view_mode": "form",
-    #         "target": "new",
-    #     }
 
     def get_commission_rules(self):
         """Return applicable commission rules by type for this line."""
@@ -119,7 +137,6 @@ class AccountMoveLine(models.Model):
                 ('sale_partner_type', '=', 'sale_team')
             ], order='sequence', limit=1) if self.team_id else False,
         }
-
 
     def generate_bill(self):
         grouped_lines = {}
@@ -158,17 +175,17 @@ class AccountMoveLine(models.Model):
                     rep_rules = sale_commission.search([
                         ('sale_rep_id', '=', line.sale_rep_id.id),
                         ('sale_partner_type', '=', 'sale_rep')
-                    ], order='sequence')
+                    ], order='sequence',limit=1)
                 elif rule_key == 'user_rule':
                     rep_rules = sale_commission.search([
                         ('user_ids', 'in', line.user_id.id),
                         ('sale_partner_type', '=', 'user')
-                    ], order='sequence')
+                    ], order='sequence',limit=1)
                 elif rule_key == 'team_rule':
                     rep_rules = sale_commission.search([
-                        ('sale_team_rep', '=', self.team_id.user_id.id),
+                        ('sale_team_rep', '=', line.team_id.user_id.id),
                         ('sale_partner_type', '=', 'sale_team')
-                    ], order='sequence')
+                    ], order='sequence', limit=1)
                 else:
                     rep_rules = sale_commission.browse()
                 data = {
@@ -290,3 +307,12 @@ class AccountMoveLine(models.Model):
                     commission_to_bill = True
                     line.commission_date = date.today()
             line.commission_to_bill = commission_to_bill
+
+    def _inverse_commission_amount(self):
+        """Safe no-op inverse for computed commission amount fields.
+        This satisfies the inverse= contract on commission_amount,
+        in_commission_amount, and out_commission_amount.
+        Implement back-propagation only if you want manual edits on amounts
+        to recompute related percentages or rules.
+        """
+        return
