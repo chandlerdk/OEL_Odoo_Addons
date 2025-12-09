@@ -175,17 +175,17 @@ class AccountMoveLine(models.Model):
                     rep_rules = sale_commission.search([
                         ('sale_rep_id', '=', line.sale_rep_id.id),
                         ('sale_partner_type', '=', 'sale_rep')
-                    ], order='sequence')
+                    ], order='sequence',limit=1)
                 elif rule_key == 'user_rule':
                     rep_rules = sale_commission.search([
                         ('user_ids', 'in', line.user_id.id),
                         ('sale_partner_type', '=', 'user')
-                    ], order='sequence')
+                    ], order='sequence',limit=1)
                 elif rule_key == 'team_rule':
                     rep_rules = sale_commission.search([
-                        ('sale_team_rep', '=', self.team_id.user_id.id),
+                        ('sale_team_rep', '=', line.team_id.user_id.id),
                         ('sale_partner_type', '=', 'sale_team')
-                    ], order='sequence')
+                    ], order='sequence', limit=1)
                 else:
                     rep_rules = sale_commission.browse()
 
