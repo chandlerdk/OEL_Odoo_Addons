@@ -74,6 +74,12 @@ class AccountMoveLine(models.Model):
     user_id = fields.Many2one('res.users', related="move_id.invoice_user_id")
     is_commission_billed = fields.Boolean(string="Commission Billed", default=False, copy=False)
 
+    def _get_generic_commission(self):
+        """Return Generic Commission Rule"""
+        return self.env['sale.commission'].search([
+            ('name', '=', 'Generic Commission')
+        ], limit=1)
+
     @api.depends(
         "sale_person_id",
         "team_id",
@@ -147,6 +153,8 @@ class AccountMoveLine(models.Model):
             if line.is_commission_billed:
                 continue
             rules = line.get_commission_rules()
+            if not rules:
+                rules = line._get_generic_commission()
 
             for rule_key, rule in rules.items():
                 if not rule:
@@ -187,7 +195,7 @@ class AccountMoveLine(models.Model):
                         ('sale_partner_type', '=', 'sale_team')
                     ], order='sequence', limit=1)
                 else:
-                    rep_rules = sale_commission.browse()
+                    rep_rules = line._get_generic_commission()
 
                 data = {
                     'percentage': 0,
@@ -202,11 +210,11 @@ class AccountMoveLine(models.Model):
                     data['percentage'] = commission_rule.percentage
                     amount = commission_rule.calculate_amount(data)
                     if amount:
-                        line.commission_id = commission_rule.id
+                        # line.commission_id = commission_rule.id
                         key = (partner.id, commission_rule.id, amount_field)
                         grouped_lines.setdefault(key, []).append(line)
+                        line.is_commission_billed = True
                         break
-                line.is_commission_billed = True
 
         def create_bill(partner_id, rule_id, amount_field, lines):
             rule = self.env['sale.commission'].browse(rule_id)
