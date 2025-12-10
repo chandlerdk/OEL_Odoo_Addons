@@ -147,6 +147,8 @@ class AccountMoveLine(models.Model):
             if line.is_commission_billed:
                 continue
             rules = line.get_commission_rules()
+            if not rules:
+                rules = line._get_generic_commission()
 
             for rule_key, rule in rules.items():
                 if not rule:
@@ -187,7 +189,8 @@ class AccountMoveLine(models.Model):
                         ('sale_partner_type', '=', 'sale_team')
                     ], order='sequence', limit=1)
                 else:
-                    rep_rules = sale_commission.browse()
+                    rep_rules = line._get_generic_commission()
+
                 data = {
                     'percentage': 0,
                     'quantity': line.quantity,
@@ -201,11 +204,11 @@ class AccountMoveLine(models.Model):
                     data['percentage'] = commission_rule.percentage
                     amount = commission_rule.calculate_amount(data)
                     if amount:
-                        line.commission_id = commission_rule.id
+                        # line.commission_id = commission_rule.id
                         key = (partner.id, commission_rule.id, amount_field)
                         grouped_lines.setdefault(key, []).append(line)
+                        line.is_commission_billed = True
                         break
-                line.is_commission_billed = True
 
         def create_bill(partner_id, rule_id, amount_field, lines):
             rule = self.env['sale.commission'].browse(rule_id)
