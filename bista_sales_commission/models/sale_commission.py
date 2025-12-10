@@ -113,11 +113,11 @@ class SaleCommission(models.Model):
         if not value:
             return None
 
-        # if not self.validate_rules(data):
-        #     return None
-        validation_result = self.validate_rules(data)
-        if validation_result is not True:
-            raise UserError(_("Commission cannot be calculated: %s") % validation_result)
+        if not self.validate_rules(data):
+            return None
+        # validation_result = self.validate_rules(data)
+        # if validation_result is not True:
+        #     raise UserError(_("Commission cannot be calculated: %s") % validation_result)
 
         product_id = data['product_id']
         percentage = data['percentage']
@@ -129,25 +129,25 @@ class SaleCommission(models.Model):
                 value = margin
         return (percentage * value) / 100
 
-    # def validate_rules(self, data):
-    #     product_rule = self.validate_product_rule(data)
-    #     partner_rule = self.validate_partner_rule(data)
-    #     validate_amount_rule = self.validate_amount_rule(data)
-    #     return product_rule and partner_rule and validate_amount_rule
-
     def validate_rules(self, data):
-        """Return True if all rules pass, else return message of failed rule."""
+        product_rule = self.validate_product_rule(data)
+        partner_rule = self.validate_partner_rule(data)
+        validate_amount_rule = self.validate_amount_rule(data)
+        return product_rule and partner_rule and validate_amount_rule
 
-        if not self.validate_product_rule(data):
-            return "Product Rule Failed"
-
-        if not self.validate_partner_rule(data):
-            return "Partner Rule Failed"
-
-        if not self.validate_amount_rule(data):
-            return "Amount Rule Failed"
-
-        return True
+    # def validate_rules(self, data):
+    #     """Return True if all rules pass, else return message of failed rule."""
+    #
+    #     if not self.validate_product_rule(data):
+    #         return "Product Rule Failed"
+    #
+    #     if not self.validate_partner_rule(data):
+    #         return "Partner Rule Failed"
+    #
+    #     if not self.validate_amount_rule(data):
+    #         return "Amount Rule Failed"
+    #
+    #     return True
 
     def validate_product_rule(self, data):
         product = data.get("product_id")
