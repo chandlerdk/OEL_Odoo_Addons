@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+
+    <record id="mail_template_oel_training_intro" model="mail.template">
+      <field name="name">OEL: Training &amp; Product Intro (OEL)</field>
+      <field name="model_id" ref="sale.model_sale_order"/>
+      <field name="subject">Introduction from OEL &amp; Training Opportunity</field>
+      <field name="email_from">No Reply &lt;no-reply@oelsales.com&gt;</field>
+      <field name="reply_to">no-reply@oelsales.com</field>
+      <field name="email_to">${object.partner_id.email}</field>
+      <field name="auto_delete" eval="True"/>
+      <field name="body_html" type="html">
+        <div style="margin:0; padding:0; font-family:Arial, Helvetica, sans-serif;">
+          <table border="0" cellpadding="0" cellspacing="0" style="padding-top:16px; background-color:#F1F2F3; color:#454748; width:100%; border-collapse:separate;">
+            <tr>
+              <td align="center">
+                <table border="0" cellpadding="0" cellspacing="0" width="590" style="padding:16px; background-color:#ffffff; color:#111; border-collapse:separate; border-radius:6px;">
+                  <tbody>
+                    <tr>
+                      <td style="font-size:14px; line-height:1.6;">
+                        <h3 style="margin:0 0 8px 0; color:#875A7B; font-size:20px;">Nice to Meet You from OEL</h3>
+
+                        <p style="margin:0 0 12px 0;">
+                          Hey ${object.partner_id and object.partner_id.name or 'there'},
+                        </p>
+
+                        <p style="margin:0 0 12px 0;">
+                          My name is Forrest and I am with OEL. We manufacture a full line of electrical
+                          safety solutions, including:
+                        </p>
+
+                        <div style="margin:18px 0; padding:12px; background:#F8FAFC; border:1px solid #E5E7EB; border-radius:6px;">
+                          <div style="font-weight:600; margin-bottom:8px;">OEL Product Portfolio</div>
+                          <div style="color:#374151;">
+                            • Arc Flash Clothing (8CAL–100CAL) – 
+                            <a href="https://oelsales.com/arc-flash-ppe/40-cal" style="color:#2563EB; text-decoration:none;">https://oelsales.com/arc-flash-ppe/40-cal</a><br/>
+                            • Rubber Gloves (00–4) – 
+                            <a href="https://oelsales.com/rubber-gloves" style="color:#2563EB; text-decoration:none;">https://oelsales.com/rubber-gloves</a><br/>
+                            • Insulated Tools (1000V) – 
+                            <a href="https://oelsales.com/insulated-tool" style="color:#2563EB; text-decoration:none;">https://oelsales.com/insulated-tool</a><br/>
+                            • Training and Assessments – 
+                            <a href="https://oelsales.com/training-services" style="color:#2563EB; text-decoration:none;">https://oelsales.com/training-services</a>
+                          </div>
+                        </div>
+
+                        <p style="margin:0 0 12px 0;">
+                          I am based in <t t-esc="object.user_id and object.user_id.city or ''"/> and would
+                          love the opportunity to conduct a training session with your team to introduce
+                          them to OEL and provide a deeper understanding of the products and services we offer.
+                        </p>
+
+                        <p style="margin:0 0 12px 0;">
+                          Feel free to reach out to me and we’ll get some dates and times nailed down.
+                        </p>
+
+                        <p style="margin:0 0 18px 0;">
+                          Looking forward to working together.
+                        </p>
+
+                        <hr style="border:none; border-top:1px solid #E5E7EB; margin:16px 0;"/>
+
+                        <div style="color:#6B7280; font-size:12px;">
+                          This email was sent from a no-reply address. Please do not reply to this message.
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <div style="color:#6B7280; font-size:12px; margin-top:12px;">
+                  <div>${object.company_id.name}</div>
+                  <div>
+                    <t t-esc="object.company_id.phone or ''"/> ·
+                    <t t-esc="object.company_id.email or ''"/>
+                  </div>
+                  <div><t t-esc="object.company_id.website or ''"/></div>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </field>
+    </record>
+
+  </data>
+</odoo>
