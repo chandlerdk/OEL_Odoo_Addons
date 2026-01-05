@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- CRM Search View (LOW priority so it's never auto-selected) -->
+    <record id="view_oel_partner_filter" model="ir.ui.view">
+        <field name="name">oel.partner.search</field>
+        <field name="model">res.partner</field>
+        <field name="type">search</field>
+        <field name="priority">1000</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="email"/>
+                <field name="phone"/>
+                <filter string="Prospects" name="filter_prospects" domain="[('org_status','=','prospect')]"/>
+                <filter string="Customers" name="filter_customers" domain="[('org_status','=','customer')]"/>
+                <filter string="Companies" name="filter_companies" domain="[('is_company','=',True)]"/>
+
+                <!-- Has Opportunities filter, auto-activated by context -->
+                <filter string="Has Opportunities"
+                        name="has_opportunities"
+                        domain="[('partner_opportunity_ids', '!=', False)]"
+                        help="Show only contacts that have at least one opportunity."/>
+
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="group_status" context="{'group_by':'org_status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Neutral Search View (LOW priority so it's never auto-selected) -->
+    <record id="view_oel_partner_filter_all" model="ir.ui.view">
+        <field name="name">oel.partner.search.all</field>
+        <field name="model">res.partner</field>
+        <field name="type">search</field>
+        <field name="priority">1000</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="email"/>
+                <field name="phone"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Tree View -->
+    <record id="view_oel_partner_tree" model="ir.ui.view">
+        <field name="name">oel.partner.tree</field>
+        <field name="model">res.partner</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="OEL Customers" default_order="name">
+                <field name="name" string="Name" optional="show"/>
+                <field name="parent_id" string="Related Company" optional="show"/>
+                <field name="email" optional="show"/>
+                <field name="phone" optional="show"/>
+                <field name="state_id" string="State" optional="show"/>
+                <field name="city" optional="show"/>
+                <field name="country_id" optional="show"/>
+                <field name="is_company" string="Is Company?" optional="show"/>
+                <field name="org_status" string="Status" optional="show"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Calendar View -->
+    <record id="view_oel_partner_calendar" model="ir.ui.view">
+        <field name="name">oel.partner.calendar</field>
+        <field name="model">res.partner</field>
+        <field name="type">calendar</field>
+        <field name="arch" type="xml">
+            <calendar string="Contacts Calendar"
+                      date_start="activity_date_deadline"
+                      color="activity_user_id">
+                <field name="name"/>
+                <field name="activity_type_id"/>
+                <field name="activity_user_id"/>
+                <field name="activity_summary"/>
+                <field name="activity_date_deadline"/>
+            </calendar>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_oel_partner_form" model="ir.ui.view">
+        <field name="name">oel.partner.form</field>
+        <field name="model">res.partner</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Customer">
+                <header>
+                    <!-- Removed Send Email; keep Create Sales Opportunity as primary -->
+                    <button name="action_create_sales_opportunity" type="object"
+                            string="Create Sales Opportunity" class="btn-primary"/>
+                    <button name="action_view_standard_profile" type="object"
+                            string="View Main Profile" class="btn-secondary"/>
+                    <field name="org_status" widget="statusbar" statusbar_visible="prospect,customer"/>
+                </header>
+
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <!-- Sales Opportunities first -->
+                        <button name="action_view_opportunities" type="object" class="oe_stat_button" icon="fa-star">
+                            <field name="opportunity_count" widget="statinfo" string="Opportunities"/>
+                        </button>
+                        <!-- Then Tasks -->
+                        <button name="action_view_tasks" type="object" class="oe_stat_button" icon="fa-tasks">
+                            <field name="task_count" widget="statinfo" string="Tasks"/>
+                        </button>
+                        <!-- Removed Sent Emails smart button -->
+
+                        <button name="action_view_active_quotes" type="object" class="oe_stat_button" icon="fa-file-text-o">
+                            <field name="active_quote_count" widget="statinfo" string="Active Quotes"/>
+                        </button>
+                        <button name="action_view_cancelled_quotes" type="object" class="oe_stat_button" icon="fa-ban">
+                            <field name="cancelled_quote_count" widget="statinfo" string="Cancelled Quotes"/>
+                        </button>
+                        <button name="action_view_orders" type="object" class="oe_stat_button" icon="fa-shopping-cart">
+                            <field name="order_count" widget="statinfo" string="Orders"/>
+                        </button>
+                        <button name="action_view_invoices" type="object" class="oe_stat_button" icon="fa-money">
+                            <field name="invoice_count" widget="statinfo" string="Invoices"/>
+                        </button>
+                        <button name="action_view_deliveries" type="object" class="oe_stat_button" icon="fa-truck">
+                            <field name="delivery_count" widget="statinfo" string="Deliveries"/>
+                        </button>
+                        <button name="action_view_documents" type="object" class="oe_stat_button" icon="fa-folder-o">
+                            <field name="document_count" widget="statinfo" string="Documents"/>
+                        </button>
+                    </div>
+
+                    <field name="image_1920" widget="image" class="oe_avatar"/>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="display_title_name" readonly="1" placeholder="Name"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Address">
+                            <field name="street"/>
+                            <field name="street2"/>
+                            <field name="city"/>
+                            <field name="state_id"/>
+                            <field name="zip"/>
+                            <field name="country_id"/>
+                        </group>
+                        <group string="Contact Info">
+                            <label for="display_contact_name" string="Contact"/>
+                            <div>
+                                <field name="display_contact_name" readonly="1" placeholder=""/>
+                            </div>
+                            <field name="email"/>
+                            <field name="phone"/>
+                            <field name="mobile"/>
+                            <field name="website"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Additional Info">
+                            <field name="function" invisible="is_company == True"/>
+                            <field name="title" invisible="is_company == True"/>
+                            <field name="lang"/>
+                            <field name="category_id" widget="many2many_tags"/>
+                        </group>
+                        <group string="Other Info">
+                            <field name="is_company" readonly="org_status == 'customer'"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Sub Contacts">
+                            <field name="child_ids" mode="tree" context="{'default_parent_id': active_id}">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="email"/>
+                                    <field name="phone"/>
+                                    <field name="mobile"/>
+                                    <field name="street" string="Street"/>
+                                    <field name="city" string="City"/>
+                                    <field name="function" string="Job Position"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Mail History">
+                            <field name="custom_mail_history_ids" context="{'default_partner_id': active_id}">
+                                <tree>
+                                    <field name="date"/>
+                                    <field name="direction"/>
+                                    <field name="subject"/>
+                                    <field name="email_from"/>
+                                    <field name="email_to"/>
+                                    <field name="state"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Notes">
+                            <field name="comment" placeholder="Internal notes..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Actions -->
+
+    <record id="action_oel_crm_prospects" model="ir.actions.act_window">
+        <field name="name">Prospects</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('org_status', '=', 'prospect'), ('type', '=', 'contact')]</field>
+        <field name="view_ids" eval="[
+            (5,0,0),
+            (0,0,{'view_mode':'tree','view_id':ref('view_oel_partner_tree')}),
+            (0,0,{'view_mode':'form','view_id':ref('view_oel_partner_form')})
+        ]"/>
+        <field name="search_view_id" ref="view_oel_partner_filter"/>
+        <field name="context">{'oel_crm_ui': True}</field>
+    </record>
+
+    <record id="action_oel_crm_active_prospects" model="ir.actions.act_window">
+        <field name="name">Active Prospects</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">tree,form</field>
+        <!-- Base domain: contacts; "Has Opportunities" filter auto-applies via context -->
+        <field name="domain">[('type', '=', 'contact')]</field>
+        <field name="view_ids" eval="[
+            (5,0,0),
+            (0,0,{'view_mode':'tree','view_id':ref('view_oel_partner_tree')}),
+            (0,0,{'view_mode':'form','view_id':ref('view_oel_partner_form')})
+        ]"/>
+        <field name="search_view_id" ref="view_oel_partner_filter"/>
+        <field name="context">
+            {
+                'oel_crm_ui': True,
+                'search_default_has_opportunities': 1
+            }
+        </field>
+    </record>
+
+    <record id="action_oel_crm_customers" model="ir.actions.act_window">
+        <field name="name">Customers</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">tree,form,calendar</field>
+        <field name="domain">[('org_status','=','customer'), ('type','=','contact')]</field>
+        <field name="view_ids" eval="[
+            (5,0,0),
+            (0,0,{'view_mode':'tree','view_id':ref('view_oel_partner_tree')}),
+            (0,0,{'view_mode':'form','view_id':ref('view_oel_partner_form')}),
+            (0,0,{'view_mode':'calendar','view_id':ref('view_oel_partner_calendar')})
+        ]"/>
+        <field name="search_view_id" ref="view_oel_partner_filter"/>
+        <field name="context">{'oel_crm_ui': True}</field>
+    </record>
+
+    <record id="action_oel_contacts_all" model="ir.actions.act_window">
+        <field name="name">Contacts</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">tree,form,calendar</field>
+        <field name="view_ids" eval="[
+            (5,0,0),
+            (0,0,{'view_mode':'tree','view_id':ref('view_oel_partner_tree')}),
+            (0,0,{'view_mode':'form','view_id':ref('view_oel_partner_form')}),
+            (0,0,{'view_mode':'calendar','view_id':ref('view_oel_partner_calendar')})
+        ]"/>
+        <field name="search_view_id" ref="view_oel_partner_filter_all"/>
+        <field name="context">{'oel_crm_ui': True}</field>
+    </record>
+
+    <record id="action_oel_companies" model="ir.actions.act_window">
+        <field name="name">Companies</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">tree,form,calendar</field>
+        <field name="domain">[('is_company','=',True), ('type','=','contact')]</field>
+        <field name="view_ids" eval="[
+            (5,0,0),
+            (0,0,{'view_mode':'tree','view_id':ref('view_oel_partner_tree')}),
+            (0,0,{'view_mode':'form','view_id':ref('view_oel_partner_form')}),
+            (0,0,{'view_mode':'calendar','view_id':ref('view_oel_partner_calendar')})
+        ]"/>
+        <field name="search_view_id" ref="view_oel_partner_filter"/>
+        <field name="context">{'oel_crm_ui': True}</field>
+    </record>
+
+</odoo>

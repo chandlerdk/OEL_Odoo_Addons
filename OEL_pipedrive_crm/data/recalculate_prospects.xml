@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="ir_cron_promote_prospects_to_customers" model="ir.cron">
+        <field name="name">CRM: Promote Prospects with Sales Orders</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="state">code</field>
+        <field name="code">
+# 1. Find all prospects that are contacts
+prospects = model.search([
+    ('org_status', '=', 'prospect'),
+    ('type', '=', 'contact')
+])
+
+if prospects:
+    # 2. Find partners from confirmed/done sales orders that are in our prospect list
+    # We search sale.order for any partner_id that matches our prospects
+    orders = env['sale.order'].search([
+        ('partner_id', 'in', prospects.ids),
+        ('state', 'in', ['sale', 'done'])
+    ])
+    
+    # 3. Extract the unique partner IDs from those orders
+    partner_ids_to_update = orders.mapped('partner_id').ids
+    
+    if partner_ids_to_update:
+        # 4. Update the status to customer
+        model.browse(partner_ids_to_update).write({'org_status': 'customer'})
+        log("Promoted %s prospects to customers based on Sales Orders." % len(partner_ids_to_update))
+        </field>
+        <field name="user_id" ref="base.user_admin"/>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="active">True</field>
+    </record>
+</odoo>

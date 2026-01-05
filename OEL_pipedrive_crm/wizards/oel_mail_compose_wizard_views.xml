@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_oel_mail_compose_wizard_form" model="ir.ui.view">
+        <field name="name">oel.mail.compose.wizard.form</field>
+        <field name="model">oel.mail.compose.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Send Email">
+                <sheet>
+                    <group>
+                        <field name="partner_id" invisible="1"/>
+                        <field name="email_to"/>
+                        <field name="subject"/>
+                    </group>
+                    <field name="body_html" widget="html"/>
+                </sheet>
+                <footer>
+                    <button string="Send" name="action_send_email" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Server action: Send Email to Selected Sub-Contacts -->
+    <record id="action_subcontact_send_email" model="ir.actions.server">
+        <field name="name">Send Email</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="binding_model_id" ref="base.model_res_partner"/>
+        <field name="state">code</field>
+        <field name="code">
+# Get selected sub-contacts
+partner_ids = records.ids
+
+# Open email composer with all selected partners as recipients
+action = {
+    'type': 'ir.actions.act_window',
+    'name': 'Send Email',
+    'res_model': 'mail.compose.message',
+    'view_mode': 'form',
+    'target': 'new',
+    'context': {
+        'default_composition_mode': 'mass_mail',
+        'default_partner_ids': partner_ids,
+        'default_use_template': False,
+        'default_model': 'res.partner',
+        'default_res_ids': partner_ids,
+    }
+}
+        </field>
+        <field name="binding_type">action</field>
+        <field name="binding_view_types">list</field>
+    </record>
+</odoo>

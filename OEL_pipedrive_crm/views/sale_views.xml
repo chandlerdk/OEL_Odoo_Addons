@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Quotes action -->
+    <record id="action_oel_my_quotes" model="ir.actions.act_window">
+        <field name="name">My Quotes</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('state', 'in', ['draft', 'sent'])]</field>
+    </record>
+
+    <!-- Orders action -->
+    <record id="action_oel_orders" model="ir.actions.act_window">
+        <field name="name">Orders</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('state', 'in', ['sale', 'done'])]</field>
+    </record>
+</odoo>
