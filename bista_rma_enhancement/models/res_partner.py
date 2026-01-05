@@ -44,8 +44,14 @@ class ResPartner(models.Model):
 
     def _compute_delivery_count(self):
         for rec in self:
-            rec.delivery_count = self.env['stock.picking'].search_count(
-                [('partner_id', 'child_of', rec.id)])
+            # If the record isn't saved yet, count is 0
+            if not rec.id:
+                rec.delivery_count = 0
+                continue
+
+            rec.delivery_count = self.env['stock.picking'].search_count([
+                ('partner_id', '=', rec.id),
+            ])
 
     def show_picking(self):
         picking_ids = self.env['stock.picking'].search(
