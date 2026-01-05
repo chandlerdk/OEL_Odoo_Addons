@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Mail History Tree View -->
+    <record id="view_oel_mail_history_tree" model="ir.ui.view">
+        <field name="name">oel.mail.history.tree</field>
+        <field name="model">oel.mail.history</field>
+        <field name="arch" type="xml">
+            <tree string="Mail History" create="false" edit="false">
+                <field name="date"/>
+                <field name="direction"/>
+                <field name="email_from"/>
+                <field name="email_to"/>
+                <field name="subject"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Mail History Form View -->
+    <record id="view_oel_mail_history_form" model="ir.ui.view">
+        <field name="name">oel.mail.history.form</field>
+        <field name="model">oel.mail.history</field>
+        <field name="arch" type="xml">
+            <form string="Mail History" create="false" edit="false">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="direction"/>
+                            <field name="state"/>
+                            <field name="date"/>
+                        </group>
+                        <group>
+                            <field name="email_from"/>
+                            <field name="email_to"/>
+                            <field name="subject"/>
+                        </group>
+                    </group>
+                    <group string="Message">
+                        <field name="body_html" widget="html" nolabel="1"/>
+                    </group>
+                    <group string="Technical Info" groups="base.group_no_one">
+                        <field name="mail_message_id"/>
+                        <field name="in_reply_to"/>
+                        <field name="references"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Mail History Action -->
+    <record id="action_oel_mail_history" model="ir.actions.act_window">
+        <field name="name">Mail History</field>
+        <field name="res_model">oel.mail.history</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_res_partner_oel_user,res.partner oel user,base.model_res_partner,,1,1,1,1
+access_mail_activity_oel_user,mail.activity oel user,mail.model_mail_activity,,1,1,1,1
+access_sale_order_oel_user,sale.order oel user,sale.model_sale_order,,1,1,1,1
+access_oel_mail_history_user,oel.mail.history.user,model_oel_mail_history,base.group_user,1,1,1,1
+access_oel_mail_compose_wizard_user,oel.mail.compose.wizard.user,model_oel_mail_compose_wizard,base.group_user,1,1,1,1

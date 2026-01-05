@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Simplified Leads list -->
+    <record id="view_crm_lead_tree_oel" model="ir.ui.view">
+        <field name="name">crm.lead.tree.oel</field>
+        <field name="model">crm.lead</field>
+        <field name="arch" type="xml">
+            <tree string="Leads">
+                <field name="name" string="Lead Name"/>
+                <field name="partner_name" string="Company / Contact"/>
+                <field name="email_from"/>
+                <field name="phone"/>
+                <field name="user_id" string="Salesperson"/>
+                <field name="stage_id"/>
+                <field name="priority" widget="priority"/>
+                <field name="date_deadline" optional="show"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Leads action (no opportunities) -->
+    <record id="action_oel_crm_leads" model="ir.actions.act_window">
+        <field name="name">Leads</field>
+        <field name="res_model">crm.lead</field>
+        <field name="view_mode">tree,kanban,form</field>
+        <field name="view_id" ref="view_crm_lead_tree_oel"/>
+        <field name="domain">[('type', '=', 'lead')]</field>
+        <field name="context">
+            {
+                'default_type': 'lead',
+                'default_user_id': uid,
+            }
+        </field>
+    </record>
+
+</odoo>
