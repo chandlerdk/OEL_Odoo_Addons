@@ -119,7 +119,6 @@
                                         </td>
                                     </tr>
                                 </t>
-                            </t>
                             <t t-if="stub_line.get('account_moves')">
                                      <t t-foreach="stub_line['account_moves']" t-as="move">
                                          <tr>
@@ -142,6 +141,7 @@
                                         </tr>
                                      </t>
                                  </t>
+                        </t>
                         </t>
                     </t>
 
