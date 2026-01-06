@@ -44,16 +44,16 @@
                             <t t-set="total_discount" t-value="0"/>
                             <t t-set="total_net" t-value="0"/>
                             <tr t-foreach="o.reconciled_bill_ids" t-as="invoice">
-                                <tr t-foreach="invoice.invoice_line_ids" t-as="record">
-                                    <t t-if="record.discount > 0">
-                                        <t t-set="disc_val" t-value="record.price_unit * record.discount / 100"/>
-                                    </t>
+<!--                                <tr t-foreach="invoice.invoice_line_ids" t-as="record">-->
+<!--                                    <t t-if="invoice.discount > 0">-->
+<!--                                        <t t-set="disc_val" t-value="record.price_unit * record.discount / 100"/>-->
+<!--                                    </t>-->
 
                                     <td class="text-start">
                                         <span t-field="invoice.date"/><!--Invoice Date-->
                                     </td>
                                     <td class="text-start">
-                                        <span t-esc="record.ref"/><!--Invoice Number-->
+                                        <span t-esc="invoice.ref"/><!--Invoice Number-->
                                     </td>
                                     <td class="text-center">
                                         <!-- Comment Column (currently empty) -->
@@ -63,8 +63,8 @@
                                         <t t-set="total_amount" t-value="total_amount + invoice.amount_total"/>
                                     </td>
                                     <td class="text-end">
-                                        <span t-esc="record.discount"/><!-- Discount -->
-                                        <t t-set="total_discount" t-value="total_discount + record.discount"/>
+<!--                                        <span t-esc="invoice.discount"/>&lt;!&ndash; Discount &ndash;&gt;-->
+<!--                                        <t t-set="total_discount" t-value="total_discount + record.discount"/>-->
                                     </td>
                                     <td  class="text-end">
                                          <span t-field="invoice.amount_total"/>
@@ -72,7 +72,7 @@
 
                                         <!-- Net Amount (currently empty) -->
                                     </td>
-                                </tr>
+<!--                                </tr>-->
                             </tr>
                             <tr>
                                 <td></td>

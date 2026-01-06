@@ -89,7 +89,6 @@
                             <!--                                    </td>-->
                             <!--                            </tr>-->
                             <t t-foreach="page['stub_lines']" t-as="stub_line">
-
                                 <t t-if="stub_line.get('header')">
                                     <tr>
                                         <th colspan="6">
@@ -120,8 +119,8 @@
                                         </td>
                                     </tr>
                                 </t>
-
-                                <t t-if="stub_line.get('account_moves')">
+                            </t>
+                            <t t-if="stub_line.get('account_moves')">
                                      <t t-foreach="stub_line['account_moves']" t-as="move">
                                          <tr>
                                             <td class="text-start">
@@ -143,7 +142,6 @@
                                         </tr>
                                      </t>
                                  </t>
-                            </t>
                         </t>
                     </t>
 
