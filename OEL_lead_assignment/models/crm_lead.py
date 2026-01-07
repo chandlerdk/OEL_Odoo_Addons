@@ -1,38 +1,44 @@
-from odoo import models, api, fields
+from odoo import models, api
 import logging
 
 _logger = logging.getLogger(__name__)
+
 
 class CrmLead(models.Model):
     _inherit = 'crm.lead'
 
     @api.model
     def create(self, vals_list):
-        """Override create to handle assignment + notifications, but skip during import dry-runs."""
+        """Send follow-up emails ONLY for imported leads (not for custom CRM opportunity creation)."""
         if not isinstance(vals_list, list):
             vals_list = [vals_list]
 
-        # Check if this is a dry-run/validation pass and skip notifications
-        if self._is_import_dryrun():
-            _logger.info("🔄 Import dry-run detected - skipping notifications")
-            return super(CrmLead, self).create(vals_list)
-
-        # Normal creation with notifications
+        # Always create the records first (but keep chatter noise down)
         leads = super(CrmLead, self.with_context(
             mail_create_nolog=True,
             mail_create_nosubscribe=True
         )).create(vals_list)
 
+        # Skip during import dry-run/validation pass
+        if self._is_import_dryrun():
+            _logger.info("🔄 Import dry-run detected - skipping notifications")
+            return leads
+
+        # Only send notifications when created via import
+        if not self._is_created_via_import():
+            _logger.info("⏭️ Lead not created via import - skipping notifications")
+            return leads
+
         for lead in leads:
             try:
-                _logger.info(f"Processing notifications for new lead: {lead.name}")
-                
+                _logger.info(f"Processing notifications for imported lead: {lead.name}")
+
                 if lead.user_id:
                     partner = lead.user_id.partner_id
                     if partner and partner.id not in lead.message_partner_ids.ids:
                         lead.with_context(mail_notify_noemail=True).message_subscribe([partner.id])
                         _logger.info(f"✅ Subscribed {partner.name} to lead {lead.name}")
-                    
+
                     self._send_salesperson_notification(lead)
 
                 if lead.email_from:
@@ -44,9 +50,13 @@ class CrmLead(models.Model):
         return leads
 
     def write(self, vals):
-        """Catch reassignment and notify, but skip during dry-runs."""
+        """Notify on reassignment ONLY for imported leads (and skip during dry-run)."""
         if self._is_import_dryrun():
             _logger.info("🔄 Import dry-run detected - skipping write notifications")
+            return super(CrmLead, self).write(vals)
+
+        # If this record wasn't created via import, do nothing special
+        if not self._is_created_via_import():
             return super(CrmLead, self).write(vals)
 
         old_users = {lead.id: lead.user_id.id if lead.user_id else False for lead in self}
@@ -64,25 +74,22 @@ class CrmLead(models.Model):
 
         return result
 
+    def _is_created_via_import(self):
+        """Detect if creation came from the import wizard."""
+        return bool(self.env.context.get('lead_created_via_import'))
+
     def _is_import_dryrun(self):
         """Detect if we're in an import dry-run/validation phase."""
-        context = self.env.context
-        
-        # Check for our custom dry-run flag from base_import override
-        if context.get('import_dryrun'):
-            _logger.debug("Detected import_dryrun=True")
-            return True
-            
-        return False
+        return bool(self.env.context.get('import_dryrun'))
+
+    # --- existing email methods unchanged below ---
 
     def _send_salesperson_notification(self, lead):
-        """Send notification email to assigned salesperson."""
         try:
             if not lead.user_id or not lead.user_id.email:
                 _logger.warning(f"Lead {lead.name}: No user assigned or user has no email")
                 return False
 
-            # Duplicate guard
             already = self.env['mail.mail'].sudo().search([
                 ('model', '=', 'crm.lead'),
                 ('res_id', '=', lead.id),
@@ -114,19 +121,17 @@ class CrmLead(models.Model):
                     subtype_xmlid='mail.mt_note',
                 )
                 return False
-                
+
         except Exception as e:
             _logger.error(f"❌ Salesperson notification failed: {str(e)}")
             return False
 
     def _send_welcome_email(self, lead):
-        """Send welcome email to the lead."""
         try:
             if not lead.email_from:
                 _logger.debug(f"Lead {lead.name} has no email_from - skipping welcome email")
                 return False
 
-            # Duplicate guard
             already = self.env['mail.mail'].sudo().search([
                 ('model', '=', 'crm.lead'),
                 ('res_id', '=', lead.id),
@@ -158,7 +163,7 @@ class CrmLead(models.Model):
                     subtype_xmlid='mail.mt_note',
                 )
                 return False
-                
+
         except Exception as e:
             _logger.error(f"❌ Welcome email failed: {str(e)}")
             return False
@@ -166,11 +171,11 @@ class CrmLead(models.Model):
     def manual_send_notifications(self):
         """Manual method to force send notifications - useful for testing."""
         _logger.info(f"Manual notification trigger for lead: {self.name}")
-        
+
         if self.user_id:
             self._send_salesperson_notification(self)
-        
+
         if self.email_from:
             self._send_welcome_email(self)
-        
+
         return True

@@ -10,6 +10,15 @@ class ResPartner(models.Model):
         ('customer', 'Customer'),
     ], string="Status", default='prospect', tracking=True)
 
+    # Company Type radio field (syncs with is_company)
+    company_type = fields.Selection(
+        string='Company Type',
+        selection=[('person', 'Individual'), ('company', 'Company')],
+        compute='_compute_company_type',
+        inverse='_inverse_company_type',
+        store=False
+    )
+
     # Smart button counts
     opportunity_count = fields.Integer(compute='_compute_opportunity_count')
     quote_count = fields.Integer(compute='_compute_quote_count')
@@ -44,6 +53,89 @@ class ResPartner(models.Model):
         string='Mail History'
     )
 
+    # -------------------------------------------------------------------------
+    # Company type (radio) <-> is_company
+    # -------------------------------------------------------------------------
+    @api.depends('is_company')
+    def _compute_company_type(self):
+        for partner in self:
+            partner.company_type = 'company' if partner.is_company else 'person'
+
+    def _inverse_company_type(self):
+        for partner in self:
+            partner.is_company = (partner.company_type == 'company')
+
+    # -------------------------------------------------------------------------
+    # BREAK default parent address copy in CRM UI only
+    # Use type='other' for sub-contacts so they have independent addresses
+    # -------------------------------------------------------------------------
+
+    @api.onchange('parent_id')
+    def _onchange_parent_id(self):
+        """
+        Odoo 17: don't call super() here because base res.partner may not define
+        _onchange_parent_id() (depends on installed modules/version).
+
+        In custom CRM UI (oel_crm_ui):
+          - link to company via parent_id
+          - force type='other'
+          - do NOT copy address from company
+
+        Outside CRM UI:
+          - do nothing (native behavior continues without our interference)
+        """
+        if not self.env.context.get('oel_crm_ui'):
+            return
+
+        for partner in self:
+            if partner.parent_id:
+                # Treat as an independent "Other Address" under that company
+                partner.type = 'other'
+                # Do NOT touch street, city, zip, state, country, etc.
+                # Address remains whatever the user enters.
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        """
+        In CRM UI:
+          - keep child contacts as 'other' type when parent_id is set,
+          - do NOT force addresses to match parent.
+        Everywhere else, standard create.
+        """
+        if not self.env.context.get('oel_crm_ui'):
+            return super().create(vals_list)
+
+        new_vals_list = []
+        for vals in vals_list:
+            vals = dict(vals)
+            if vals.get('parent_id'):
+                # Sub-contact in CRM UI is an "Other Address"
+                vals.setdefault('type', 'other')
+            new_vals_list.append(vals)
+
+        partners = super().create(new_vals_list)
+        return partners
+
+    def write(self, vals):
+        """
+        In CRM UI:
+          - if parent_id is set, keep type='other',
+          - never auto-sync the address from the company.
+        Elsewhere, use standard behavior.
+        """
+        if not self.env.context.get('oel_crm_ui'):
+            return super().write(vals)
+
+        vals = dict(vals)
+        if 'parent_id' in vals and vals.get('parent_id'):
+            # Keep as "Other Address" when linked to a company
+            vals.setdefault('type', 'other')
+
+        return super().write(vals)
+
+    # -------------------------------------------------------------------------
+    # Display names
+    # -------------------------------------------------------------------------
     @api.depends('name', 'parent_id', 'parent_id.name')
     def _compute_display_names(self):
         for rec in self:
@@ -54,6 +146,9 @@ class ResPartner(models.Model):
                 rec.display_title_name = rec.name or ''
                 rec.display_contact_name = ''
 
+    # -------------------------------------------------------------------------
+    # Counts
+    # -------------------------------------------------------------------------
     @api.depends('sale_order_ids.state', 'child_ids.sale_order_ids.state')
     def _compute_quote_count(self):
         for partner in self:
@@ -167,6 +262,9 @@ class ResPartner(models.Model):
         for rec in self:
             rec.mail_history_count = len(rec.custom_mail_history_ids)
 
+    # -------------------------------------------------------------------------
+    # Actions
+    # -------------------------------------------------------------------------
     def action_view_opportunities(self):
         partners = self | self.mapped('child_ids')
         return {
@@ -182,7 +280,7 @@ class ResPartner(models.Model):
         partners = self | self.mapped('child_ids')
         return {
             'name': 'Quotations',
-            'type': 'ir.actions.act_window',   
+            'type': 'ir.actions.act_window',
             'res_model': 'sale.order',
             'view_mode': 'tree,form',
             'domain': [('partner_id', 'in', partners.ids), ('state', 'in', ['draft', 'sent'])],
@@ -342,12 +440,10 @@ class CrmLead(models.Model):
     def create(self, vals_list):
         """Override create to invalidate partner cache when opportunity is created."""
         leads = super().create(vals_list)
-        # Collect all partners that need recompute
         partners = self.env['res.partner'].browse()
         for lead in leads:
             if lead.type == 'opportunity' and lead.partner_id:
                 partners |= lead.partner_id
-        # Trigger recompute
         if partners:
             partners._compute_partner_opportunity_ids()
         return leads
@@ -356,23 +452,20 @@ class CrmLead(models.Model):
         """Override write to invalidate partner cache when partner_id or type changes."""
         old_partners = self.env['res.partner'].browse()
         if 'partner_id' in vals or 'type' in vals:
-            # Collect old partners
             for lead in self:
                 if lead.partner_id:
                     old_partners |= lead.partner_id
-        
+
         res = super().write(vals)
-        
-        # Collect new partners
+
         new_partners = self.env['res.partner'].browse()
         if 'partner_id' in vals or 'type' in vals:
             for lead in self:
                 if lead.type == 'opportunity' and lead.partner_id:
                     new_partners |= lead.partner_id
-        
-        # Trigger recompute for both old and new partners
+
         all_partners = old_partners | new_partners
         if all_partners:
             all_partners._compute_partner_opportunity_ids()
-        
+
         return res
