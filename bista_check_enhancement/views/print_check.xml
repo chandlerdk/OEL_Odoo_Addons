@@ -5,8 +5,8 @@
             <t t-if="page['state'] == 'cancelled'">
                 <div class="o-watermark">VOID</div>
             </t>
-            <div class="ckus_payee_addr" t-if="page['sequence_number'] and page['manual_sequencing']"
-                 t-out="page['sequence_number']"/>
+<!--            <div class="ckus_payee_addr" t-if="page['sequence_number'] and page['manual_sequencing']"-->
+<!--                 t-out="page['sequence_number']"/>-->
             <div class="ckus_date" t-out="page['date']"/>
             <!--            <div class="ckus_payee_name" t-out="page['partner_name']"/>-->
 
