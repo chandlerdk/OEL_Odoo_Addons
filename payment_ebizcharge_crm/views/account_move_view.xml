@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="action_custom_generate_payment_link" model="ir.actions.server">
+            <field name="name">Generate Payment link</field>
+            <field name="model_id" ref="account.model_account_move"/>
+            <field name="binding_model_id" ref="account.model_account_move"/>
+            <field name="binding_view_types">form</field>
+            <field name="state">code</field>
+            <field name="code">action = records.action_generate_odoo_payment_link()</field>
+        </record>
+
+        <record id="form_view_account_move_ebizcharge" model="ir.ui.view">
+            <field name="name">account.move.form</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_move_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//header" position="inside">
+                    <field name="odoo_payment_link" invisible="1" />
+                    <field invisible="1" name="is_payment_processed"/>
+                    <field invisible="1" name="odoo_payment_link"/>
+                    <field invisible="1" name="save_payment_link"/>
+                    <field invisible="1" name="ebiz_internal_id"/>
+                    <field invisible="1" name="receipt_status"/>
+                    <field invisible="1" name="ebiz_auto_sync"/>
+                    <field invisible="1" name="ebiz_auto_sync_credit_note"/>
+                    <field invisible="1" name="is_refund_processed"/>
+                    <field invisible="1" name="payment_internal_id"/>
+                    <field invisible="1" name="log_status_emv"/>
+                    <field invisible="1" name="emv_transaction_id" />
+                    <field invisible="1" name="ebiz_invoice_status"/>
+                    <field invisible="1" name="done_transaction_ids"/>
+                    <field invisible="1" name="email_received_payments"/>
+                    <field name="save_payment_link" invisible="1"/>
+                    <field name="ebiz_payment_link" invisible="1"/>
+                    <button class="oe_highlight" invisible="move_type != 'out_invoice' or state == 'draft'" name="sync_to_ebiz_invoice" string="EBizCharge Upload" type="object"/>
+                    <button class="oe_highlight" invisible="ebiz_internal_id or ebiz_auto_sync_credit_note or move_type != 'out_refund' or state == 'draft'" name="sync_to_ebiz_credit_note" string="EBizCharge Upload" type="object"/>
+                    <button class="oe_highlight" invisible="authorized_transaction_ids or payment_state in ('paid', 'in_payment') or ebiz_invoice_status == 'pending' or move_type != 'out_invoice' or state == 'cancel'" name="email_invoice_ebiz" string="Email Pay Request" type="object"/>
+                    <button class="oe_highlight" invisible="ebiz_invoice_status != 'pending' or payment_state == 'paid' or email_received_payments or move_type != 'out_invoice'" name="resend_email_invoice_ebiz" string="Resend Email Pay Request" type="object"/>
+                    <button class="oe_highlight" invisible="not payment_internal_id or ebiz_payment_link != 'received' or save_payment_link == False or payment_state == 'paid' or move_type != 'out_invoice' " name="get_pending_invoices" context="{'for_pay_link': True}" string="Apply Received Payments" type="object"/>
+                    <button class="oe_highlight" invisible="ebiz_invoice_status != 'pending' or email_received_payments or payment_state == 'paid' or move_type != 'out_invoice'" name="show_pending_ebiz_email" string="View Pending Requests" type="object"/>
+                    <button class="oe_highlight" invisible="ebiz_invoice_status != 'pending' or payment_state == 'paid' or email_received_payments or move_type != 'out_invoice'" name="delete_ebiz_invoice" string="Cancel Email Pay Request" type="object"/>
+                    <button class="oe_highlight" invisible="not is_payment_processed or move_type != 'out_invoice'" name="email_receipt_ebiz" string="Email Receipt" type="object"/>
+                    <button class="oe_highlight" invisible="not ebiz_internal_id" name="show_ebiz_invoice" string="View EBizCharge Invoice" type="object"/>
+                </xpath>
+                <xpath expr="//field[@name='invoice_incoterm_id']" position="after">
+                        <field name="save_payment_link" string="Payment Link" readonly="1" widget="CopyClipboardChar" invisible="save_payment_link == False"/>
+                        <field name="request_amount" invisible="1"/>
+                        <field name="last_request_amount" invisible="1"/>
+                </xpath>
+                <field name="partner_id" position="after">
+                    <field name="sync_status" readonly="1"/>
+                    <field invisible="0" name="request_amount"/>
+                </field>
+                <xpath expr="//button[@name='payment_action_capture']" position="attributes">
+                    <attribute name="invisible">move_type not in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund') or state != 'posted' or payment_state == 'paid' or not authorized_transaction_ids</attribute>
+                </xpath>
+                <xpath expr="//button[@name='payment_action_void']" position="attributes">
+                    <attribute name="invisible">move_type not in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund') or state != 'posted' or payment_state == 'paid' or not authorized_transaction_ids</attribute>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="model_action_wizard_invoice_multi_sync" model="ir.actions.server">
+            <field name="name">EBizCharge Upload</field>
+            <field name="model_id" ref="account.model_account_move"/>
+            <field name="binding_model_id" ref="account.model_account_move"/>
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code">action = records.ebiz_sync_multiple_invoices()</field>
+        </record>
+
+        <record id="view_sale_order_ebizcharge_status" model="ir.ui.view">
+            <field name="name">account.move.ebiz.status</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_invoice_tree"/>
+            <field name="arch" type="xml">
+               <xpath expr="//field[@name='state']" position="after">
+                    <field name="ebiz_invoice_status"/>
+                    <field name="sync_status" optional="show"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_account_move_reversal_update" model="ir.ui.view">
+            <field name="name">account.move.reversal.form</field>
+            <field name="model">account.move.reversal</field>
+            <field name="inherit_id" ref="account.view_account_move_reversal"/>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='refund_moves']" position="attributes">
+                    <attribute name="string">Process</attribute>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+        <record id="action_contact_us_page" model="ir.actions.client">
+            <field name="name">Help &amp; Contact Us</field>
+            <field name="tag">contact_us_page</field>
+        </record>
+
+        <menuitem id="contact_us_menu"
+                  name="Help &amp; Contact Us"
+                  parent="payment_ebizcharge_crm.ebizcharge_menu_root"
+                  action="payment_ebizcharge_crm.action_contact_us_page"
+                  sequence="8"/>
+    </data>
+</odoo>
