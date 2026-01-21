@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- CRM Search View (LOW priority so it's never auto-selected) -->
+    <!-- CRM Search View (LOW priority so it's never auto-selected by Sales) -->
     <record id="view_oel_partner_filter" model="ir.ui.view">
         <field name="name">oel.partner.search</field>
         <field name="model">res.partner</field>
@@ -90,7 +90,6 @@
         <field name="arch" type="xml">
             <form string="Customer">
                 <header>
-                    <!-- Removed Send Email; keep Create Sales Opportunity as primary -->
                     <button name="action_create_sales_opportunity" type="object"
                             string="Create Sales Opportunity" class="btn-primary"/>
                     <button name="action_view_standard_profile" type="object"
@@ -100,15 +99,12 @@
 
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                        <!-- Sales Opportunities first -->
                         <button name="action_view_opportunities" type="object" class="oe_stat_button" icon="fa-star">
                             <field name="opportunity_count" widget="statinfo" string="Opportunities"/>
                         </button>
-                        <!-- Then Tasks -->
                         <button name="action_view_tasks" type="object" class="oe_stat_button" icon="fa-tasks">
                             <field name="task_count" widget="statinfo" string="Tasks"/>
                         </button>
-                        <!-- Removed Sent Emails smart button -->
 
                         <button name="action_view_active_quotes" type="object" class="oe_stat_button" icon="fa-file-text-o">
                             <field name="active_quote_count" widget="statinfo" string="Active Quotes"/>
@@ -133,9 +129,15 @@
                     <field name="image_1920" widget="image" class="oe_avatar"/>
                     <div class="oe_title">
                         <h1>
-                            <field name="display_title_name" readonly="1" placeholder="Name"/>
+                            <field name="name" placeholder="Name" required="1"/>
                         </h1>
+                        <div>
+                            <field name="company_type" widget="radio" options="{'horizontal': true}"/>
+                        </div>
                     </div>
+
+                    <!-- Hidden field required for invisible modifiers that use is_company -->
+                    <field name="is_company" invisible="1"/>
 
                     <group>
                         <group string="Address">
@@ -147,10 +149,10 @@
                             <field name="country_id"/>
                         </group>
                         <group string="Contact Info">
-                            <label for="display_contact_name" string="Contact"/>
-                            <div>
-                                <field name="display_contact_name" readonly="1" placeholder=""/>
-                            </div>
+                            <!-- Company association when this record is an individual under a company -->
+                            <field name="parent_id" string="Company"
+                                   domain="[('is_company', '=', True)]"
+                                   invisible="is_company"/>
                             <field name="email"/>
                             <field name="phone"/>
                             <field name="mobile"/>
@@ -160,19 +162,20 @@
 
                     <group>
                         <group string="Additional Info">
-                            <field name="function" invisible="is_company == True"/>
-                            <field name="title" invisible="is_company == True"/>
+                            <!-- Job Position and Title only meaningful for individuals -->
+                            <field name="function" invisible="is_company"/>
+                            <field name="title" invisible="is_company"/>
                             <field name="lang"/>
-                            <field name="category_id" widget="many2many_tags"/>
                         </group>
                         <group string="Other Info">
-                            <field name="is_company" readonly="org_status == 'customer'"/>
+                            <field name="category_id" widget="many2many_tags" string="Customer Type Tag"/>
                         </group>
                     </group>
 
                     <notebook>
                         <page string="Sub Contacts">
-                            <field name="child_ids" mode="tree" context="{'default_parent_id': active_id}">
+                            <field name="child_ids" mode="tree"
+                                   context="{'default_parent_id': active_id, 'default_type': 'other', 'oel_crm_ui': True}">
                                 <tree>
                                     <field name="name"/>
                                     <field name="email"/>
@@ -217,22 +220,25 @@
         <field name="name">Prospects</field>
         <field name="res_model">res.partner</field>
         <field name="view_mode">tree,form</field>
-        <field name="domain">[('org_status', '=', 'prospect'), ('type', '=', 'contact')]</field>
+        <field name="domain">[('org_status', '=', 'prospect')]</field>
         <field name="view_ids" eval="[
             (5,0,0),
             (0,0,{'view_mode':'tree','view_id':ref('view_oel_partner_tree')}),
             (0,0,{'view_mode':'form','view_id':ref('view_oel_partner_form')})
         ]"/>
         <field name="search_view_id" ref="view_oel_partner_filter"/>
-        <field name="context">{'oel_crm_ui': True}</field>
+        <field name="context">
+            {
+                'oel_crm_ui': True
+            }
+        </field>
     </record>
 
     <record id="action_oel_crm_active_prospects" model="ir.actions.act_window">
         <field name="name">Active Prospects</field>
         <field name="res_model">res.partner</field>
         <field name="view_mode">tree,form</field>
-        <!-- Base domain: contacts; "Has Opportunities" filter auto-applies via context -->
-        <field name="domain">[('type', '=', 'contact')]</field>
+        <field name="domain">[]</field>
         <field name="view_ids" eval="[
             (5,0,0),
             (0,0,{'view_mode':'tree','view_id':ref('view_oel_partner_tree')}),
@@ -251,7 +257,7 @@
         <field name="name">Customers</field>
         <field name="res_model">res.partner</field>
         <field name="view_mode">tree,form,calendar</field>
-        <field name="domain">[('org_status','=','customer'), ('type','=','contact')]</field>
+        <field name="domain">[('org_status','=','customer')]</field>
         <field name="view_ids" eval="[
             (5,0,0),
             (0,0,{'view_mode':'tree','view_id':ref('view_oel_partner_tree')}),
@@ -259,7 +265,11 @@
             (0,0,{'view_mode':'calendar','view_id':ref('view_oel_partner_calendar')})
         ]"/>
         <field name="search_view_id" ref="view_oel_partner_filter"/>
-        <field name="context">{'oel_crm_ui': True}</field>
+        <field name="context">
+            {
+                'oel_crm_ui': True
+            }
+        </field>
     </record>
 
     <record id="action_oel_contacts_all" model="ir.actions.act_window">
@@ -273,14 +283,18 @@
             (0,0,{'view_mode':'calendar','view_id':ref('view_oel_partner_calendar')})
         ]"/>
         <field name="search_view_id" ref="view_oel_partner_filter_all"/>
-        <field name="context">{'oel_crm_ui': True}</field>
+        <field name="context">
+            {
+                'oel_crm_ui': True
+            }
+        </field>
     </record>
 
     <record id="action_oel_companies" model="ir.actions.act_window">
         <field name="name">Companies</field>
         <field name="res_model">res.partner</field>
         <field name="view_mode">tree,form,calendar</field>
-        <field name="domain">[('is_company','=',True), ('type','=','contact')]</field>
+        <field name="domain">[('is_company','=',True)]</field>
         <field name="view_ids" eval="[
             (5,0,0),
             (0,0,{'view_mode':'tree','view_id':ref('view_oel_partner_tree')}),
@@ -288,7 +302,11 @@
             (0,0,{'view_mode':'calendar','view_id':ref('view_oel_partner_calendar')})
         ]"/>
         <field name="search_view_id" ref="view_oel_partner_filter"/>
-        <field name="context">{'oel_crm_ui': True}</field>
+        <field name="context">
+            {
+                'oel_crm_ui': True
+            }
+        </field>
     </record>
 
 </odoo>

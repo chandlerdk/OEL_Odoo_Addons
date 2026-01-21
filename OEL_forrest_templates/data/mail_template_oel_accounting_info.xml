@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+
+    <record id="mail_template_oel_accounting_info" model="mail.template">
+      <field name="name">OEL: Accounting Information (OEL)</field>
+      <field name="model_id" ref="sale.model_sale_order"/>
+      <field name="subject">OEL Accounting &amp; Setup Information</field>
+      <field name="email_from">No Reply &lt;no-reply@oelsales.com&gt;</field>
+      <field name="reply_to">no-reply@oelsales.com</field>
+      <field name="email_to">${object.partner_id.email}</field>
+      <field name="auto_delete" eval="True"/>
+      <field name="body_html" type="html">
+        <div style="margin:0; padding:0; font-family:Arial, Helvetica, sans-serif;">
+          <table border="0" cellpadding="0" cellspacing="0" style="padding-top:16px; background-color:#F1F2F3; color:#454748; width:100%; border-collapse:separate;">
+            <tr>
+              <td align="center">
+                <table border="0" cellpadding="0" cellspacing="0" width="590" style="padding:16px; background-color:#ffffff; color:#111; border-collapse:separate; border-radius:6px;">
+                  <tbody>
+                    <tr>
+                      <td style="font-size:14px; line-height:1.6;">
+                        <h3 style="margin:0 0 8px 0; color:#875A7B; font-size:20px;">OEL Accounting Information</h3>
+
+                        <p style="margin:0 0 12px 0;">
+                          Hey Chandler,
+                        </p>
+
+                        <p style="margin:0 0 12px 0;">
+                          Here is all of OEL's accounting info for your system. Please let me know if you
+                          need anything further from me.
+                        </p>
+
+                        <div style="margin:18px 0; padding:12px; background:#F8FAFC; border:1px solid #E5E7EB; border-radius:6px;">
+                          <div style="font-weight:600; margin-bottom:8px;">Company Details</div>
+                          <div style="color:#374151;">
+                            <strong>OEL WORLDWIDE INDUSTRIES</strong><br/><br/>
+
+                            <strong>Physical Address:</strong><br/>
+                            OEL Worldwide Ind.<br/>
+                            701 County Line Road<br/>
+                            Palmer Lake, CO<br/>
+                            80133<br/><br/>
+
+                            <strong>Billing Address:</strong><br/>
+                            OEL Worldwide Ind.<br/>
+                            PO Box 445<br/>
+                            Palmer Lake, CO<br/>
+                            80133<br/><br/>
+
+                            <strong>Accounting Department / Accounts Payable:</strong><br/>
+                            Stacey Cahalane – stacey@oelsales.com<br/>
+                            Karol Fisher – Karol@oelsales.com<br/><br/>
+
+                            <strong>Customer Service – Basic questions, tracking, order updates, etc.</strong><br/>
+                            customerservice@oelsales.com<br/>
+                            719-559-0951 ext. 1<br/><br/>
+
+                            <strong>PO Submission:</strong><br/>
+                            orders@oelsales.com<br/><br/>
+
+                            <strong>Attached (for your system):</strong><br/>
+                            • W9 Form<br/>
+                            • Customer Credit Application – please fill this out and send it back to us<br/>
+                            • Latest Pricesheet<br/><br/>
+
+                            <strong>Marketing:</strong><br/>
+                            Asa Dyer – asa@oelsales.com
+                          </div>
+                        </div>
+
+                        <p style="margin:0 0 18px 0;">
+                          If there is anything else you need for your records or onboarding process,
+                          don’t hesitate to reach out.
+                        </p>
+
+                        <hr style="border:none; border-top:1px solid #E5E7EB; margin:16px 0;"/>
+
+                        <div style="color:#6B7280; font-size:12px;">
+                          This email was sent from a no-reply address. Please do not reply to this message.
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <div style="color:#6B7280; font-size:12px; margin-top:12px;">
+                  <div>${object.company_id.name}</div>
+                  <div>
+                    <t t-esc="object.company_id.phone or ''"/> ·
+                    <t t-esc="object.company_id.email or ''"/>
+                  </div>
+                  <div><t t-esc="object.company_id.website or ''"/></div>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </field>
+    </record>
+
+  </data>
+</odoo>

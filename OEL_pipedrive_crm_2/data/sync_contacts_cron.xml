@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Scheduled Action (Cron) to sync Contacts -> OEL v2 Prospects -->
+    <record id="ir_cron_oel_v2_sync_contacts_to_prospects" model="ir.cron">
+        <field name="name">OEL v2 - Sync Contacts to Prospects</field>
+        <field name="model_id" ref="model_oel_v2_sync_contacts_cron"/>
+        <field name="state">code</field>
+        <field name="code">model.run_sync_contacts_to_prospects()</field>
+        <!-- Run daily at 2:00 by default; you can turn off automatic running in UI if desired -->
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="active">False</field>
+    </record>
+
+</odoo>

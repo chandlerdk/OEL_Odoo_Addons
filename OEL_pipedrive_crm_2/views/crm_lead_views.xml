@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Search View (standard fields only) -->
+    <record id="view_oel_v2_crm_lead_filter" model="ir.ui.view">
+        <field name="name">oel.v2.crm.lead.search</field>
+        <field name="model">crm.lead</field>
+        <field name="type">search</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" string="Opportunity"/>
+                <field name="partner_id" string="Customer"/>
+                <field name="contact_name" string="Contact Name"/>
+                <field name="email_from" string="Email"/>
+                <field name="phone" string="Phone"/>
+
+                <!-- Use probability as a proxy for "prospect vs customer" -->
+                <filter string="Prospects" name="filter_prospects"
+                        domain="[('type','=','opportunity'), ('probability','&lt;',50)]"/>
+                <filter string="Customers" name="filter_customers"
+                        domain="[('type','=','opportunity'), ('probability','&gt;=',50)]"/>
+
+                <group expand="0" string="Group By">
+                    <filter string="Stage" name="group_stage"
+                            context="{'group_by':'stage_id'}"/>
+                    <filter string="Salesperson" name="group_user"
+                            context="{'group_by':'user_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+
+    <!-- Tree View -->
+    <record id="view_oel_v2_crm_lead_tree" model="ir.ui.view">
+        <field name="name">oel.v2.crm.lead.tree</field>
+        <field name="model">crm.lead</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Opportunities" default_order="name">
+                <field name="name" string="Opportunity"/>
+                <field name="partner_id" string="Customer"/>
+                <field name="contact_name" string="Contact"/>
+                <field name="email_from" string="Email"/>
+                <field name="phone" string="Phone"/>
+                <field name="city" string="City"/>
+                <field name="state_id" string="State"/>
+                <field name="country_id" string="Country"/>
+                <field name="stage_id"/>
+                <field name="user_id" string="Salesperson"/>
+                <field name="expected_revenue" sum="Total Expected Revenue"/>
+                <field name="probability"/>
+                <field name="date_deadline"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Calendar View -->
+    <record id="view_oel_v2_crm_lead_calendar" model="ir.ui.view">
+        <field name="name">oel.v2.crm.lead.calendar</field>
+        <field name="model">crm.lead</field>
+        <field name="type">calendar</field>
+        <field name="arch" type="xml">
+            <calendar string="Opportunities Calendar"
+                      date_start="date_deadline"
+                      color="user_id">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="stage_id"/>
+            </calendar>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_oel_v2_crm_lead_form" model="ir.ui.view">
+        <field name="name">oel.v2.crm.lead.form</field>
+        <field name="model">crm.lead</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Opportunity">
+                <header>
+                    <!-- Only standard stage statusbar -->
+                    <field name="stage_id" widget="statusbar"
+                           options="{'clickable': '1', 'fold_field': 'fold'}"/>
+                </header>
+
+                <sheet>
+                    <!-- Removed custom oe_button_box with invalid object methods -->
+
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1>
+                            <field name="name" placeholder="e.g. Product Inquiry"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Customer &amp; Organization">
+                            <field name="partner_id" string="Customer"/>
+                            <field name="company_id" string="Company"/>
+                            <field name="city"/>
+                            <field name="state_id"/>
+                            <field name="country_id"/>
+                        </group>
+                        <group string="Contact">
+                            <field name="contact_name" string="Contact Name"/>
+                            <field name="email_from" string="Email"/>
+                            <field name="phone" string="Phone"/>
+                            <field name="mobile" string="Mobile"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Sales Info">
+                            <field name="user_id" string="Salesperson" widget="many2one_avatar_user"/>
+                            <field name="team_id"/>
+                            <field name="expected_revenue"/>
+                            <field name="probability"/>
+                            <field name="date_deadline"/>
+                        </group>
+                        <group string="Classification">
+                            <field name="priority" widget="priority"/>
+                            <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Internal Notes">
+                            <field name="description" placeholder="Internal notes about this opportunity..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- ACTIONS -->
+
+    <!-- Prospects (by probability) -->
+    <record id="action_oel_v2_crm_prospects" model="ir.actions.act_window">
+        <field name="name">Prospects</field>
+        <field name="res_model">crm.lead</field>
+        <field name="view_mode">tree,form,calendar,kanban</field>
+        <field name="domain">[('type','=','opportunity'), ('probability','&lt;',50)]</field>
+        <field name="view_ids" eval="[
+            (5,0,0),
+            (0,0,{'view_mode': 'tree', 'view_id': ref('view_oel_v2_crm_lead_tree')}),
+            (0,0,{'view_mode': 'form', 'view_id': ref('view_oel_v2_crm_lead_form')}),
+            (0,0,{'view_mode': 'calendar', 'view_id': ref('view_oel_v2_crm_lead_calendar')})
+        ]"/>
+        <field name="search_view_id" ref="view_oel_v2_crm_lead_filter"/>
+        <field name="context">{'default_type': 'opportunity', 'default_probability': 10}</field>
+    </record>
+
+    <!-- Customers (by probability) -->
+    <record id="action_oel_v2_crm_customers" model="ir.actions.act_window">
+        <field name="name">Customers</field>
+        <field name="res_model">crm.lead</field>
+        <field name="view_mode">tree,form,calendar,kanban</field>
+        <field name="domain">[('type','=','opportunity'), ('probability','&gt;=',50)]</field>
+        <field name="view_ids" eval="[
+            (5,0,0),
+            (0,0,{'view_mode': 'tree', 'view_id': ref('view_oel_v2_crm_lead_tree')}),
+            (0,0,{'view_mode': 'form', 'view_id': ref('view_oel_v2_crm_lead_form')}),
+            (0,0,{'view_mode': 'calendar', 'view_id': ref('view_oel_v2_crm_lead_calendar')})
+        ]"/>
+        <field name="search_view_id" ref="view_oel_v2_crm_lead_filter"/>
+        <field name="context">{'default_type': 'opportunity', 'default_probability': 80}</field>
+    </record>
+
+    <!-- All Opportunities -->
+    <record id="action_oel_v2_crm_all_opportunities" model="ir.actions.act_window">
+        <field name="name">All Opportunities</field>
+        <field name="res_model">crm.lead</field>
+        <field name="view_mode">tree,form,calendar,kanban</field>
+        <field name="domain">[('type','=','opportunity')]</field>
+        <field name="view_ids" eval="[
+            (5,0,0),
+            (0,0,{'view_mode': 'tree', 'view_id': ref('view_oel_v2_crm_lead_tree')}),
+            (0,0,{'view_mode': 'form', 'view_id': ref('view_oel_v2_crm_lead_form')}),
+            (0,0,{'view_mode': 'calendar', 'view_id': ref('view_oel_v2_crm_lead_calendar')})
+        ]"/>
+        <field name="search_view_id" ref="view_oel_v2_crm_lead_filter"/>
+        <field name="context">{'default_type': 'opportunity'}</field>
+    </record>
+
+</odoo>

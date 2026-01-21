@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Root App Menu for v2 -->
+    <menuitem id="menu_oel_saleshub_v2_root"
+              name="OEL Sales Hub v2"
+              sequence="20"
+              web_icon="OEL_pipedrive_crm_v2,static/description/icon.png"/>
+
+    <!-- Acquisition -->
+    <menuitem id="menu_oel_v2_acquisition"
+              name="Acquisition"
+              parent="menu_oel_saleshub_v2_root"
+              sequence="10"/>
+
+    <!-- Prospects (opportunities) -->
+    <menuitem id="menu_oel_v2_prospects"
+              name="Prospects"
+              parent="menu_oel_v2_acquisition"
+              action="action_oel_v2_crm_prospects"
+              sequence="5"/>
+
+    <!-- Customers (opportunities) -->
+    <menuitem id="menu_oel_v2_customers"
+              name="Customers"
+              parent="menu_oel_v2_acquisition"
+              action="action_oel_v2_crm_customers"
+              sequence="10"/>
+
+    <!-- Leads inbox -->
+    <menuitem id="menu_oel_v2_leads"
+              name="Leads"
+              parent="menu_oel_v2_acquisition"
+              action="action_oel_v2_crm_leads"
+              sequence="20"/>
+
+    <!-- Opportunities -->
+    <menuitem id="menu_oel_v2_all_opportunities"
+              name="All Opportunities"
+              parent="menu_oel_saleshub_v2_root"
+              action="action_oel_v2_crm_all_opportunities"
+              sequence="20"/>
+
+    <!-- Quotes -->
+    <menuitem id="menu_oel_v2_quotes_root"
+              name="Quotes"
+              parent="menu_oel_saleshub_v2_root"
+              action="action_oel_v2_my_quotes"
+              sequence="30"/>
+
+    <!-- Orders -->
+    <menuitem id="menu_oel_v2_orders_root"
+              name="Orders"
+              parent="menu_oel_saleshub_v2_root"
+              action="action_oel_v2_orders"
+              sequence="40"/>
+
+</odoo>
