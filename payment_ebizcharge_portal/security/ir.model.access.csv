@@ -1,2 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_payment_ebizcharge_portal_payment_ebizcharge_portal,payment_ebizcharge_portal.payment_ebizcharge_portal,model_payment_ebizcharge_portal_payment_ebizcharge_portal,base.group_user,1,1,1,1
