@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="payment_inh" xml:space="preserve">
+
+<!--    <t t-name="payment_ebizcharge.display_tx_list_inh" t-inherit="payment.transaction_status" t-inherit-mode="extension" owl="1">-->
+<!--        <xpath expr="//t[@t-foreach='tx_cancel']/a" position="inside">-->
+<!--               <small class="list-group-item-text"  t-if="tx['state_message']">-->
+<!--                    <br/>-->
+<!--                   <strong>Reason: </strong><t t-esc="tx['state_message']"/>-->
+<!--                </small>-->
+<!--        </xpath>-->
+<!--    </t>-->
+
+</templates>

@@ -1,0 +1,47 @@
+<odoo>
+
+    <template id="sale_order_transaction_history" name="Sales Order: Transaction History" inherit_id="sale.sale_order_portal_content">
+        <xpath expr="//section[@id='terms']" position="after">
+            <section class="mt-5" if="transactions">
+                <h3 class="">Transaction History</h3>
+                <form class="form-inline mb-3 o_portal_transaction_history">
+                    <div class="input-group input-group-sm w-100">
+                        <input type="text" class="form-control form-control-sm" placeholder="Search by reference number" t-att-value='search' name="search"/>
+                        <span class="input-group-append">
+                            <button class="btn btn-primary search-submit" type="button">
+                                <span class="fa fa-search"/>
+                            </button>
+                        </span>
+                    </div>
+                </form>
+                <table class="table table-sm" id="">
+                    <thead class="bg-100">
+                        <tr>
+                            <th class="text-left">Transaction Date</th>
+                            <th class="text-right">Amount</th>
+                            <th class="text-right">Surcharge %</th>
+                            <th class="text-right">Surcharge Amount</th>
+                            <th class="text-left">Payment Method</th>
+                            <th class="text-right">Reference Number</th>
+                            <th class="text-right">Type</th>
+                        </tr>
+                    </thead>
+                    <tbody class="sale_tbody">
+                        <t t-foreach="transactions" t-as="transaction">
+                            <tr>
+                                <td class="text-left" id="transaction_date"><span t-esc="transaction['date_time']"/></td>
+                                <td class="text-right" id="transaction_amount"><span t-esc="transaction['amount']"/></td>
+                                <td class="text-right" id="transaction_amount"><span t-esc="transaction['surcharge_percentage']"/></td>
+                                <td class="text-right" id="transaction_amount"><span t-esc="transaction['surcharge_amount']"/></td>
+                                <td class="text-left" id="transaction_card_no"> <span t-esc="transaction['card_no_ecom']"/></td>
+                                <td class="text-right" id="transaction_ref_no"><span t-esc="transaction['ref_no']"/></td>
+                                <td class="text-right" id="transaction_type"><span t-esc="transaction['transaction_type']"/></td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+            </section>
+        </xpath>
+    </template>
+
+</odoo>
