@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="payment_method_ebizcharge" model="payment.method">
+            <field name="name">EBizCharge</field>
+            <field name="code">ebizcharge</field>
+            <field name="sequence">1000</field>
+            <field name="image" type="base64" file="payment_ebizcharge_crm/static/description/icon.png"/>
+            <field name="support_tokenization">True</field>
+            <field name="support_refund"></field>
+        </record>
+
+        <record id="default_ebizcharge_product" model="product.product">
+            <field name="name">EBizCharge over deposit</field>
+            <field name="sale_ok">True</field>
+            <field name="standard_price">0.00</field>
+            <field name="list_price">0.00</field>
+            <field name="weight">0.00</field>
+            <field name="type">service</field>
+            <field name="taxes_id" eval="[(5,)]"/>
+            <field name="supplier_taxes_id" eval="[(5,)]"/>
+            <field name="categ_id" ref="product.product_category_all"/>
+            <field name="uom_id" ref="uom.product_uom_unit"/>
+            <field name="uom_po_id" ref="uom.product_uom_unit"/>
+            <field name="purchase_ok">True</field>
+        </record>
+
+        <record id="payment_method_ebizcharge_in" model="account.payment.method">
+            <field name="name">EBizCharge</field>
+            <field name="code">ebizcharge</field>
+            <field name="payment_type">inbound</field>
+        </record>
+
+        <record id="payment_method_ebizcharge_out" model="account.payment.method">
+            <field name="name">EBizCharge</field>
+            <field name="code">ebizcharge</field>
+            <field name="payment_type">outbound</field>
+        </record>
+
+<!--        <record id="account_journal_ebizcharge" model="account.journal">-->
+<!--            <field name="name">EBizCharge</field>-->
+<!--            <field name="type">bank</field>-->
+<!--            <field name="code">EBIZC</field>-->
+<!--        </record>-->
+
+        <record id="payment_provider_ebizcharge" model="payment.provider">
+            <field name="name">EBizCharge</field>
+            <field name="image_128"
+                   type="base64"
+                   file="payment_ebizcharge_crm/static/src/img/ebiz_icon.png"/>
+            <field name="module_id" ref="base.module_payment_ebizcharge_crm"/>
+<!--            <field name="journal_id" ref="payment_ebizcharge_crm.account_journal_ebizcharge"/>-->
+            <field name="payment_method_ids"
+                   eval="[(6, 0, [
+                   ref('payment.payment_method_card'),
+                   ref('payment.payment_method_bank_account'),
+                   ref('payment.payment_method_maestro'),
+                   ref('payment.payment_method_mastercard'),
+                   ref('payment.payment_method_discover'),
+                   ref('payment.payment_method_jcb'),
+                   ref('payment.payment_method_visa'),
+                   ref('payment_ebizcharge_crm.payment_method_ebizcharge'),
+                ])]"/>
+            <field name="code">ebizcharge</field>
+            <field name="capture_manually">True</field>
+            <field name="support_refund">partial</field>
+            <field name="support_tokenization">True</field>
+            <field name="allow_tokenization">True</field>
+        </record>
+
+        <record id="sequence_advance_payment_transaction" model="ir.sequence">
+            <field name="name">Advance Payment Transaction</field>
+            <field name="code">advance.payment.transaction</field>
+            <field name="prefix">TX.ADV/%(range_year)s/</field>
+            <field eval="1" name="number_next"/>
+            <field eval="1" name="number_increment"/>
+            <field eval="True" name="use_date_range"/>
+            <field eval="False" name="company_id"/>
+            <field name="padding">4</field>
+        </record>
+
+    </data>
+</odoo>
+

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates>
+       <t t-name="payment_ebizcharge_crm.FieldMasking" >
+          <input type="text" t-ref="inputdate" class="o_input" style="border-bottom:none;" t-att-value="value" placeholder="Security Key"/>
+       </t>
+</templates>
+
+
+

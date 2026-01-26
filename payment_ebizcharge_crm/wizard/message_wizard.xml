@@ -1,0 +1,417 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="custom_message_wizard_form" model="ir.ui.view">
+            <field name="name">message.wizard</field>
+            <field name="model">message.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Message" edit="false" create="false" >
+                    <field invisible="1" name="currency_id"/>
+                    <field name="text" nolabel="1" invisible="currency_id" style="font-weight:bold;"/>
+                    <field invisible="1" name="is_ach"/>
+                    <field invisible="1"   name="transaction_id"/>
+                    <field invisible="1" name="is_eligible"/>
+                    <field invisible="1" name="is_surcharge"/>
+                    <field invisible="1" name="surcharge_percentage"/>
+
+                    <group invisible="not currency_id">
+                        <field   name="surcharge_total" options="{'currency_field': 'currency_id'}"
+                                 readonly="1" string="Total Amount Paid" widget="monetary"/>
+                    </group>
+                    <group class="oe_title" invisible="not currency_id" >
+                      <group string="Transaction Overview">
+                             <field name="partner_id" readonly="1"  string="Customer" />
+                             <field name="transaction_type" readonly="1"  string="Transaction Type" />
+                             <field name="document_number" readonly="1"  string="Document #" />
+                             <field name="reference_number" readonly="1"  string="Reference #" />
+                             <field name="auth_code" readonly="1"  string="Auth Code" />
+                      </group>
+                      <group string="Payment Details"  >
+                             <field name="payment_method"  string="Payment Method" readonly="1" />
+                             <field name="date_paid"  string="Date &amp; Time Paid" readonly="1" />
+                             <field name="subtotal" readonly="1" options="{'currency_field': 'currency_id'}" widget="monetary"  string="Subtotal" />
+                             <field name="surcharge_percent" readonly="1" invisible="surcharge_percentage==0.0 or not is_surcharge or is_ach"  string="Surcharge %" />
+                             <label for="surcharge_amount" string="Surcharge Amount" invisible="surcharge_amount != 0.0 or not is_surcharge or is_ach"/>
+                             <field name="surcharge_amount" style="display: inline-block;" readonly="1"
+                                    options="{'currency_field': 'currency_id'}" widget="monetary"
+                                    invisible="surcharge_amount==0.0 or not is_surcharge or is_ach"/>
+                             <span style="display: inline-block;" invisible="surcharge_amount != 0.0 or not is_surcharge or is_ach">Ineligible</span>
+                      </group>
+                      <group string="Security Checks"  invisible="is_ach"  >
+                         <field name="avs_street"  readonly="1" string="AVS Street" invisible="is_ach" />
+                         <field name="avs_zip_code" readonly="1"  string="AVS Zip / Postal Code" invisible="is_ach" />
+                         <field name="cvv" readonly="1" string="CVV" invisible="is_ach" />
+                      </group>
+                    </group>
+                    <footer>
+                    
+                        <button name="action_confirm" class="oe_highlight" string="Ok" style="width:10%" type="object" />
+
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="custom_message_wizard" model="ir.actions.act_window">
+            <field name="name">Lost Reason</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">message.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="custom_message_wizard_form"/>
+            <field name="target">new</field>
+        </record>
+
+        <record id="wizard_token_delete_confirmation_view" model="ir.ui.view">
+            <field name="name">wizard.token.delete.confirmation</field>
+            <field name="model">wizard.token.delete.confirmation</field>
+            <field name="arch" type="xml">
+                <form string="Message">
+                    <field name="text" nolabel="1"/>
+                    <footer>
+                        <button class="oe_highlight" name="delete_record" string="Yes, delete" style="width:100px" type="object"/>
+                        <button special="cancel" string="Cancel" style="width:10%"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="wizard_delete_token_action" model="ir.actions.act_window">
+            <field name="name">Please Confirm</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">wizard.token.delete.confirmation</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="wizard_token_delete_confirmation_view"/>
+            <field name="target">new</field>
+        </record>
+
+        <record id="success_message_payment_methods" model="ir.ui.view">
+            <field name="name">success.payment.methods</field>
+            <field name="model">success.payment.methods</field>
+            <field name="arch" type="xml">
+                <form string="Message">
+                    <field name="text"/>
+                    <footer>
+                        <button class="oe_highlight" name="open_register_wizard" string="Ok" style="width:10%" type="object"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="wizard_rpm_delete_confirmation_view" model="ir.ui.view">
+            <field name="name">wizard.delete.payment.methods</field>
+            <field name="model">wizard.delete.payment.methods</field>
+            <field name="arch" type="xml">
+                <form string="Message">
+                    <field name="text" nolabel="1"/>
+                    <footer>
+                        <button class="oe_highlight" name="delete_record" string="Yes, remove" type="object"/>
+                        <button special="cancel" string="Cancel" style="width:10%"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="wizard_rpm_delete_download_logs_view" model="ir.ui.view">
+            <field name="name">wizard.delete.logs.download</field>
+            <field name="model">wizard.delete.logs.download</field>
+            <field name="arch" type="xml">
+                <form string="Message">
+                    <field name="text" nolabel="1"/>
+                    <footer>
+                        <button class="oe_highlight" name="delete_record" string="Yes, clear" style="width:100px" type="object"/>
+                        <button special="cancel" string="Cancel" style="width:10%"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="wizard_delete_inactive_customers_view" model="ir.ui.view">
+            <field name="name">wizard.inactive.customers</field>
+            <field name="model">wizard.inactive.customers</field>
+            <field name="arch" type="xml">
+                <form string="Message">
+                    <field name="text" nolabel="1"/>
+                    <footer>
+                        <button class="oe_highlight" name="delete_record" string="Yes, deactivate" type="object"/>
+                        <button special="cancel" string="Cancel" style="width:10%"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="wizard_delete_upload_logs_view" model="ir.ui.view">
+            <field name="name">wizard.delete.upload.logs</field>
+            <field name="model">wizard.delete.upload.logs</field>
+            <field name="arch" type="xml">
+                <form string="Message">
+                    <field name="text" nolabel="1"/>
+                    <footer>
+                        <button class="oe_highlight" name="delete_record" string="Yes, clear" style="width:100px" type="object"/>
+                        <button special="cancel" string="Cancel" style="width:10%"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="wizard_email_pay_delete_confirmation_view" model="ir.ui.view">
+            <field name="name">wizard.delete.email.pay</field>
+            <field name="model">wizard.delete.email.pay</field>
+            <field name="arch" type="xml">
+                <form string="Message">
+                    <field name="text" nolabel="1"/>
+                    <footer>
+                        <button class="oe_highlight" name="delete_record" string="Yes, remove" type="object"/>
+                        <button special="cancel" string="Cancel" style="width:10%"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="wizard_received_email_pay_view" model="ir.ui.view">
+            <field name="name">wizard.receive.email.pay</field>
+            <field name="model">wizard.receive.email.pay</field>
+            <field name="arch" type="xml">
+                <form string="Message">
+                    <field name="text" nolabel="1"/>
+                    <footer>
+                        <button class="oe_highlight" name="apply_record" string="Yes, apply" style="width:100px" type="object"/>
+                        <button special="cancel" string="Cancel" style="width:10%"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="wizard_received_email_pay_payment_link_view" model="ir.ui.view">
+            <field name="name">wizard.receive.email.payment.link</field>
+            <field name="model">wizard.receive.email.payment.link</field>
+            <field name="arch" type="xml">
+                <form string="Message">
+                    <field name="text" nolabel="1"/>
+                    <footer>
+                        <button class="oe_highlight" name="send_email" string="Yes, continue" style="width:125px" type="object"/>
+                        <button special="cancel" string="Cancel" style="width:10%"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="wizard_received_email_pay" model="ir.actions.act_window">
+            <field name="name">Please Confirm</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">wizard.receive.email.pay</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="wizard_received_email_pay_view"/>
+            <field name="target">new</field>
+        </record>
+
+        <record id="wizard_received_email_pay_payment_link" model="ir.actions.act_window">
+            <field name="name">Please Confirm</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">wizard.receive.email.payment.link</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="wizard_received_email_pay_payment_link_view"/>
+            <field name="target">new</field>
+        </record>
+
+        <record id="wizard_delete_rpm_action" model="ir.actions.act_window">
+            <field name="name">Please Confirm</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">wizard.delete.payment.methods</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="wizard_rpm_delete_confirmation_view"/>
+            <field name="target">new</field>
+        </record>
+
+        <record id="wizard_delete_downloads_logs_action" model="ir.actions.act_window">
+            <field name="name">Please Confirm</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">wizard.delete.logs.download</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="wizard_rpm_delete_download_logs_view"/>
+            <field name="target">new</field>
+        </record>
+
+        <record id="wizard_delete_inactive_customers" model="ir.actions.act_window">
+            <field name="name">Please Confirm</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">wizard.inactive.customers</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="wizard_delete_inactive_customers_view"/>
+            <field name="target">new</field>
+        </record>
+
+        <record id="wizard_delete_upload_logs" model="ir.actions.act_window">
+            <field name="name">Please Confirm</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">wizard.delete.upload.logs</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="wizard_delete_upload_logs_view"/>
+            <field name="target">new</field>
+        </record>
+
+        <record id="wizard_delete_email_pay_action" model="ir.actions.act_window">
+            <field name="name">Please Confirm</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">wizard.delete.email.pay</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="wizard_email_pay_delete_confirmation_view"/>
+            <field name="target">new</field>
+        </record>
+
+        <record id="wizard_credit_note_validate_form" model="ir.ui.view">
+            <field name="name">wizard.credit.note.validate.form</field>
+            <field name="model">wizard.credit.note.validate</field>
+            <field name="arch" type="xml">
+                <form string="Message">
+                    <field name="text" nolabel="1"/>
+                    <footer>
+                        <button class="oe_highlight" name="proceed" string="Yes" style="width:10%" type="object"/>
+                        <button class="oe_highlight" special="cancel" string="No" style="width:10%"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="wizard_credit_note_validate_form" model="ir.ui.view">
+            <field name="name">wizard.credit.note.validate.form</field>
+            <field name="model">wizard.credit.note.validate</field>
+            <field name="arch" type="xml">
+                <form string="Message">
+                    <field name="text" nolabel="1"/>
+                    <footer>
+                        <button class="oe_highlight" name="proceed" string="Yes" style="width:10%" type="object"/>
+                        <button class="oe_highlight" special="cancel" string="No" style="width:10%"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="wizard_multi_payment_message_view" model="ir.ui.view">
+            <field name="name">wizard.multi.payment.message</field>
+            <field name="model">wizard.multi.payment.message</field>
+            <field name="arch" type="xml">
+                <form string="Message">
+                    <field invisible="1" name="name"/>
+                    <div invisible="name != 'send'">
+                        <field name="success_count" nolabel="1" readonly="1"/>
+                        out of
+                        <field name="total" nolabel="1" readonly="1"/>
+                        request(s) were successfully sent!
+                    </div>
+                    <div invisible="name != 'resend'">
+                        <field name="success_count" nolabel="1" readonly="1"/>
+                        out of
+                        <field name="total" nolabel="1" readonly="1"/>
+                        request(s) were successfully resent!
+                    </div>
+                    <div invisible="name != 'delete'">
+                        <field name="success_count" nolabel="1" readonly="1"/>
+                        out of
+                        <field name="total" nolabel="1" readonly="1"/>
+                        request(s) for Payment Method(s) were successfully removed!
+                    </div>
+                    <br/>
+                    <field color="green:status=='Success'" name="lines_ids" readonly="1">
+                        <tree>
+                            <field name="customer_name"/>
+                            <field name="customer_id"/>
+                            <field color="green:status=='Success'" name="status"/>
+                        </tree>
+                    </field>
+                    <footer>
+                        <button class="oe_highlight" special="cancel" string="Ok" style="width:10%"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="wizard_email_pay_message_view" model="ir.ui.view">
+            <field name="name">wizard.email.pay.message</field>
+            <field name="model">wizard.email.pay.message</field>
+            <field name="arch" type="xml">
+                <form string="Message">
+                    <field invisible="1" name="name"/>
+                    <div invisible="name != 'email_pay'">
+                        <field name="success_count" nolabel="1" readonly="1"/>
+                        out of
+                        <field name="total" nolabel="1" readonly="1"/>
+                        request(s) were successfully sent!
+                    </div>
+                    <div invisible="name != 'resend_email_pay'">
+                        <field name="success_count" nolabel="1" readonly="1"/>
+                        out of
+                        <field name="total" nolabel="1" readonly="1"/>
+                        request(s) were successfully resent!
+                    </div>
+                    <br/>
+                    <field color="green:status=='Success'" name="lines_ids" readonly="1">
+                        <tree>
+                            <field name="number"/>
+                            <field name="customer_name"/>
+                            <field name="customer_id"/>
+                            <field color="green:status=='Success'" name="status"/>
+                        </tree></field>
+                    <footer>
+                        <button class="oe_highlight" special="cancel" string="Ok" style="width:10%"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="wizard_transaction_view" model="ir.ui.view">
+            <field name="name">wizard.transaction.history.message</field>
+            <field name="model">wizard.transaction.history.message</field>
+            <field name="arch" type="xml">
+                <form string="Message">
+                    <br/>
+                    <field color="green:status=='Success'" name="lines_ids" readonly="1">
+                        <tree>
+                            <field name="customer_id"/>
+                            <field name="customer_name"/>
+                            <field name="ref_num"/>
+                            <field name="type"/>
+                            <field color="green:status=='Success'" name="status"/>
+                        </tree>
+                    </field>
+                    <footer>
+                        <button class="oe_highlight" special="cancel" string="Ok" style="width:10%"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="wizard_transaction_message_action" model="ir.actions.act_window">
+            <field name="name">Transaction History</field>
+            <field name="res_model">wizard.transaction.history.message</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+        <record id="wizard_multi_payment_message_action" model="ir.actions.act_window">
+            <field name="name">Request Payment Methods</field>
+            <field name="res_model">wizard.multi.payment.message</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+        <record id="wizard_email_pay_message_action" model="ir.actions.act_window">
+            <field name="name">Email Pay for Invoices</field>
+            <field name="res_model">wizard.email.pay.message</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+        <record id="wizard_credit_note_validate_action" model="ir.actions.act_window">
+            <field name="name">Credit Note validation</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">wizard.credit.note.validate</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="wizard_credit_note_validate_form"/>
+            <field name="context">{'invoice_id':active_id, 'reversal_model': 'account.move'}</field>
+            <field name="target">new</field>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,106 @@
+<odoo>
+    <data>
+
+        <record id="wizard_generate_so_link_form_views" model="ir.ui.view">
+            <field name="name">wizard.generate.so.link.payment</field>
+            <field name="model">wizard.generate.so.link.payment</field>
+            <field name="arch" type="xml">
+                <form string="Wizard Generate Payment Link for So" edit="1" js_class="ebiz_custom_form">
+                    <div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div>
+                                    <field name="payment_lines" nolabel="1" readonly='0'>
+                                        <tree string="Payment Lines" editable="bottom" edit="1" create="0"
+                                              delete="1" limit="15">
+
+                                            <field name="partner_id" readonly="1"/>
+                                            <field name="order_id" readonly="1" string="Number"/>
+                                            <field name="transaction_type"  string="Transaction Type"/>
+
+                                            <field name="currency_id" column_invisible="1" />
+                                            <field name="so_payment_link" column_invisible="1" />
+
+                                            <field name="amount_total_signed" readonly="1"  string="Order Total"
+                                                   options="{'currency_field': 'currency_id'}" widget="monetary"/>
+                                            <field name="amount_residual_signed" readonly="1" string="Balance Remaining"
+                                                   options="{'currency_field': 'currency_id'}" widget="monetary"/>
+                                             <field name="request_amount"
+                                                   options="{'currency_field': 'currency_id'}" widget="monetary"/>
+                                        </tree>
+                                    </field>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <footer>
+                        <button name="generate_payment_link" type="object" string="Generate" class="oe_highlight"/>
+                        <button string="Cancel" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="wizard_so_exist_payment_link_view" model="ir.ui.view">
+            <field name="name">wizard.so.exist.payment.link</field>
+            <field name="model">wizard.so.exist.payment.link</field>
+            <field name="arch" type="xml">
+                <form string="Message">
+                    <field name="text" nolabel="1"/>
+                    <footer>
+                        <button string="Yes, Continue" class="oe_highlight" type="object" name="delete_record_link"
+                                style="width:100px"/>
+                        <button string="Cancel" special="cancel" style="width:10%"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="wizard_generate_so_select_payment_link_view" model="ir.ui.view">
+            <field name="name">wizard.generate.so.select.payment.link</field>
+            <field name="model">wizard.generate.so.select.payment.link</field>
+            <field name="arch" type="xml">
+                <form string="Message">
+                    <field name="text" nolabel="1"/>
+                    <footer>
+                        <button string="Yes, Continue" class="oe_highlight" type="object" name="generate_selected_record_link"
+                                style="width:100px"/>
+                        <button string="Cancel" special="cancel" style="width:10%"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <!-- Wizard Action for Generate Payment Link for So  -->
+        <record id="wizard_generate_so_link_form_views_action" model="ir.actions.act_window">
+            <field name="name">Generate Payment Link for Sales Orders</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">wizard.generate.so.link.payment</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="wizard_generate_so_link_form_views"/>
+            <field name="context">{'compute_from_view': True}</field>
+            <field name="target">new</field>
+        </record>
+
+        <!--  Wizard Action for remove select So record payment link  -->
+        <record id="wizard_so_exist_payment_link_action" model="ir.actions.act_window">
+            <field name="name">Please Confirm</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">wizard.so.exist.payment.link</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="wizard_so_exist_payment_link_view"/>
+            <field name="target">new</field>
+        </record>
+
+        <!-- Wizard Action for generate select So record payment link-->
+        <record id="wizard_generate_so_select_payment_link_action" model="ir.actions.act_window">
+            <field name="name">Please Confirm</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">wizard.generate.so.select.payment.link</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="wizard_generate_so_select_payment_link_view"/>
+            <field name="target">new</field>
+        </record>
+
+    </data>
+</odoo>

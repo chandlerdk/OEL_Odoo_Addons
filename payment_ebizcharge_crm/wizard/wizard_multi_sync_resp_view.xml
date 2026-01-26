@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="wizard_multi_sync_message_view" model="ir.ui.view">
+            <field name="name">wizard.multi.sync.message</field>
+            <field name="model">wizard.multi.sync.message</field>
+            <field name="arch" type="xml">
+                <form string="Message">
+                    <field invisible="1" name="name"/>
+                    <div invisible="name != 'customers'">
+                        <field name="success_count" nolabel="1" readonly="1"/>
+                        out of
+                        <field name="total" nolabel="1" readonly="1"/>
+                        customer(s) have been successfully uploaded.
+                    </div>
+                    <div invisible="name != 'sales orders'">
+                        <field name="success_count" nolabel="1" readonly="1"/>
+                        out of
+                        <field name="total" nolabel="1" readonly="1"/>
+                        sales order(s) have been successfully uploaded.
+                    </div>
+                    <div invisible="name != 'invoices'">
+                        <field name="success_count" nolabel="1" readonly="1"/>
+                        out of
+                        <field name="total" nolabel="1" readonly="1"/>
+                        invoice(s) have been successfully uploaded.
+                    </div>
+                    <div invisible="name != 'credit_notes'">
+                        <field name="success_count" nolabel="1" readonly="1"/>
+                        out of
+                        <field name="total" nolabel="1" readonly="1"/>
+                        credit note(s) have been successfully uploaded.
+                    </div>
+                    <div invisible="name != 'products'">
+                        <field name="success_count" nolabel="1" readonly="1"/>
+                        out of
+                        <field name="total" nolabel="1" readonly="1"/>
+                        product(s) have been successfully uploaded.
+                    </div>
+                    <br/>
+                    <field color="green:record_message=='Success'" invisible="name != 'customers'" name="customer_lines_ids" readonly="1">
+                        <tree>
+                            <field name="customer_name"/>
+                            <field name="customer_id"/>
+                            <field name="record_message"/>
+                        </tree>
+                    </field>
+                    <field color="green:record_message=='Success'" invisible="name != 'products'" name="lines_ids" readonly="1">
+                        <tree>
+                            <field name="record_name"/>
+                            <field name="record_message"/>
+                        </tree>
+                    </field>
+                    <field color="green:record_message=='Success'" invisible="name != 'sales orders'" name="order_lines_ids" readonly="1">
+                        <tree>
+                            <field name="customer_name"/>
+                            <field name="customer_id"/>
+                            <field name="order_number"/>
+                            <field name="record_message"/>
+                        </tree>
+                    </field>
+                    <field color="green:record_message=='Success'" invisible="name != 'invoices' and name != 'credit_notes'" name="invoice_lines_ids" readonly="1">
+                        <tree>
+                            <field name="customer_name"/>
+                            <field name="customer_id"/>
+                            <field name="invoice_number"/>
+                            <field name="record_message"/>
+                        </tree>
+                    </field>
+                    <footer>
+                        <button class="oe_highlight" special="cancel" string="Ok" style="width:10%"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="wizard_multi_sync_message_action" model="ir.actions.act_window">
+            <field name="name">Result</field>
+            <field name="res_model">wizard.multi.sync.message</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+    </data>
+</odoo>

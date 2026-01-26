@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="ebiz_payment_link_wizard_view_form" model="ir.ui.view">
+        <field name="name">ebiz.payment.link.wizard.form</field>
+        <field name="model">ebiz.payment.link.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Generate Payment Link">
+                <group>
+                    <field invisible="1" name="res_id"/>
+                    <field invisible="1" name="res_model"/>
+                    <field invisible="1" name="partner_id"/>
+                    <field invisible="1" name="partner_email"/>
+                    <field invisible="1" name="amount_max"/>
+                    <field name="description" readonly="1"/>
+                    <field name="amount" readonly="1"/>
+                    <field domain="[('instance_id', '=', ebiz_profile_id), ('template_type_id', '=', 'WebFormEmail')]" name="select_template" options="{'no_create': True, 'no_quick_create': True, 'no_create_edit':True}" required="1"/>
+                    <field invisible="1" name="currency_id"/>
+                    <field invisible="1" name="ebiz_profile_id"/>
+                    <field invisible="1" name="is_sale_order"/>
+                    <field invisible="is_sale_order == False" name="transaction_type" required="is_sale_order == True"/>
+                </group>
+                <footer>
+                    <button class="oe_highlight" name="generate_link" string="Generate Payment Link" type="object"/>
+                    <button special="cancel" string="Cancel"/>
+                </footer>
+            </form></field>
+    </record>
+
+    <record id="ebiz_payment_copy_wizard_view_form" model="ir.ui.view">
+        <field name="name">ebiz.payment.link.copy.form</field>
+        <field name="model">ebiz.payment.link.copy</field>
+        <field name="arch" type="xml">
+            <form string="Copy Payment Link">
+                <group>
+                        </group>
+                    <field name="link" readonly="1" widget="CopyClipboardChar" invisible="not link"/>
+                     <div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div>
+                            <field name="copy_link_lines" nolabel="1" readonly='0'>
+                                <tree string="Copy Payment Lines" editable="bottom" edit="1"
+                                      create="false" delete="false" limit="15">
+                                    <field name="number" readonly="1"/>
+                                    <field name="link" widget="CopyClipboardChar"/>
+                                </tree>
+                            </field>
+                                </div>
+                    </div>
+                    </div>
+                    </div>
+
+
+                <footer>
+                    <button class="btn-primary" special="cancel" string="Close"/>
+                </footer>
+            </form></field>
+    </record>
+
+            <!-- Wizard Action for Generate Payment Link for Invoices  -->
+        <record id="wizard_copy_link_form_views_action" model="ir.actions.act_window">
+            <field name="name">Payment Links</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">ebiz.payment.link.copy</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="ebiz_payment_copy_wizard_view_form"/>
+            <field name="context">{'compute_from_view': True}</field>
+            <field name="target">new</field>
+        </record>
+
+
+
+
+    <record id="ebiz_action_invoice_order_generate_link" model="ir.actions.server">
+        <field name="name">Generate an EBizCharge Payment Link</field>
+        <field name="type">ir.actions.server</field>
+        <field name="model_id" ref="model_account_move"/>
+        <field name="binding_model_id" ref="model_account_move"/>
+        <field name="binding_view_types">form,tree</field>
+        <field name="state">code</field>
+        <field name="code">action = records.generate_payment_link()</field>
+    </record>
+
+
+    <record id="ebiz_action_so_order_generate_link" model="ir.actions.server">
+        <field name="name">Generate an EBizCharge Payment Link</field>
+        <field name="type">ir.actions.server</field>
+        <field name="model_id" ref="model_sale_order"/>
+        <field name="binding_model_id" ref="model_sale_order"/>
+        <field name="binding_view_types">form,tree</field>
+        <field name="state">code</field>
+        <field name="code">action = records.generate_payment_link()</field>
+    </record>
+
+</odoo>

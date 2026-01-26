@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="ebizcharge_report_invoice" inherit_id="account.report_invoice_document">
+        <xpath expr="//div[@id='qrcode']" position="after">
+            <a t-if="o.save_payment_link" t-attf-href="{{o.save_payment_link}}">Pay Now</a>
+        </xpath>
+    </template>
+
+    <template id="ebizcharge_report_sales" inherit_id="sale.report_saleorder_document">
+        <xpath expr="//span[@name='order_note']" position="after">
+            <br/>
+            <br/>
+            <a t-if="doc.save_payment_link" t-attf-href="{{doc.save_payment_link}}">Pay Now</a>
+        </xpath>
+    </template>
+
+</odoo>
