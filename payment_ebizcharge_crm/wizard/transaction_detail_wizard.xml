@@ -1,0 +1,25 @@
+<odoo>
+    <data>
+
+        <record id="transaction_detail_wizard_form" model="ir.ui.view">
+            <field name="name">transaction.detail.wizard</field>
+            <field name="model">transaction.detail.wizard</field>
+            <field name="arch" type="xml" >
+                <form string="Message">
+                    <field name="transaction_lines" readonly="1">
+                        <tree edit="0" no_open="1">
+                            <field name="name"/>
+                            <field name="document_type"/>
+                            <field name="currency_id" column_invisible="1"/>
+                            <field name="payment_amount" options="{'currency_field': 'currency_id'}" widget="monetary" />
+                        </tree>
+                    </field>
+                    <footer>
+                        <button string="Ok" class="oe_highlight" special="cancel" style="width:10%"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_process_ebiz_transaction_form" model="ir.ui.view">
+            <field name="name">wizard.order.process.transaction</field>
+            <field name="model">wizard.order.process.transaction</field>
+            <field name="arch" type="xml">
+                <form string="Process Transaction">
+                    <group>
+                        <field invisible="1" name="sale_order_id"/>
+                        <field invisible="1" name="invoice_id"/>
+                        <field invisible="1" name="partner_id"/>
+                        <field invisible="1" name="allow_partial_payment"/>
+                        <field invisible="1" name="currency_id"/>
+                        <group>
+                            <field name="amount" options="{'currency_field': 'currency_id'}" readonly="not allow_partial_payment" widget="monetary"/>
+                            <field invisible="is_check_or_credit == 'ach' or not sale_order_id" name="transaction_command" required="is_check_or_credit == 'credit' and sale_order_id"/>
+                            <field invisible="is_check_or_credit == 'ach' or not invoice_id" name="inv_transaction_command" required="is_check_or_credit == 'credit' and invoice_id"/>
+                        </group>
+                        <group>
+                            <field name="is_check_or_credit"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page invisible="is_check_or_credit == 'ach'" name="card" string="Credit Card">
+                            <notebook>
+                                <page name="credit_card" string="Existing Credit Card">
+                                    <group>
+                                        <field domain="[('partner_id','=',partner_id),('token_type','=','credit')]" name="card_id"/>
+                                    </group>
+                                </page>
+                                <page name="new_credit_card" string="New Credit Card">
+                                    <group>
+                                        <group>
+                                            <field name="card_account_holder_name" required="not card_id and is_check_or_credit == 'credit'"/>
+                                            <field name="card_card_number" required="not card_id and is_check_or_credit == 'credit'"/>
+                                            <field name="card_exp_month" required="not card_id and is_check_or_credit == 'credit'"/>
+                                            <field name="card_exp_year" required="not card_id and is_check_or_credit == 'credit'"/>
+                                        </group>
+                                        <group>
+                                            <field name="card_avs_street" required="not card_id and is_check_or_credit == 'credit'"/>
+                                            <field name="card_avs_zip" required="not card_id and is_check_or_credit == 'credit'"/>
+                                            <field name="card_card_code" required="not card_id and is_check_or_credit == 'credit'"/>
+                                        </group>
+                                    </group>
+                                </page>
+                            </notebook>
+                        </page>
+                        <page invisible="is_check_or_credit == 'credit'" name="ach" string="EBiz Bank">
+                            <notebook>
+                                <page name="bank" string="Existing ACH">
+                                    <group>
+                                        <field domain="[('partner_id','=',partner_id),('token_type','=','ach')]" name="ach_id"/>
+                                    </group>
+                                </page>
+                                <page name="new_bank" string="EBiz ACH">
+                                    <group>
+                                        <group>
+                                            <field name="ach_account_holder_name" required="not ach_id and is_check_or_credit == 'ach'"/>
+                                            <field name="ach_account" required="not ach_id and is_check_or_credit == 'ach'"/>
+                                            <field name="ach_routing" required="not ach_id and is_check_or_credit == 'ach'"/>
+                                            <field name="ach_account_type" required="not ach_id and is_check_or_credit == 'ach'"/>
+                                        </group>
+                                    </group>
+                                </page>
+                            </notebook>
+                        </page>
+                    </notebook>
+                    <footer>
+                        <button class="oe_highlight" name="process_transaction" string="Process Payment" type="object"/>
+                        <button class="oe_highlight" special="cancel" string="Cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_process_ebiz_transaction" model="ir.actions.act_window">
+            <field name="name">Process Transaction</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">wizard.order.process.transaction</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_process_ebiz_transaction_form"/>
+            <field name="target">new</field>
+        </record>
+
+    </data>
+</odoo>

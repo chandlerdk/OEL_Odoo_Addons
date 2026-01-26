@@ -1,0 +1,53 @@
+<odoo>
+    <data>
+
+        <record id="view_ebiz_request_payments_bulk" model="ir.ui.view">
+            <field name="name">Email Pay for Invoices</field>
+            <field name="model">ebiz.request.payment.bulk</field>
+            <field name="arch" type="xml" >
+                <form string="Email Pay for Invoices" edit="1">
+                    <div>
+                        <div class="row">
+                            <div class="col-7">
+                                <div>
+                                    <field name="payment_lines" nolabel="1" readonly='0' >
+                                        <tree string="Payment Lines" editable="bottom"  edit="1" create="false" delete="false" limit="15">
+                                            <field name="name" readonly="1"/>
+                                            <field name="currency_id" column_invisible="1"/>
+                                            <field name="customer_name" readonly="1"/>
+                                            <field name="amount_due" readonly="0" options="{'currency_field': 'currency_id'}" widget="monetary"/>
+                                            <field name="email_id" class="my_editable_email_id" readonly="0"/>
+                                            <field name="ebiz_profile_id" column_invisible="1"/>
+                                        </tree>
+                                    </field>
+                                </div>
+                            </div>
+                            <div class="col-5">
+                                <group>
+                                    <field name="select_template" string="Template" required="1" domain="[('template_type_id', '=', 'WebFormEmail'), ('instance_id', '=', ebiz_profile_id)]" options="{'no_create': True, 'no_quick_create': True, 'no_create_edit':True,'no_open':True}"/>
+                                    <field name="email_subject" readonly="1"/>
+                                    <field name="ebiz_profile_id" invisible="1"/>
+                                </group>
+                            </div>
+                        </div>
+                    </div>
+                    <footer>
+                        <button name="send_email" type="object" string="Send Email" class="oe_highlight"/>
+                        <button string="Cancel" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_ebiz_request_payments_bulk" model="ir.actions.act_window">
+            <field name="name">Email Pay for Invoices</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">ebiz.request.payment.bulk</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_ebiz_request_payments_bulk"/>
+            <field name="context">{'compute_from_view': True}</field>
+            <field name="target">new</field>
+        </record>
+
+    </data>
+</odoo>
