@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_ebiz_download_payments_form_v2" model="ir.ui.view">
+            <field name="name">download.ebiz.payments</field>
+            <field name="model">ebiz.download.payments</field>
+            <field name="arch" type="xml">
+                <form create="0" js_class="ebiz_custom_form" string="Download Payments">
+                    <h1>Download Received Payments</h1>
+                    <p>Download received payments from connected software.</p>
+                    <group>
+                        <group>
+                            <label class="text-nowrap" for="ebiz_profile_id" string="EBizCharge Merchant Account"/>
+                            <field domain="[('is_valid_credential', '=', True), ('is_active', '=', True), '|', ('company_ids', 'in', company_ids), ('company_ids', '=', False)]" name="ebiz_profile_id" nolabel="1" options="{'no_create': True, 'no_open': True, 'no_quick_create': True}" string="EBizCharge Merchant Account"/>
+                            <field context="{'onchange': True}" name="from_date"/>
+                        </group>
+                        <group>
+                            <label class="text-nowrap" for="payment_category"/>
+                            <field name="payment_category" nolabel="1" required="1"/>
+                            <field context="{'onchange': True}" name="to_date"/>
+                        </group>
+                    </group>
+                    <br/>
+                    <button class="oe_highlight" context="{'profile': ebiz_profile_id}" name="fetch_again" string="Download" type="object"/>
+                    <field invisible="1" name="company_ids"/>
+                    <field invisible="1" name="name"/>
+                    <field invisible="1" name="is_download_pressed"/>
+                    <field invisible="1" name="is_download_pressed_fixed_auto_amount"/>
+                    <br/><br/>
+                    <notebook>
+                        <page string="List">
+                            <group/>
+                            <field class="notebook_width" invisible="not payment_lines" mode="tree" name="payment_lines" readonly="0" widget="download_invoice_payment">
+                                <tree limit="15" create="0" no_open="1" string="Payment Lines">
+                                    <field name="type_id" readonly="1"/>
+                                    <field column_invisible="parent.is_download_pressed_fixed_auto_amount" name="invoice_number" readonly="1"/>
+                                    <field name="partner_id" readonly="1"/>
+                                    <field name="customer_id" readonly="1"/>
+                                    <field name="date_paid" readonly="1"/>
+                                    <field column_invisible="1" name="currency_id"/>
+                                    <field column_invisible="parent.is_download_pressed_fixed_auto_amount" name="invoice_amount" options="{'currency_field': 'currency_id'}" readonly="1" widget="monetary"/>
+                                    <field name="paid_amount" options="{'currency_field': 'currency_id'}" readonly="1" widget="monetary"/>
+                                    <field column_invisible="1" name="amount_due" options="{'currency_field': 'currency_id'}" readonly="1" widget="monetary"/>
+                                    <field name="payment_method" readonly="1"/>
+                                    <field name="auth_code" readonly="1"/>
+                                    <field name="ref_num" readonly="1"/>
+                                    <field name="source" readonly="1"/>
+
+                                    <field column_invisible="1" name="is_save_link" />
+
+                                    <field column_invisible="1" name="invoice_number_op"/>
+                                    <field column_invisible="1" name="paid_amount_op"/>
+                                    <field column_invisible="1" name="is_email_payment"/>
+                                    <field column_invisible="1" name="payment_internal_id"/>
+                                </tree>
+                            </field>
+                            <div invisible="is_download_pressed">
+                                <div class="empty_div_setting">
+                                    <div class="o_view_nocontent">
+                                        <div class="o_nocontent_help">
+                                            <p class="o_view_nocontent_smiling_face" style="margin-top: 25%;">
+                                                Determine a Payment Category and Press Download
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div invisible="not is_download_pressed or payment_lines">
+                                <div class="empty_div_setting">
+                                    <div class="o_view_nocontent">
+                                        <div class="o_nocontent_help">
+                                            <p class="o_view_nocontent_smiling_face" style="margin-top: 70%;">
+                                                No Record(s) Found.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </page>
+                        <page name="download_invoice_credit_memos_log" string="Logs">
+                            <field class="notebook_width" invisible="not transaction_log_lines" mode="tree" name="transaction_log_lines" widget="download_invoice_payment">
+                                <tree limit="15" no_open="1" string="Logs">
+                                    <field name="type_id" readonly="1"/>
+                                    <field name="invoice_number" readonly="1"/>
+                                    <field name="partner_id" readonly="1"/>
+                                    <field name="customer_id" readonly="1"/>
+                                    <field name="date_paid" readonly="1"/>
+                                    <field column_invisible="1" name="currency_id"/>
+                                    <field name="invoice_amount" options="{'currency_field': 'currency_id'}" readonly="1" widget="monetary"/>
+                                    <field name="paid_amount" options="{'currency_field': 'currency_id'}" readonly="1" widget="monetary"/>
+                                    <field name="payment_method" readonly="1"/>
+                                    <field name="auth_code" readonly="1"/>
+                                    <field name="ref_num" readonly="1"/>
+                                    <field name="last_sync_date" readonly="1"/>
+                                </tree>
+                            </field>
+                            <div invisible="transaction_log_lines">
+                                <div class="empty_div_setting">
+                                    <div class="o_view_nocontent">
+                                        <div class="o_nocontent_help">
+                                            <p class="o_view_nocontent_smiling_face" style="margin-top: 90%;">
+                                                No Record(s) Found.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </page>
+                    </notebook>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_ebiz_download_payments_form" model="ir.actions.act_window">
+            <field name="name">Download Received Payments</field>
+            <field name="res_model">ebiz.download.payments</field>
+            <field name="target">inline</field>
+            <field name="view_mode">form,tree</field>
+        </record>
+
+        <menuitem action="action_ebiz_download_payments_form" id="menu_ebiz_download_payments" name="Download Received Payments" parent="menu_download_ebiz" sequence="5"/>
+
+        <record id="wizard_ebiz_download_message_view" model="ir.ui.view">
+            <field name="name">download.payment.message</field>
+            <field name="model">download.payment.message</field>
+            <field name="arch" type="xml">
+                <form string="Message">
+                    <div>
+                        <field name="succeeded" nolabel="1" readonly="1"/>
+                        out
+                        <field name="total" nolabel="1" readonly="1"/>
+                        payment(s) have been successfully imported into Odoo
+                    </div>
+                    <br/>
+                    <field color="green:record_message=='Success" name="lines_ids" readonly="1">
+                        <tree>
+                            <field name="customer_name"/>
+                            <field name="customer_id"/>
+                            <field name="invoice_no"/>
+                            <field name="status"/>
+                        </tree>
+                    </field>
+                    <footer>
+                        <button class="oe_highlight" special="cancel" string="Ok" style="width:10%"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="wizard_ebiz_download_message_action" model="ir.actions.act_window">
+            <field name="name">Result</field>
+            <field name="res_model">download.payment.message</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+    </data>
+</odoo>

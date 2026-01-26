@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record model="ir.ui.view" id="view_payment_token_form_ebiz_card_save">
+        <field name="name">payment.token.form.ebiz.save</field>
+        <field name="model">payment.token</field>
+        <field name="inherit_id" ref="payment.payment_token_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="is_card_save" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="payment_token_credit_card_view_form" model="ir.ui.view">
+        <field name="name">acquirer.form.ebizcharge</field>
+        <field name="model">payment.token</field>
+        <field name="priority" eval="80"/>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <group>
+                        <field name="account_holder_name" string="Name on Card *" required="1"/>
+                        <field name="card_number" required="1" readonly="1"/>
+                        <label for="card_exp_month" string="Expiration Date *"/>
+                        <div class="o_address_format">
+                            <field name="card_exp_month" required="1" placeholder="MM" style="width: 48%; margin-right: 2%;"/>
+                            <field name="card_exp_year" required="1" placeholder="YYYY" style="width: 48%; margin-left: 1%;"/>
+                        </div>
+                        <field name="card_code"/>
+                    </group>
+                    <group>
+                        <field name="avs_street" required="1"/>
+                        <field name="avs_zip" required="1"/>
+                        <field name="is_default" widget="boolean_toggle"/>
+                    </group>
+                </group>
+                <footer>
+                    <button string="Save" class="oe_highlight" name="update_payment_token" type='object' />
+                    <button string="Cancel" special="cancel"/>
+                </footer>
+
+            </form>
+        </field>
+    </record>
+
+    <record id="payment_token_ach_view_form" model="ir.ui.view">
+        <field name="name">acquirer.form.ebizcharge</field>
+        <field name="model">payment.token</field>
+        <field name="priority" eval="80"/>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <group>
+                        <field name="account_holder_name" required="1"/>
+                        <field name="account_type" required="1"/>
+                    </group>
+                    <group>
+                        <field name="account_number" required="1" readonly="1"/>
+                        <field name="routing" required="1" readonly="1"/>
+                        <field name="is_default" widget="boolean_toggle"/>
+                    </group>
+                </group>
+                <footer>
+                    <button string="Save" class="oe_highlight" name="update_payment_token" type='object' />
+                    <button string="Cancel" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="payment_token_ach_view_tree" model="ir.ui.view">
+        <field name="name">acquirer.form.ebizcharge</field>
+        <field name="model">payment.token</field>
+        <field name="priority" eval="900"/>
+        <field name="arch" type="xml">
+            <tree create="0" delete="1">
+                <field name="account_holder_name" />
+                <field name="account_number" readonly="1"/>
+                <field name="routing" readonly="1"/>
+                <field name="account_type" />
+                <field name="is_default" widget="boolean_toggle" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_payment_token_tree" model="ir.actions.act_window">
+        <field name="name">Bank Accounts</field>
+        <field name="res_model">payment.token</field>
+        <field name='view_mode'>tree,form</field>
+        <field name='domain'>[['token_type','=','ach']]</field>
+        <field name='view_id' ref="payment_token_ach_view_tree"/>
+    </record>
+
+    <record id="payment_token_multiple_view_test" model="ir.ui.view">
+        <field name="name">payment.token.ebizcharge</field>
+        <field name="model">payment.token</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="account_holder_name" string="Card Holder Name"/>
+                <field name="card_number"/>
+                <field name="avs_street"/>
+                <field name="avs_zip"/>
+                <field name="card_exp_date"/>
+                <field name="card_code" password="1" invisible="1"/>
+                <field name="is_default" widget="boolean_toggle" />
+            </tree>
+        </field>
+    </record>
+
+<!--    <record model="ir.actions.act_window" id="payment.action_payment_token">-->
+<!--        <field name="name">Saved Payment Data</field>-->
+<!--        <field name="res_model">payment.token</field>-->
+<!--        <field name="view_mode">tree,form</field>-->
+<!--        <field name="domain">[['token_type','=','credit'],['create_uid', '=', uid]]</field>-->
+<!--        <field name="view_id" ref="payment_ebizcharge_crm.payment_token_multiple_view_test"/>-->
+<!--        <field name="help" type="html">-->
+<!--            <p class="o_view_nocontent_smiling_face">-->
+<!--                Create a saved payment data-->
+<!--            </p>-->
+<!--        </field>-->
+<!--    </record>-->
+
+    <record id="payment_token_multiple_view_credit_note" model="ir.ui.view">
+        <field name="name">payment.token.test</field>
+        <field name="model">payment.token</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="account_holder_name" string="Card Holder Name"/>
+                <field name="card_number"/>
+                <field name="avs_street"/>
+                <field name="avs_zip"/>
+                <field name="card_exp_date"/>
+                <field name="card_code"/>
+                <field name="is_default" widget="boolean_toggle" />
+            </tree>
+        </field>
+    </record>
+
+</odoo>

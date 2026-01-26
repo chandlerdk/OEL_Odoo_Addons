@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_sale_order_ebizcharge" model="ir.ui.view">
+            <field name="name">sale.order.form.inh</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//header" position="inside">
+                    <field invisible="1" name="odoo_payment_link"/>
+                    <field invisible="1" name="ebiz_internal_id"/>
+                    <field invisible="1" name="receipt_status"/>
+                    <field invisible="1" name="ebiz_auto_sync"/>
+                    <field invisible="1" name="is_pre_auth"/>
+                    <field invisible="1" name="log_status_emv"/>
+                    <field invisible="1" name="emv_transaction_id"/>
+                    <field invisible="1" name="payment_internal_id"/>
+                    <field invisible="1" name="done_transaction_ids"/>
+                    <field invisible="1" name="is_invoice_paid"/>
+                    <field invisible="1" name="request_amount"/>
+<!--                    <field name="website_id" invisible="1" groups="!website.group_multi_website"/>-->
+                    <button class="oe_highlight" invisible="ebiz_internal_id or ebiz_auto_sync or state in ['cancel']" name="sync_to_ebiz_ind" string="EBizCharge Upload" type="object"/>
+<!--                    <button name="pre_authorize" type="object" string="Register Payment" class="oe_highlight" invisible="ebiz_amount_residual == 0 or website_id != False or state in ['cancel'] or invoice_status in ['invoiced']"/>-->
+                    <button name="pre_authorize" type="object" string="Register Payment"
+                            class="oe_highlight"
+                            invisible="ebiz_amount_residual == 0 and request_amount==0 or state in ['cancel'] or invoice_status in ['invoiced']"/>
+                </xpath>
+                <field name="partner_id" position="after">
+                    <field name="sync_status" readonly="1"/>
+                </field>
+                <group name="sale_info" position="inside">
+                    <field name="ebiz_transaction_ref"/>
+                    <field invisible="0" name="ebiz_amount_residual"/>
+                </group>
+                <xpath expr="//button[@name='payment_action_capture']" position="attributes">
+                    <attribute name="invisible">not authorized_transaction_ids or invoice_status in ['to invoice', 'no']</attribute>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_order_ebizcharge_status" model="ir.ui.view">
+            <field name="name">sale.order.ebiz.status</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_tree"/>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="sync_status" optional="show"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_qa_order_ebizcharge_status" model="ir.ui.view">
+            <field name="name">sale.order.ebiz.status</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_quotation_tree_with_onboarding"/>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="sync_status" optional="show"/>
+                </tree>
+                <field name="amount_total" position="before">
+                    <field name="amount_due_custom" options="{'currency_field': 'currency_id'}" widget="monetary"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="view_qa_order_ebizcharge_status_sale" model="ir.ui.view">
+            <field name="name">sale.order.ebiz.status.sale</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_tree"/>
+            <field name="arch" type="xml">
+                <field name="amount_total" position="before">
+                    <field name="amount_due_custom" options="{'currency_field': 'currency_id'}" widget="monetary"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="model_action_wizard_register_payment" model="ir.actions.server">
+            <field name="name">Register Payment</field>
+            <field name="model_id" ref="sale.model_sale_order"/>
+            <field name="binding_model_id" ref="sale.model_sale_order"/>
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code">action = records.pre_authorize()</field>
+        </record>
+
+        <record id="model_action_wizard_sale_multi_sync" model="ir.actions.server">
+            <field name="name">EBizCharge Upload</field>
+            <field name="model_id" ref="sale.model_sale_order"/>
+            <field name="binding_model_id" ref="sale.model_sale_order"/>
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code">action = records.sync_multi_sale_orders()</field>
+        </record>
+
+        <record id="view_sale_advance_payment_inv_inherit" model="ir.ui.view">
+            <field name="name">Invoice Orders</field>
+            <field name="model">sale.advance.payment.inv</field>
+            <field name="inherit_id" ref="sale.view_sale_advance_payment_inv"/>
+            <field name="arch" type="xml">
+
+                <field name="count" position="after">
+                    <field invisible="1" name="is_website_order"/>
+                    <field invisible="1" name="is_pay_link"/>
+                </field>
+
+                <xpath expr="//group[@name='down_payment_specification']" position="after">
+                    <group>
+                      <div invisible="not is_pay_link"  class="fa fa-info-circle text-nowrap"
+                       style="padding:10px;background-color:#E4D4E0;font-weight:bold;margin:2px;border-radius:4px;" >
+                       This sales order has an active payment link, converting it to an invoice will invalidate the link. Do you want to continue?                    </div>
+                    </group>
+                 </xpath>
+
+                
+                <field name="advance_payment_method" position="attributes">
+                    <attribute name="readonly">is_website_order</attribute>
+                </field>
+            </field>
+        </record>
+
+    </data>
+</odoo>
