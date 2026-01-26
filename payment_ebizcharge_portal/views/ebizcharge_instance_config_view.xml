@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ebizcharge_instance_config_form_inh" model="ir.ui.view">
+        <field name="name">ebizcharge.instance.config.form.inh</field>
+        <field name="model">ebizcharge.instance.config</field>
+        <field name="inherit_id" ref="payment_ebizcharge_crm.view_ebizcharge_instance_config_form"/>
+        <field name="arch" type="xml">
+            <field name="company_ids" position="after">
+                <label class="fw-bolder" for="is_website" string="Is Website"/>
+                <field name="is_website" nolabel="1" widget="boolean_toggle"/>
+            </field>
+            <xpath expr="//notebook" position="inside">
+                <page invisible="not is_website" string="Website Settings">
+                    <field name="website_ids"/>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
