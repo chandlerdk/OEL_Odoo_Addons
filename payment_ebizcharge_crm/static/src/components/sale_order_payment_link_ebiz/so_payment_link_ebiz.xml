@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates>
+    <t t-name="payment_ebizcharge_crm.SalePaymentLinkEBiz" t-inherit="web.ListRenderer" t-inherit-mode="primary" owl="1">
+        <xpath expr="//table" position="before">
+            <div align="right" class="mt-4" style="margin-right:0.5%;">
+                <button class="btn btn-primary" t-on-click="showSoExport" id="is-invoice-export">EXPORT</button>
+                <button class="btn btn-primary" style="margin-left:0.3%" t-on-click="removeSoPaylink"
+                        id="is-remove-payment-link">REMOVE LINK(S)
+                </button>
+                <button class="btn btn-primary" style="margin-left:0.3%" t-on-click="generateSoPaylink"
+                        id="is-generate-payment-link">GENERATE
+                </button>
+            </div>
+        </xpath>
+
+               <xpath expr="//table" position="replace">
+            <table t-attf-class="o_list_table table table-sm table-hover position-relative mb-0 {{props.list.isGrouped ? 'o_list_table_grouped' : 'o_list_table_ungrouped table-striped'}}" t-ref="table">
+                <thead>
+                    <tr>
+                        <th  class="o_list_record_selector o_list_controller align-middle pe-1 cursor-pointer" tabindex="-1" t-on-keydown="(ev) => this.onCellKeydown(ev)" t-on-click.stop="toggleSelection">
+                            <CheckBox disabled="!_canSelectRecord" value="selectAll" className="'d-flex m-0'" onChange.bind="toggleSelection"/>
+                        </th>
+                        <t t-foreach="state.columns" t-as="column" t-key="column.id">
+                            <th t-if="column.type === 'field'"
+                                t-att-data-name="column.name"
+                                t-att-class="getColumnClass(column) + ' opacity-trigger-hover'"
+                                t-on-pointerup="onColumnTitleMouseUp"
+                                t-on-click="() => this.onClickSortColumn(column)"
+                                t-on-keydown="(ev) => this.onCellKeydown(ev)"
+                                t-att-data-tooltip-template="isDebugMode ? 'web.FieldTooltip' : false"
+                                t-att-data-tooltip-info="isDebugMode ? makeTooltip(column) : false"
+                                data-tooltip-delay="1000"
+                                tabindex="-1">
+                                <t t-if="column.hasLabel and column.widget !== 'handle'">
+                                <t t-set="isNumeric" t-value="isNumericColumn(column)"/>
+                                    <div t-att-class="{'d-flex': true, 'flex-row-reverse': shouldReverseHeader(column)}">
+                                        <span class="d-block min-w-0 text-truncate flex-grow-1" t-att-class="isNumeric ? 'o_list_number_th' : ''"
+                                              t-esc="column.label"/>
+                                        <i t-att-class="getSortableIconClass(column)"/>
+                                    </div>
+                                    <span
+                                          class="o_resize position-absolute top-0 end-0 bottom-0 ps-1 bg-black-25 opacity-0 opacity-50-hover z-index-1"
+                                          t-on-pointerdown.stop.prevent="onStartResize"/>
+                                </t>
+                            </th>
+                            <th t-else="" t-on-keydown="(ev) => this.onCellKeydown(ev)" t-att-class="{o_list_button: column.type === 'button_group'}"/>
+                        </t>
+                        <th t-if="props.onOpenFormView" t-on-keydown="(ev) => this.onCellKeydown(ev)" class="o_list_open_form_view"/>
+                        <th t-if="displayOptionalFields or activeActions.onDelete" t-on-keydown="(ev) => this.onCellKeydown(ev)" class="o_list_controller o_list_actions_header position-sticky end-0">
+                            <Dropdown t-if="displayOptionalFields"
+                                class="'o_optional_columns_dropdown text-center border-top-0'"
+                                togglerClass="'btn p-0'"
+                                skipTogglerTabbing="true"
+                                listRendererClass="uniqueRendererClass"
+                                position="'bottom-end'">
+                                <t t-set-slot="toggler">
+                                    <i class="o_optional_columns_dropdown_toggle oi oi-fw oi-settings-adjust"/>
+                                </t>
+
+                                <t t-foreach="optionalFieldGroups" t-as="group" t-key="group_index">
+                                    <div t-if="!group_first" role="separator" class="dropdown-divider"/>
+                                    <DropdownItem t-if="group.displayName" parentClosingMode="'none'" onSelected="() => this.toggleOptionalFieldGroup(group.id)">
+                                        <div class="fw-bold" t-esc="group.displayName"/>
+                                    </DropdownItem>
+                                    <t t-foreach="group.optionalFields" t-as="field" t-key="field_index">
+                                        <DropdownItem parentClosingMode="'none'" onSelected="() => this.toggleOptionalField(field.name)">
+                                            <CheckBox
+                                                onChange="() => this.toggleOptionalField(field.name)"
+                                                value="field.value"
+                                                name="field.name"
+                                            >
+                                                <span class="d-flex align-items-center"><span class="text-truncate" t-esc="field.label"/><span class="ps-1" t-if="env.debug" t-esc="' (' + field.name + ')'" /></span>
+                                            </CheckBox>
+                                        </DropdownItem>
+                                    </t>
+                                </t>
+                            </Dropdown>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="ui-sortable">
+                    <t t-call="{{ constructor.rowsTemplate }}">
+                        <t t-set="list" t-value="props.list"/>
+                    </t>
+                </tbody>
+                <tfoot t-on-click="() => props.list.leaveEditMode()" class="o_list_footer cursor-default" t-att-class="{o_sample_data_disabled: props.list.model.useSampleModel}">
+                    <tr>
+                        <td />
+                        <t t-foreach="state.columns" t-as="column" t-key="column.id">
+                            <t t-set="aggregate" t-value="aggregates[column.name]"/>
+                            <td t-if="aggregate" class="o_list_number" >
+                                <span t-esc="aggregate.value" t-att-data-tooltip="aggregate.help"/>
+                            </td>
+                            <td t-else=""/>
+                        </t>
+                        <td t-if="props.onOpenFormView"/>
+                        <td t-if="displayOptionalFields or activeActions.onDelete" />
+                    </tr>
+                </tfoot>
+            </table>
+
+        </xpath>
+
+
+    </t>
+
+</templates>
+
+
+
