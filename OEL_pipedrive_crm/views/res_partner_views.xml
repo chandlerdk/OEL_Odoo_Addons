@@ -16,7 +16,7 @@
                 <filter string="Customers" name="filter_customers" domain="[('org_status','=','customer')]"/>
                 <filter string="Companies" name="filter_companies" domain="[('is_company','=',True)]"/>
 
-                <!-- Has Opportunities filter, auto-activated by context -->
+                <!-- Has Opportunities filter, optionally used by users -->
                 <filter string="Has Opportunities"
                         name="has_opportunities"
                         domain="[('partner_opportunity_ids', '!=', False)]"
@@ -234,11 +234,12 @@
         </field>
     </record>
 
+    <!-- Active Prospects: only show partners that have at least one opportunity assigned to current user -->
     <record id="action_oel_crm_active_prospects" model="ir.actions.act_window">
         <field name="name">Active Prospects</field>
         <field name="res_model">res.partner</field>
         <field name="view_mode">tree,form</field>
-        <field name="domain">[]</field>
+        <field name="domain">[('partner_opportunity_ids.user_id', '=', uid)]</field>
         <field name="view_ids" eval="[
             (5,0,0),
             (0,0,{'view_mode':'tree','view_id':ref('view_oel_partner_tree')}),
@@ -247,8 +248,7 @@
         <field name="search_view_id" ref="view_oel_partner_filter"/>
         <field name="context">
             {
-                'oel_crm_ui': True,
-                'search_default_has_opportunities': 1
+                'oel_crm_ui': True
             }
         </field>
     </record>
