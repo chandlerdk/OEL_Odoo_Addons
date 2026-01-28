@@ -1,0 +1,51 @@
+<odoo>
+
+    <!-- Product Template -->
+    <record id="product_template_form_inherit_kit_bom_overview" model="ir.ui.view">
+        <field name="name">product.template.form.inherit.kit.bom.overview.button</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+
+            <!-- Ensure field exists in view -->
+            <xpath expr="//sheet" position="inside">
+                <field name="has_kit_bom" invisible="1"/>
+            </xpath>
+
+            <!-- Insert button in header - only visible for Kit products -->
+            <xpath expr="//header" position="inside">
+                <button name="action_open_kit_bom_overview"
+                        type="object"
+                        string="BoM Overview"
+                        class="btn-secondary"
+                        invisible="not has_kit_bom"/>
+            </xpath>
+
+        </field>
+    </record>
+
+    <!-- Product Variant -->
+    <record id="product_product_form_inherit_kit_bom_overview" model="ir.ui.view">
+        <field name="name">product.product.form.inherit.kit.bom.overview.button</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_normal_form_view"/>
+        <field name="arch" type="xml">
+
+            <!-- Ensure field exists in view -->
+            <xpath expr="//sheet" position="inside">
+                <field name="has_kit_bom" invisible="1"/>
+            </xpath>
+
+            <!-- Insert button in header - only visible for Kit products -->
+            <xpath expr="//header" position="inside">
+                <button name="action_open_kit_bom_overview"
+                        type="object"
+                        string="BoM Overview"
+                        class="btn-secondary"
+                        invisible="not has_kit_bom"/>
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>

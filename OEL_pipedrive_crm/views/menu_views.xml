@@ -6,11 +6,32 @@
               sequence="10"
               web_icon="OEL_pipedrive_crm,static/description/icon.png"/>
 
-    <!-- Acquisition -->
+    <!-- Orders (Parent Menu) - FIRST -->
+    <menuitem id="menu_oel_orders_root"
+              name="Orders"
+	      parent="menu_oel_saleshub_root"
+	      action="action_oel_my_quotes"
+              sequence="10"/>
+
+    <!-- Quotes (submenu under Orders) -->
+    <menuitem id="menu_oel_quotes"
+              name="Quotes"
+              parent="menu_oel_orders_root"
+              action="action_oel_my_quotes"
+              sequence="10"/>
+
+    <!-- Orders (submenu under Orders) -->
+    <menuitem id="menu_oel_orders"
+              name="Orders"
+              parent="menu_oel_orders_root"
+              action="action_oel_orders"
+              sequence="20"/>
+
+    <!-- Acquisition - SECOND -->
     <menuitem id="menu_oel_acquisition"
               name="Acquisition"
               parent="menu_oel_saleshub_root"
-              sequence="10"/>
+              sequence="20"/>
 
     <!-- a) Prospects -->
     <menuitem id="menu_oel_prospects"
@@ -40,11 +61,25 @@
               action="action_oel_crm_leads"
               sequence="20"/>
 
-    <!-- Contacts -->
+    <!-- My Activities - THIRD -->
+    <menuitem id="menu_oel_my_activities"
+              name="My Activities"
+              parent="menu_oel_saleshub_root"
+              action="action_oel_my_activities"
+              sequence="30"/>
+
+    <!-- Activities Calendar - FOURTH -->
+    <menuitem id="menu_oel_activities_calendar"
+              name="Calendar"
+              parent="menu_oel_saleshub_root"
+              action="action_oel_my_activities_calendar"
+              sequence="40"/>
+
+    <!-- Contacts - FIFTH -->
     <menuitem id="menu_oel_contacts_root"
               name="Contacts"
               parent="menu_oel_saleshub_root"
-              sequence="20"/>
+              sequence="50"/>
 
     <menuitem id="menu_oel_contacts_all"
               name="Contacts"
@@ -58,35 +93,7 @@
               action="action_oel_companies"
               sequence="20"/>
 
-    <!-- My Activities (list+form+calendar) -->
-    <menuitem id="menu_oel_my_activities"
-              name="My Activities"
-              parent="menu_oel_saleshub_root"
-              action="action_oel_my_activities"
-              sequence="30"/>
-
-    <!-- Activities Calendar (top-level) -->
-    <menuitem id="menu_oel_activities_calendar"
-              name="Calendar"
-              parent="menu_oel_saleshub_root"
-              action="action_oel_my_activities_calendar"
-              sequence="31"/>
-
-    <!-- Quotes -->
-    <menuitem id="menu_oel_quotes_root"
-              name="Quotes"
-              parent="menu_oel_saleshub_root"
-              action="action_oel_my_quotes"
-              sequence="40"/>
-
-    <!-- Orders -->
-    <menuitem id="menu_oel_orders_root"
-              name="Orders"
-              parent="menu_oel_saleshub_root"
-              action="action_oel_orders"
-              sequence="50"/>
-
-    <!-- Reporting -->
+    <!-- Reporting - SIXTH (LAST) -->
     <menuitem id="menu_oel_reporting"
               name="Reporting"
               parent="menu_oel_saleshub_root"
