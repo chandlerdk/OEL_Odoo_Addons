@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates id="masking_template" xml:space="preserve">
+    <t t-name="FieldMasking">
+        <input type="text"
+               class="o_field_char o_input"
+               t-att-id="widget.id_for_label"
+               t-att-tabindex="widget.attrs.tabindex"
+               t-att-autofocus="widget.attrs.autofocus"
+               t-att-placeholder="widget.attrs.placeholder"
+               t-att-autocomplete="widget.attrs.autocomplete"
+               t-att-maxlength="widget.field.size"
+        />
+    </t>
+
+</templates>
+

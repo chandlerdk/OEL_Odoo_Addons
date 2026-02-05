@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="payment_ebizcharge_crm.contact_us_page">
+        <div class="container-fluid" style="display: table;">
+            <div class="row mt-4">
+                <div class="col-lg-12">
+                    <h1 class="font-weight-bolder"> Help &amp; Contact Us</h1>
+                </div>
+            </div>
+            <div class="row mt-5">
+                <div class="col-lg-6" style="display: table;">
+                    <div class="p-5 border rounded" style="display: table-cell;">
+                        <div class="row">
+                            <div class="col-lg-3">
+                                <div class="p-4">
+                                    <img class="" src="payment_ebizcharge_crm/static/src/img/Knowledge_Base.svg" alt="Knowledge Base"/>
+                                </div>
+                            </div>
+                            <div class="col-lg-9">
+                                <p class="myHeading">Knowledge Base</p>
+                                <p class="myParagraph mt-3">
+                                    Visit our Knowledge Base to access how-to articles, release notes, and more, for the EBizCharge for Odoo
+                                    integration and the EBizCharge Cloud, Portal, and Mobile products.
+                                </p>
+                                <br/>
+                                <h5><a class="mylinks" href="https://help.ebizcharge.com/crm-integrations/odoo-crm/" target="new">EBizCharge for Odoo CRM Knowledge Base</a></h5>
+                                <h5 class="font-weight-bold">Code: ODO975!</h5>
+                                <br/>
+                                <h5><a class="mylinks" href="https://help.ebizcharge.com/ecommerce-integrations/odoo-ecommerce/" target="new">EBizCharge for Odoo eCommerce Knowledge Base</a></h5>
+                                <h5 class="font-weight-bold">Code: ODO975!</h5>
+                                <br/>
+                                <h5><a class="mylinks" href="https://help.ebizcharge.com/ebizcharge/" target="new">EBizCharge Knowledge Base</a></h5>
+                                <h5 class="font-weight-bold">Code: EBIZ975!</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6" style="display: table;">
+                    <div class="p-5 border rounded" style="display: table-cell;">
+                        <div class="row">
+                            <div class="col-lg-3">
+                                <div class="p-4">
+                                    <img class="" src="payment_ebizcharge_crm/static/src/img/Contact_Illustration.svg" alt="Contact"/>
+                                </div>
+                            </div>
+                            <div class="col-lg-9">
+                                <p class="myHeading">Contact EBizCharge Support</p>
+                                <p class="myParagraph mt-3">Contact our in-house Support team available 24/7.</p>
+                                <br/>
+                                <h5 style="font-weight: bold;font-family: europa, sans-serif;">888-500-7798 x 1</h5>
+                                <h5><a class="mylinks" href="mailto:support@ebizcharge.com">support@ebizcharge.com</a></h5>
+                                <br/>
+                                <br/>
+                                <br/>
+                                <br/>
+                                <br/>
+                                <br/>
+                                <br/>
+                                <br/>
+                                <br/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12 mt-5">
+                    <p style="font-size: 15px;font-weight: bold;font-family: europa, sans-serif;">EBizCharge for Odoo version 17.1.0.0</p>
+                    <p class="" style="font-size: 15px;font-family: europa, sans-serif;">We recommend using Chrome as your browser for the best user experience.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </t>
+
+</templates>
