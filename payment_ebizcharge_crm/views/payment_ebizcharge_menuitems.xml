@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+        <record id="teste_google" model="ir.actions.act_url">
+                <field name="name">Give Feedback</field>
+                <field name="type">ir.actions.act_url</field>
+                <field name="target">new</field>
+                <field name="url">https://ebizcharge.sjc1.qualtrics.com/jfe/form/SV_50cDnQaB33CDDXE</field>
+        </record>
+
+
+        <!-- Top menu item -->
+        <menuitem id="ebizcharge_menu_root"
+            name="EBizCharge"
+            sequence="7" web_icon="payment_ebizcharge_crm,static/description/icon.png"/>
+
+
+        <menuitem id="ebiz_upload_menu_main"
+            name="Sync Upload"
+            parent="ebizcharge_menu_root"
+            sequence="3"/>
+
+        <menuitem id="menu_download_ebiz"
+            name="Sync Download"
+            parent="ebizcharge_menu_root"
+            sequence="4"/>
+
+        <menuitem id="ebiz_transactions_menu_main"
+            name="Transactions"
+            parent="ebizcharge_menu_root"
+            sequence="1"/>
+
+        <menuitem id="ebiz_email_template_menu_main"
+            name="Requests"
+            parent="ebizcharge_menu_root"
+            sequence="2"/>
+
+        <menuitem id="setup_menu_main"
+            name="Setup"
+            parent="ebizcharge_menu_root"
+            sequence="6"/>
+
+        <menuitem action="teste_google"
+                  name="Give Feedback"
+                  id="menu_teste_google"
+                  parent="ebizcharge_menu_root"
+                  sequence="9"/>
+
+</odoo>

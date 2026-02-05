@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="emv_device_wizard_form" model="ir.ui.view">
+            <field name="name">wizard.emv.device</field>
+            <field name="model">wizard.emv.device</field>
+            <field name="arch" type="xml">
+                <form string="Configure Device">
+                    <group class="oe_title">
+                            <field name="source_key" widget="eb_device_field_masking"  readonly="1"/>
+                            <field name="pin" password="True" placeholder="************" readonly="1" />
+                            <field name="merchant_id" invisible="1"/>
+                            <field name="emv_device_id" domain="[('merchant_id','=',False)]"
+                                   options="{'no_create': True, 'no_open': True, 'no_quick_create': True}" required="1"/>
+                            <field name="emv_device_key"  readonly="1" />
+                            <field name="is_default_emv" widget="boolean_toggle"/>
+                    </group>
+                    <footer>
+                       <button name="action_add_device" type="object" string="Save" class="btn-primary"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        <record id="emv_device_wizard_form_action" model="ir.actions.act_window">
+            <field name="name">Configure Device</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">wizard.emv.device</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="emv_device_wizard_form"/>
+            <field name="target">new</field>
+        </record>
+    </data>
+</odoo>

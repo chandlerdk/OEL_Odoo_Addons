@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_ebiz_transaction_validation_form" model="ir.ui.view">
+            <field name="name">wizard.order.process.transaction</field>
+            <field name="model">wizard.ebiz.transaction.validation</field>
+            <field name="arch" type="xml">
+                <form style="color:red">
+                    <script>
+                            $(document).ready(function(){
+                            $('.btn-close').css({'visibility': 'hidden'});
+                            });
+                    </script>
+                    <field invisible="1" name="check_avs_match" readonly="1"/>
+                    <field invisible="1" name="is_card_denied"/>
+                    <field invisible="1" name="full_amount_avs"/>
+                    <group invisible="check_avs_match or is_card_denied">
+                        <field invisible="address in ['Match']" name="address" readonly="1" style="color:red"/>
+                        <field invisible="address not in ['Match']" name="address" readonly="1"/>
+                        <field invisible="zip_code in ['Match']" name="zip_code" readonly="1" style="color:red"/>
+                        <field invisible="zip_code not in ['Match']" name="zip_code" readonly="1"/>
+                        <field invisible="card_code in ['Match']" name="card_code" readonly="1" style="color:red"/>
+                        <field invisible="card_code not in ['Match']" name="card_code" readonly="1"/>
+                    </group>
+                    <p invisible="check_avs_match or is_card_denied">
+                        This transaction was successfully processed, but it could result in a chargeback.
+                        <br/>
+                        Do you still wish to accept?
+                    </p>
+                    <p invisible="not is_card_denied">
+                        Transaction Declined with a reason (<field name="denied_message" nolabel="1" readonly="1"/>)
+                    </p>
+                    <footer>
+                        <button class="oe_highlight" invisible="check_avs_match or full_amount_avs" name="update_and_retry" string="Update Info and Retry" type="object"/>
+                        <button class="oe_highlight" invisible="check_avs_match or is_card_denied" name="proceed_with_transaction" string="Accept Transaction Anyway" type="object"/>
+                        <button class="oe_highlight" invisible="check_avs_match" name="void_transaction" string="Cancel Transaction" type="object"/>
+                        <button class="oe_highlight" invisible="not check_avs_match" special="cancel" string="OK"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_ebiz_transaction_validation_form" model="ir.actions.act_window">
+            <field name="name">Security Mismatch</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">wizard.ebiz.transaction.validation</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_ebiz_transaction_validation_form"/>
+            <field name="target">new</field>
+        </record>
+
+    </data>
+</odoo>
