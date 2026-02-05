@@ -1,0 +1,438 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="portal_my_home_payment_ebiz" name="Show Borrows" customize_show="True"
+                  inherit_id="portal.portal_my_home">
+            <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+                <t t-if="methods_allowing_tokenization or existing_tokens" t-call="portal.portal_docs_entry">
+                    <t t-set="icon" t-value="'/payment/static/img/payment-methods.svg'"/>
+                    <t t-set="title">EBizCharge Payment methods</t>
+                    <t t-set="text">Manage your payment methods</t>
+                    <t t-set="url" t-value="'/my/ebiz_payment_method'"/>
+                    <t t-set="config_card" t-value="True"/>
+                </t>
+            </xpath>
+        </template>
+        <!-- Display of /my/ebiz_payment_methods -->
+        <template id="payment_ebizcharge_portal.payment_methods" name="Payment Methods">
+            <t t-call="portal.frontend_layout">
+                <t t-set="page_title" t-value="'Payment Methods'"/>
+                <t t-set="allow_token_deletion" t-value="allow_token_deletion or False"/>
+                <t t-set="additional_title">
+                    <t t-esc="page_title"/>
+                </t>
+                <div id="o_ebiz_payment_form" class="wrap">
+                    <div class="container">
+                        <!-- Portal breadcrumb -->
+                        <t t-call="payment.portal_breadcrumb"/>
+                        <!-- Payment methods page -->
+                        <div class="row justify-content-left">
+                            <div class="col-lg-8 card-header border">
+                                <input type="hidden" name="data_set"
+                                           data-create-route="/payment/ebizcharge/s2s/create_json_3ds"/>
+                                <input type="hidden" name="provider_id" t-att-value="id"/>
+                                <input type="hidden" name="providerid" id="ebiz_provider_id" t-att-value="providerid"/>
+                                <input type="hidden" name="token_save_box_acc" t-att-value="true"/>
+                                <input type="hidden" id="new_account_tab_id" value="new_card" name="new_account_tab"/>
+                                <input type="hidden" name="token_save_box_credit" t-att-value="true"/>
+                                <input type="hidden" name="is_ebiz_manage_screen" id="is_ebiz_manage_screen"
+                                       t-att-value="true"/>
+                                <input t-if="return_url" type="hidden" name="return_url" t-att-value="return_url"/>
+                                <input t-if="partner_id" type="hidden" name="partner_id" t-att-value="partner_id"/>
+                                <input type="hidden" name="card_type" id="card_type" class="form-control"/>
+                                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                                    <li t-if="showCreditCards == True" class="nav-item">
+                                        <a class="nav-link active" id="card-tab" data-bs-toggle="tab"
+                                           href="#addCardDetails" role="tab" aria-controls="home" aria-selected="true">
+                                            Add Card
+                                        </a>
+                                    </li>
+                                    <li t-if="showACH == True and logIn == True" class="nav-item">
+                                        <a class="nav-link" id="account-tab" data-bs-toggle="tab"
+                                           href="#addBankAccountDetails" role="tab" aria-controls="profile"
+                                           aria-selected="false" value="1">Add Account
+                                        </a>
+                                    </li>
+                                </ul>
+                                <input type="hidden" name="addCardBank" class="form-control"/>
+                                <input type="hidden" name="authorizeOnly" class="form-control" t-att-value="authOnly"/>
+                                <input type="hidden" name="showCreditCards" class="form-control"
+                                       t-att-value="showCreditCards"/>
+                                <div class="tab-content mt-3" id="myTabContent">
+                                    <div t-if="showCreditCards == True"
+                                         class="box mt8 bootstrap_formatting tab-pane fade show active"
+                                         aria-labelledby="card-tab" id="addCardDetails">
+
+                                        <div class="mb-3 col-md-6" t-att-class="'form-group col-md-6 mb-3 card-number' if bootstrap_formatting else 'form-group col-md-6 mb-3 card-number'">
+                                            <input type="text" name="card_number" id="cc_number"
+                                                   class="form-control"
+                                                   placeholder="Card Number" data-is-required="true" required="1"/>
+                                            <span id="creditcard-keyup"></span>
+                                            <div class="card_placeholder"></div>
+                                            <div class="visa"></div>
+                                            <input type="hidden" name="cc_brand" value=""/>
+                                        </div>
+                                        <div class="mb-3 col-md-6" t-att-class="'form-group col-md-6 mb-3' if bootstrap_formatting else 'form-group col-md-6 mb-3'">
+                                            <input type="text" name="account_holder_name" id="cc_holder_name"
+                                                   class="form-control"
+                                                   placeholder="Cardholder Name" maxlength="50"
+                                                   data-is-required="true"
+                                                   required="1"/>
+                                        </div>
+                                        <div class="mb-3 col-md-6" t-att-class="'form-group col-md-6 mb-3 avs-street' if bootstrap_formatting else 'form-group col-md-6 mb-3 avs-street'">
+                                            <input type="text" name="avs_street" id="avs_street"
+                                                   class="form-control"
+                                                   placeholder="Billing Address" data-is-required="true"
+                                                   required="1"/>
+                                        </div>
+                                        <div class="mb-3 col-md-6" t-att-class="'form-group col-md-6 mb-3 zip-code' if bootstrap_formatting else 'form-group col-md-6 mb-3 zip-code'">
+                                            <input type="text" name="avs_zip" id="avs_zip" class="form-control"
+                                                   placeholder="Zip / Postal Code" maxlength="15"
+                                                   data-is-required="true" required="1"/>
+                                        </div>
+                                        <div class="mb-3 col-md-4" t-att-class="'form-group col-md-6 mb-3 cc-expiry' if bootstrap_formatting else 'form-group col-md-6 mb-3 cc-expiry'">
+                                            <input type="text" name="card_expiration" id="cc_expiry"
+                                                   class="form-control"
+                                                   placeholder="Expires (MM/YY)" data-is-required="true"
+                                                   maxlength="7"
+                                                   required="1"/>
+                                            <span id="card_expiration-keyup"></span>
+                                        </div>
+                                        <div class="mb-3 col-md-4" t-att-class="'form-group col-md-6 mb-3 cc-cvc' if bootstrap_formatting else 'form-group col-md-6 mb-3 cc-cvc'">
+                                            <input type="text" name="card_code" id="cc_cvc" class="form-control"
+                                                   maxlength="4" placeholder="CVC" t-att-data-is-required="VerifyCreditCardBeforeSaving"
+                                                   required="1"/>
+                                            <input type="hidden" id="verify_credit_card_before_saving"
+                                                    t-att-value="VerifyCreditCardBeforeSaving"/>
+                                            <input type="hidden" name="token_save_box_credit"
+                                                   id="token_save_box_credit"
+                                                   t-att-value="true"/>
+                                            <input type="hidden" name="is_ebiz_manage_screen"
+                                                   id="is_ebiz_manage_screen"
+                                                   t-att-value="true"/>
+                                            <input type="hidden" name="update_pm_id" id="update_pm_id"
+                                                   class="form-control" placeholder="Record ID"
+                                                   t-att-value="update_pm_id"/>
+                                        </div>
+                                        <div t-if="logIn == True"
+                                             t-att-class="'form-group col-md-6' if bootstrap_formatting else 'form-group col-md-6'">
+                                            <label><input type="checkbox" class="default_check"
+                                                          name="default_card_method" id="default_card_method"/>Make
+                                                default payment method
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div t-if="showACH == True and logIn == True"
+                                         class="box mt8 bootstrap_formatting tab-pane fade"
+                                         aria-labelledby="account-tab" id="addBankAccountDetails">
+                                        <div class="mb-3 col-md-6" t-att-class="'form-group col-md-6 mb-3 bank-account-name' if bootstrap_formatting else 'form-group col-md-6 mb-3 bank-account-name'">
+                                            <input type="text" name="bank_account_holder_name"
+                                                   id="bank_account_holder_name" class="form-control"
+                                                   placeholder="Account Holder Name" maxlength="50"
+                                                   data-is-required="true" required="1"/>
+                                        </div>
+                                        <div class="mb-3 col-md-6" t-att-class="'form-group col-md-6 mb-3 bank-account-type' if bootstrap_formatting else 'form-group col-md-6 mb-3 bank-account-type'">
+                                            <select name="bank_account_type" id="bank_account_type"
+                                                    class="form-control">
+                                                <option value="Checking">Checking</option>
+                                                <option value="Savings">Savings</option>
+                                            </select>
+                                            <input type="hidden" name="token_save_box_acc" id="token_save_box_acc"
+                                                   t-att-value="true"/>
+                                            <input type="hidden" name="update_pm_id" id="update_pm_id"
+                                                   class="form-control" placeholder="Record ID"
+                                                   t-att-value="update_pm_id"/>
+                                        </div>
+                                        <div class="mb-3 col-md-6" t-att-class="'form-group col-md-4 mb-3 account-number1' if bootstrap_formatting else 'form-group col-md-4 mb-3 account-number1'">
+                                            <input type="text" name="account_number" id="account_number"
+                                                   class="form-control"
+                                                   placeholder="Account Number" data-is-required="true"
+                                                   required="1"/>
+                                            <div class="bank_placeholder"></div>
+                                        </div>
+                                        <div class="mb-3 col-md-6" t-att-class="'form-group col-md-4 mb-3 routing-number' if bootstrap_formatting else 'form-group col-md-4 mb-3 routing-number'">
+                                            <input type="text" name="routing_number" id="routing_number"
+                                                   class="form-control"
+                                                   placeholder="Routing Number" data-is-required="true"
+                                                   required="1"/>
+                                        </div>
+                                        <div class="mb-3 col-md-6">
+                                            <label>
+                                                <input type="checkbox" class="default_check"
+                                                       name="default_account_method" id="default_account_method"/>
+                                                Make default payment method
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <button name="ebiz_submit_button" id="add_new_ebiz_card" class="btn btn-primary"
+                                                type="submit">Save
+                                        </button>
+                                        <button name="ebiz_cancel_button" special="cancel" class="btn btn-secondary">
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="row" t-if="showACH == True or showCreditCards == True and logIn == True">
+                                    <button t-if="logIn == True" onclick="myFunction()" type="button"
+                                            class="col btn btn-link">Show/Hide Saved Payment Methods
+                                    </button>
+                                    <button t-if="logIn == True" name="refresh_payment_tokens" type="button"
+                                            icon="fa-refresh" style="background-color:#EFEFEF; float: right;"
+                                            class="col btn">Refresh Payment Methods
+                                    </button>
+                                </div>
+
+
+                                <div class="row">
+                                    <input type="hidden" name="token_save_box_acc" t-att-value="true"/>
+                                    <input type="hidden" name="token_save_box_credit" t-att-value="true"/>
+                                    <input type="hidden" name="is_ebiz_manage_screen" t-att-value="true"/>
+                                    <!-- === EBizCharge Credit Cards === -->
+                                    <div t-if="showCreditCards == True and logIn == True" class="card-header border"
+                                         id="CreditCards">
+                                        <strong>EBizCharge Credit Cards</strong>
+                                    </div>
+                                    <div t-if="showCreditCards == True and logIn == True" class="card-body"
+                                         id="CreditCardsDetails">
+                                        <table class="table table-borderless">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">Name on Card</th>
+                                                    <th scope="col">Card Type &amp; Number</th>
+                                                    <th scope="col">Expiration Date</th>
+                                                    <th scope="col" class="text-center">Default Payment Method</th>
+                                                    <th scope="col" class="text-center">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <t t-foreach="tokens" t-as="token">
+                                                    <t t-if="token.token_type == 'credit' and token.provider_id.code == 'ebizcharge'">
+                                                        <tr class="o_payment_provider_select">
+                                                            <td>
+                                                                <label style="width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                                                                    <input name="o_payment_radio"
+                                                                           type="radio"
+                                                                           t-att-checked="token.id == default_payment_option_id"
+                                                                           t-att-data-payment-option-id="token.id"
+                                                                           t-att-data-provider="token.provider_code"
+                                                                           data-payment-option-type="token"
+                                                                           t-att-value="'%s-%s' % (token.id, 'ebizcharge')"
+                                                                    />
+                                                                    <span class="payment_option_name"
+                                                                          t-esc="token.account_holder_name"/>
+                                                                    <input type="hidden" name="card_acquirer_name"
+                                                                           id="card_acquirer_name" class="form-control"
+                                                                           t-att-value="token.provider_id.code"/>
+                                                                </label>
+                                                            </td>
+                                                            <td>
+                                                                <label>
+                                                                    <span t-set="logo" t-if="token.image and token.card_type == 'M'"
+                                                                          style="font-size:24px;color:#000080"
+                                                                          class="fa fa-cc-mastercard"/>
+                                                                    <span t-set="logo" t-if="token.image and token.card_type == 'V'"
+                                                                          style="font-size:24px;color:#000080"
+                                                                          class="fa fa-cc-visa"/>
+                                                                    <span t-set="logo" t-if="token.image and token.card_type == 'A'"
+                                                                          style="font-size:24px;color:#000080"
+                                                                          class="fa fa-cc-amex"/>
+                                                                    <span t-set="logo" t-if="token.image and token.card_type == 'DN'"
+                                                                          style="font-size:24px;color:#000080"
+                                                                          class="fa fa-cc-diners-club"/>
+                                                                    <span t-set="logo" t-if="token.image and token.card_type == 'J'"
+                                                                          style="font-size:24px;color:#000080"
+                                                                          class="fa fa-cc-jcb"/>
+                                                                    <span t-set="logo" t-if="token.image and token.card_type == 'DS'"
+                                                                          style="font-size:24px;color:#000080"
+                                                                          class="fa fa-cc-discover"/>
+                                                                    <span t-field="token.card_number_ecom"/>
+                                                                </label>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <label>
+                                                                    <span class="payment_option_name"
+                                                                          t-esc="token.card_exp_date"/>
+                                                                </label>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <label>
+                                                                    <t t-if="token.is_default">
+                                                                        <i class="fa fa-check fa-lg text-success"
+                                                                           title="This payment method is set as a default payment method."
+                                                                           role="img" aria-label="Ok"></i>
+                                                                    </t>
+                                                                    <t t-else="">
+                                                                        <i class="fa fa-check fa-lg text-muted"
+                                                                           title="This payment method has not been verified by our system."
+                                                                           role="img" aria-label="Not verified"></i>
+                                                                    </t>
+                                                                </label>
+                                                            </td>
+                                                            <td class="text-center d-flex" style="width:150px">
+                                                                <a href="#card-tab">
+                                                                    <button style="background-color: none; border: none;"
+                                                                            t-if="token.ebizcharge_profile != false"
+                                                                            name="update_ebiz_card"
+                                                                            t-att-value="token.id"
+                                                                            class="btn btn-outline-primary mr-2 update_ebiz_card">
+                                                                        <i class="fa fa-pencil fa-lg"
+                                                                           title="Update payment method"
+                                                                           data-bs-toggle="tooltip"
+                                                                           data-bs-placement="top"
+                                                                           data-bs-delay="0"
+                                                                        />
+                                                                    </button>
+                                                                </a>
+                                                                <button style="background-color: none; border: none;"
+                                                                        name="delete_ebiz_pm" t-att-value="token.id"
+                                                                        class="btn btn-outline-primary delete_pm">
+                                                                    <i class="fa fa-trash"
+                                                                       title="Delete payment method"
+                                                                       data-bs-toggle="tooltip"
+                                                                       data-bs-placement="top"
+                                                                       data-bs-delay="0"
+                                                                    />
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                        <!--                                                    </t>-->
+                                                    </t>
+                                                </t>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!-- === EBizCharge Bank Accounts === -->
+                                    <div t-if="showACH == True and logIn == True" class="card-header border"
+                                         id="BankAccounts">
+                                        <strong>EBizCharge Bank Accounts</strong>
+                                    </div>
+                                    <div t-if="showACH == True and logIn == True" class="card-body"
+                                         id="BankAccountsDetails">
+                                        <table class="table table-borderless">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">Name on Account</th>
+                                                    <th scope="col">Account Type &amp; Number</th>
+                                                    <th scope="col text-center">Default Payment Method</th>
+                                                    <th scope="col" class="text-center">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+
+                                                <t t-foreach="tokens" t-as="token">
+                                                    <t t-if="token.token_type == 'ach' and token.provider_id.code == 'ebizcharge'">
+                                                        <tr class="o_payment_provider_select">
+                                                            <td>
+                                                                <label style="width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                                                                    <input name="o_payment_radio"
+                                                                           type="radio"
+                                                                           t-att-checked="token.id == default_payment_option_id"
+                                                                           t-att-data-payment-option-id="token.id"
+                                                                           t-att-data-provider="token.provider_code"
+                                                                           data-payment-option-type="token"/>
+                                                                    <span class="payment_option_name"
+                                                                          t-esc="token.account_holder_name"/>
+                                                                    <input type="hidden"
+                                                                           name="account_acquirer_name"
+                                                                           id="account_acquirer_name"
+                                                                           class="form-control"
+                                                                           t-att-value="token.provider_id.code"/>
+                                                                </label>
+                                                            </td>
+                                                            <td>
+                                                                <label>
+                                                                    <i class="fa fa-bank fa-lg text-muted"
+                                                                       role="img">
+                                                                        <span class="payment_option_name"
+                                                                              t-esc="token.account_number_ecom"/>
+                                                                    </i>
+                                                                </label>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <label>
+                                                                    <t t-if="token.is_default">
+                                                                        <i class="fa fa-check fa-lg text-success"
+                                                                           title="This payment method is set as a default payment method."
+                                                                           role="img" aria-label="Ok"></i>
+                                                                    </t>
+                                                                    <t t-else="">
+                                                                        <i class="fa fa-check fa-lg text-muted"
+                                                                           title="This payment method has not been verified by our system."
+                                                                           role="img" aria-label="Not verified"></i>
+                                                                    </t>
+                                                                </label>
+                                                            </td>
+                                                            <td class="text-center d-flex" style="width:150px">
+                                                                <button style="background-color: none; border: none;"
+                                                                        t-if="token.ebizcharge_profile != false"
+                                                                        name="update_ebiz_account"
+                                                                        t-att-value="token.id"
+                                                                        class="btn btn-outline-primary mr-2 update_ebiz_account">
+                                                                    <i class="fa fa-pencil fa-lg"
+                                                                       title="Update payment method"
+                                                                       data-bs-toggle="tooltip"
+                                                                       data-bs-placement="top"
+                                                                       data-bs-delay="0"
+                                                                    />
+                                                                </button>
+                                                                <button style="background-color: none; border: none;"
+                                                                        name="delete_ebiz_pm" t-att-value="token.id"
+                                                                        class="btn btn-outline-primary delete_pm">
+                                                                    <i class="fa fa-trash"
+                                                                       title="Delete payment method"
+                                                                       data-bs-toggle="tooltip"
+                                                                       data-bs-placement="top"
+                                                                       data-bs-delay="0"
+                                                                    />
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    </t>
+                                                </t>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!-- === Tokens === -->
+                                    <t t-foreach="tokens" t-as="token">
+                                        <t t-if="token.provider_id.code != 'ebizcharge'">
+                                            <div name="o_payment_option_card" class="card-body o_payment_option_card">
+                                                <label>
+                                                    <!-- === Radio button === -->
+                                                    <!-- Only shown if 'assign_token_route' is set -->
+                                                    <input name="o_payment_radio"
+                                                           type="radio"
+                                                           t-att-checked="token.id == default_payment_option_id"
+                                                           t-att-class="'' if bool(assign_token_route) else 'd-none'"
+                                                           t-att-data-payment-option-id="token.id"
+                                                           t-att-data-provider="token.provider_code"
+                                                           data-payment-option-type="token"/>
+                                                    <!-- === Token name === -->
+                                                    <span class="payment_option_name" t-esc="token.display_name"/>
+                                                    <!-- === "V" check mark === -->
+                                                    <t t-call="payment.verified_token_checkmark"/>
+                                                </label>
+                                                <!-- === "Delete" token button === -->
+                                                <button name="o_payment_delete_token"
+                                                        class="btn btn-primary btn-sm float-right">
+                                                    <i class="fa fa-trash"/>
+                                                    Delete
+                                                </button>
+                                            </div>
+                                            <!-- === Token inline form === -->
+                                            <div t-attf-id="o_payment_token_inline_form_{{token.id}}"
+                                                 name="o_payment_inline_form"
+                                                 class="card-footer d-none"/>
+                                        </t>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </template>
+    </data>
+</odoo>
