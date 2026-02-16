@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <record id="send_email_invoice_wizard" model="ir.ui.view">
+            <field name="name">Email Pay Request</field>
+            <field name="model">email.invoice</field>
+            <field name="priority" eval="8"/>
+            <field name="arch" type="xml">
+                <form string="Email Pay Request" create="false" edit="false">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="currency_id" invisible="1"/>
+                                <field name="partner_ids" widget="many2many_tags" readonly="context.get('default_selection_check', True)"/>
+                                <field name="email_customer" string="Customer Email" invisible="context.get('default_selection_check')" readonly='0' required="1"/>
+                                <field name="amount" options="{'currency_field': 'currency_id'}" widget="monetary"/>
+                                <field name="select_template" required="1" domain="[('instance_id', '=', ebiz_profile_id), ('template_type_id', '=', 'WebFormEmail')]" options="{'no_create': True, 'no_quick_create': True, 'no_create_edit':True,'no_open':True}"/>
+                                <field name="email_subject" readonly="1"/>
+                                <field name="ebiz_profile_id" invisible="1"/>
+                            </group>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button name="send_email" type="object" string="Send Email" class="oe_highlight" />
+                        <button string="Cancel" special="cancel" style="width:10%"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+    </data>
+</odoo>

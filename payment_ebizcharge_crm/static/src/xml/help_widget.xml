@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates id="template" xml:space="preserve">
+    <div t-name="PopoverdefaultHelptemplate">
+        <p>
+            The default merchant account will be used if a customer without a merchant account is uploaded or payment is taken on an associated
+            record. A default merchant account is required, and there can only be one default. The default merchant account cannot be attached to a
+            company. If there is only one merchant account it is automatically the default account.
+        </p>
+    </div>
+</templates>

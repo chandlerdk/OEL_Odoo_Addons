@@ -1,0 +1,36 @@
+<odoo>
+    <data>
+        <record id="wizard_card_expiring_view" model="ir.ui.view">
+            <field name="name">Please Select</field>
+            <field name="model">wizard.cards.expiring.soon</field>
+            <field name="arch" type="xml" >
+                <form string="Add New Card">
+                    <div class="row">
+                        <div class="col-4">
+                            <label for="date_selection"  string="Display customers with saved card(s) expiring?"/>
+                        </div>
+                        <div class="col-8">
+                            <field name="date_selection" required="1" nolabel="1" style="width:80%;"/>
+                        </div>
+                    </div>
+                    <footer>
+                        <div align="right">
+                            <button string="Apply" class="oe_highlight" name="apply_filters" type="object"
+                                    style="margin-right: 30px !important;padding-right: 15px !important;padding-left: 15px !important;"/>
+                            <button string="Cancel" special="cancel" />
+                        </div>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_card_expiring_soon" model="ir.actions.act_window">
+            <field name="name">Please Select</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">wizard.cards.expiring.soon</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="wizard_card_expiring_view"/>
+            <field name="target">new</field>
+        </record>
+    </data>
+</odoo>

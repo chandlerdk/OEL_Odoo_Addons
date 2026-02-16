@@ -1,0 +1,38 @@
+<odoo>
+    <data>
+
+        <record id="view_wizard_add_new_ach_form" model="ir.ui.view">
+            <field name="name">wizard.add.new.ach.form</field>
+            <field name="model">wizard.add.new.ach</field>
+            <field name="arch" type="xml" >
+                <form string="Add New Bank Account">
+                    <group>
+                        <group>
+                            <field name="ach_account_holder_name" required="1" />
+                            <field name="ach_account_type" required="1"/>
+                        </group>
+                        <group>
+                            <field name="ach_account_number" required="1"/>
+                            <field name="ach_routing" required="1"/>
+                            <field name="make_default_card" widget="boolean_toggle"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button string="Save" class="oe_highlight" type="object" name="save_ach"/>
+                        <button string="Cancel" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_wizard_add_new_ach" model="ir.actions.act_window">
+            <field name="name">Add New Bank Account</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">wizard.add.new.ach</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_wizard_add_new_ach_form"/>
+            <field name="target">new</field>
+        </record>
+
+    </data>
+</odoo>

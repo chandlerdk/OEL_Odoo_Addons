@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_wizard_add_new_card_form" model="ir.ui.view">
+            <field name="name">wizard.add.new.card.form</field>
+            <field name="model">wizard.add.new.card</field>
+            <field name="arch" type="xml">
+                <form string="Add New Card">
+                    <group>
+                        <group>
+                            <field name="card_account_holder_name" required="1"/>
+                            <field name="card_card_number" required="1"/>
+                            <field invisible="1" name="required_security_code"/>
+                            <label for="card_exp_month" string="Expiration Date *"/>
+                            <div class="o_address_format">
+                                <field name="card_exp_month" placeholder="MM" required="1" style="width:48%; margin-right:2%;"/>
+                                <field name="card_exp_year" placeholder="YYYY" required="1" style="width:48%; margin-left:1%;"/>
+                            </div>
+                            <label for="card_card_code" invisible="not required_security_code" string="Security Code *"/>
+                            <label for="card_card_code" invisible="required_security_code" string="Security Code"/>
+                            <field name="card_card_code" nolabel="1" required="required_security_code"/>
+                        </group>
+                        <group>
+                            <field name="card_avs_street" required="1"/>
+                            <field name="card_avs_zip" required="1"/>
+                            <field name="make_default_card" widget="boolean_toggle"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button class="oe_highlight" name="save_card" string="Save" type="object"/>
+                        <button special="cancel" string="Cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_wizard_add_new_card" model="ir.actions.act_window">
+            <field name="name">Add New Card</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">wizard.add.new.card</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_wizard_add_new_card_form"/>
+            <field name="target">new</field>
+        </record>
+
+        <record id="wizard_validate_default_view_form" model="ir.ui.view">
+            <field name="name">message.wizard</field>
+            <field name="model">wizard.validate.default</field>
+            <field name="arch" type="xml">
+                <form string="Message">
+                    <field name="text" nolabel="1" readonly="1"/>
+                    <footer>
+                        <button class="oe_highlight" name="accept_default" string="Yes" style="width:10%" type="object"/>
+                        <button name="reject_default" string="No" style="width:10%" type="object"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_wizard_validate_default" model="ir.actions.act_window">
+            <field name="name">Please Confirm</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">wizard.validate.default</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="wizard_validate_default_view_form"/>
+            <field name="target">new</field>
+        </record>
+
+        <record id="wizard_validate_default_view_form_on_create" model="ir.ui.view">
+            <field name="name">message.wizard</field>
+            <field name="model">wizard.validate.default</field>
+            <field name="arch" type="xml">
+                <form string="Message">
+                    <field name="text" nolabel="1" readonly="1"/>
+                    <footer>
+                        <button class="oe_highlight" name="accept_default_on_create" string="Yes" style="width:10%" type="object"/>
+                        <button name="reject_default_on_create" string="No" style="width:10%" type="object"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_wizard_validate_default_on_create" model="ir.actions.act_window">
+            <field name="name">Please Confirm</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">wizard.validate.default</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="wizard_validate_default_view_form_on_create"/>
+            <field name="target">new</field>
+        </record>
+
+    </data>
+</odoo>

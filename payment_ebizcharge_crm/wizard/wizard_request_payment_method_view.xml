@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+
+        <record id="wizard_ebiz_request_payment_method_view" model="ir.ui.view">
+            <field name="name">Request Payment Method</field>
+            <field name="model">wizard.ebiz.request.payment.method</field>
+            <field name="priority" eval="8"/>
+            <field name="arch" type="xml">
+                <form string="Request Payment Method" create="false" >
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="partner_id" widget="many2many_tags" readonly="context.get('default_selection_check', True)"/>
+                                <field name="email" invisible="context.get('default_selection_check')" required='1'/>
+
+                                <field name="cc_option" invisible="1"/>
+                                <field name="ach_option" invisible="1"/>
+
+                                <field name="payment_method_type" required='1' invisible="not cc_option or not ach_option" />
+                                <field name="payment_method_type_cc" required='1' invisible="not cc_option or ach_option" />
+                                <field name="payment_method_type_ach" required='1' invisible="not ach_option or cc_option" />
+
+                                <field name="ebiz_profile_id" invisible='1' />
+                                <field name="select_template" required="1" domain="[('template_type_id', '=', 'AddPaymentMethodFormEmail'), ('instance_id', '=', ebiz_profile_id)]" options="{'no_create': True, 'no_quick_create': True, 'no_create_edit':True,'no_open':True}"/>
+                                <field name="subject" readonly="1"/>
+                                <field name="email_note"/>
+                            </group>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button name="send_email" type="object" string="Send Request" class="oe_highlight" />
+                        <button string="Cancel" special="cancel" style="width:10%"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_wizard_ebiz_request_payment_method" model="ir.actions.act_window">
+            <field name="name">Request Payment Method</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">wizard.ebiz.request.payment.method</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="wizard_ebiz_request_payment_method_view"/>
+            <field name="target">new</field>
+        </record>
+
+        <record id="wizard_ebiz_request_payment_method_view_bulk" model="ir.ui.view">
+            <field name="name">Request Payment Method</field>
+            <field name="model">wizard.ebiz.request.payment.method.bulk</field>
+            <field name="priority" eval="8"/>
+            <field name="arch" type="xml">
+                <form string="Request Payment Method">
+                    <sheet>
+                        <div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <div>
+                                        <field name="partner_id" options="{'no_open': True}" nolabel="1">
+                                            <tree editable="bottom"  edit="1" create="false">
+                                                <field name="id" column_invisible="1"/>
+                                                <field name="name" />
+                                                <field name="email"/>
+                                            </tree>
+                                        </field>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <group>
+
+                                        <field name="cc_option" invisible="1"/>
+                                        <field name="ach_option" invisible="1"/>
+
+                                         <field name="payment_method_type" required='1' invisible="not cc_option or not ach_option" />
+                                         <field name="payment_method_type_cc" required='1' invisible="not cc_option or ach_option" />
+                                         <field name="payment_method_type_ach" required='1' invisible="not ach_option or cc_option" />
+
+                                        <field name="select_template" required="1" domain="[('instance_id', '=', ebiz_profile_id),('template_type_id', '=', 'AddPaymentMethodFormEmail')]" options="{'no_create': True, 'no_quick_create': True, 'no_create_edit':True,'no_open':True}"/>                                        <field name="subject" readonly="1"/>
+                                        <field name="email_note"/>
+                                        <field name="ebiz_profile_id" invisible="1"/>
+                                    </group>
+                                </div>
+                            </div>
+                        </div>
+                    </sheet>
+                    <footer>
+                        <button name="send_email" type="object" string="Send Request" class="oe_highlight" />
+                        <button string="Cancel" special="cancel" style="width:10%"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_wizard_ebiz_request_payment_method_bulk" model="ir.actions.act_window">
+            <field name="name">Request Payment Method</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">wizard.ebiz.request.payment.method.bulk</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="wizard_ebiz_request_payment_method_view_bulk"/>
+            <field name="target">new</field>
+        </record>
+
+    </data>
+</odoo>

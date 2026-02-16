@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <data noupdate="1">
+            <record id="my_record_11" model="sale.order.payment.link.bulk">
+                <field name="add_filter">0</field>
+            </record>
+        </data>
+        <record id="form_view_sale_order_payment_link_bulk" model="ir.ui.view">
+            <field name="name">Sale Order Payment Link Bulk</field>
+            <field name="model">sale.order.payment.link.bulk</field>
+            <field name="arch" type="xml">
+                <form create="0" js_class="ebiz_custom_form" string="Sale Order Payment Link Bulk">
+                    <h1>
+                        Generate Payment Links for Sales Orders
+                    </h1>
+                    <br/>
+                    <group>
+                        <group>
+                            <label class="text-nowrap" for="ebiz_profile_id" string="EBizCharge Merchant Account"/>
+                            <field domain="[('is_valid_credential', '=', True), ('is_active', '=', True), ('is_active', '=', True), '|', ('company_ids', 'in', company_ids), ('company_ids', '=', False)]" name="ebiz_profile_id" nolabel="1" options="{'no_create': True, 'no_open': True, 'no_quick_create': True}" string="EBizCharge Merchant Account"/>
+                            <field name="start_date"/>
+                            <field name="number"/>
+                            <field invisible="1" name="company_ids"/>
+                        </group>
+                        <group>
+                            <field name="partner_id" options="{'no_create': True, 'no_open': True, 'no_quick_create': True}"/>
+                            <field name="end_date"/>
+                            <field name="generated_link_status"/>
+                        </group>
+                    </group>
+                    <button class="oe_highlight" name="create_default_records" string="Refresh" type="object"/>
+                    <field invisible="not sale_order_lines" mode="tree" name="sale_order_lines" widget="so_payment_link_ebiz">
+                        <tree create="false" delete="0" limit="15" no_open="1" string="Sale Order">
+                            <field column_invisible="1" name="id"/>
+                            <field column_invisible="1" name="currency_id"/>
+
+                            <field name="customer_id" readonly="1" string="Customer ID"/>
+                            <field name="partner_id" readonly="1" string="Customer"/>
+                            <field name="order_id" readonly="1" string="Number"/>
+                            <field name="date_order" readonly="1" string="Order Date"/>
+                            <field name="transaction_type" readonly="1" string="Transaction Type"/>
+                            <field name="amount_total_signed"
+                                   options="{'currency_field': 'currency_id'}"
+                                   string="Order Total" widget="monetary"/>
+                            <field name="amount_residual_signed"
+                                   options="{'currency_field': 'currency_id'}"
+                                   string="Balance Remaining" widget="monetary"/>
+                            <!--                            <field name="transaction_type" readonly="0"/>-->
+                            <field name="request_amount"/>
+                            <field name="generated_link" options="{'string': 'Copy Link'}" widget="CopyClipboardChar"/>
+                            <field column_invisible="1" name="so_payment_link"/>
+                        </tree></field>
+                    <div invisible="sale_order_lines">
+                        <div class="empty_div_setting">
+                            <div class="o_view_nocontent">
+                                <div class="o_nocontent_help">
+                                    <p class="o_view_nocontent_smiling_face" style="margin-top: 60%;">
+                                        No Order(s) Found.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form></field>
+        </record>
+        <record id="sale_order_payment_link_bulk_act" model="ir.actions.act_window">
+            <field name="name">Generate Payment Links for Sale Orders</field>
+            <field name="res_model">sale.order.payment.link.bulk</field>
+            <field name="res_id" ref="my_record_11"/>
+            <field name="target">inline</field>
+            <field name="view_mode">form,tree</field>
+        </record>
+         <menuitem action="sale_order_payment_link_bulk_act" id="sale_order_payment_link_bulk_menu"
+                   name="Generate Payment Links for Sales Orders" parent="ebiz_email_template_menu_main" sequence="2"/>
+
+    </data>
+</odoo>

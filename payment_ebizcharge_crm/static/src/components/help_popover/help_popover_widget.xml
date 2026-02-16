@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<template id="template" xml:space="preserve">
+
+    <t t-name="payment_ebizcharge_crm.buttonhelp" owl="1">
+        <div>
+            <a t-on-mouseenter="showPopup" t-on-mouseleave="closePopup" tabindex="0" t-attf-class="p-1 fa #{ icon || 'fa-info-circle'} #{ color || 'text-primary'}"/>
+        </div>
+    </t>
+
+    <!-- TODO: rename this to QtyAtDatePopup in master version -->
+    <t t-name="payment_ebizcharge_crm.HelpPopOvertemplate" owl="1">
+         <div style="width:300px; padding:5px;">
+            The default merchant account will be used if a customer without a merchant account is uploaded or payment is taken on an associated
+            record. A default merchant account is required, and there can only be one default. The default merchant account cannot be attached to a
+            company. If there is only one merchant account it is automatically the default account.
+        </div>
+    </t>
+</template>

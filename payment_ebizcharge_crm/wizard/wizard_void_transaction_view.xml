@@ -1,0 +1,31 @@
+<odoo>
+    <data>
+
+        <record id="view_ebiz_transaction_void_form" model="ir.ui.view">
+            <field name="name">wizard.ebiz.transaction.void</field>
+            <field name="model">wizard.ebiz.transaction.void</field>
+            <field name="arch" type="xml" >
+                <form string="Security Mismatch" style="color:red">
+                    <group>
+                        <p>Are you sure you want to void this transaction?</p>
+                        <field name="ref_no" string="Reference Number" readonly="1"/>
+                    </group>
+                    <footer>
+                        <button string="Don't Void" class="oe_highlight" type="object" name="proceed_with"/>
+                        <button string="Yes, Void Now" class="oe_highlight" type="object" name="void_transaction"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_ebiz_transaction_void_form" model="ir.actions.act_window">
+            <field name="name">Void Transaction</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">wizard.ebiz.transaction.void</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_ebiz_transaction_void_form"/>
+            <field name="target">new</field>
+        </record>
+
+    </data>
+</odoo>

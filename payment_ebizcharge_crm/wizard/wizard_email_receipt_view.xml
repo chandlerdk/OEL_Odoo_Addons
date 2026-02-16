@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+
+        <record id="send_email_receipt_wizard" model="ir.ui.view">
+            <field name="name">Email Receipts</field>
+            <field name="model">wizard.email.receipts</field>
+            <field name="priority" eval="8"/>
+            <field name="arch" type="xml">
+                <form string="Email Receipt" create="false" edit="false" >
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="partner_ids" widget="many2many_tags" readonly="context.get('default_selection_check', True)"/>
+                                <field name="email_customer" string="Customer Email" invisible="context.get('default_selection_check')" readonly='0' required="1"/>
+                                <field name="record_id" invisible="1"/>
+                                <field name="model_name" invisible="1"/>
+                                <field name="multiple_ref_num" readonly="0" required="1" widget="many2many_tags" options="{'no_edit': True, 'no_create': True, 'no_open': True}"
+                                       domain="[('invoice_id','=', record_id)]"/>
+                                <field name="select_template" domain="[('instance_id', '=', ebiz_profile_id)]" required="1" options="{'no_open': True,'no_create': True, 'no_quick_create': True, 'no_create_edit':True}"/>
+                                <field name="email_subject" readonly="1"/>
+                                <field name="ebiz_profile_id" invisible="1"/>
+                            </group>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button name="send_email" type="object" string="Send Email" class="oe_highlight" />
+                        <button string="Cancel" special="cancel" style="width:10%"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="send_email_receipt_wizard_bulk" model="ir.ui.view">
+            <field name="name">Email Receipts</field>
+            <field name="model">wizard.email.receipts.bulk</field>
+            <field name="priority" eval="8"/>
+            <field name="arch" type="xml">
+                <form string="Email Receipt" create="false" edit="false">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="select_template" domain="[('instance_id', '=', ebiz_profile_id)]" options="{'no_create': True, 'no_quick_create': True, 'no_create_edit':True,'no_open':True}"/>
+                                <field name="email_subject" readonly="1"/>
+                                <field name="ebiz_profile_id" invisible="1"/>
+                            </group>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button name="send_email" type="object" string="Send Email" class="oe_highlight" />
+                        <button string="Cancel" special="cancel" style="width:10%"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+    </data>
+</odoo>

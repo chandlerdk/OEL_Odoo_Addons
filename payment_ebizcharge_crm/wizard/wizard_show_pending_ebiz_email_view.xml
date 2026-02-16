@@ -1,0 +1,38 @@
+<odoo>
+    <data>
+
+        <record id="view_ebiz_pending_payments_form" model="ir.ui.view">
+            <field name="name">download.ebiz.payments</field>
+            <field name="model">ebiz.pending.payment</field>
+            <field name="arch" type="xml" >
+                <form string="Download Payments" edit="1">
+                    <field name="payment_lines" readonly='1'>
+                        <tree string="Payment Lines" editable="bottom" edit="1" create="false" delete="false" limit="15">
+                            <field name="date_paid" readonly="1"/>
+                            <field name="customer_id" readonly="1"/>
+                            <field name="invoice_number" readonly="1"/>
+                            <field name="email_id" readonly="1"/>
+                            <field name="currency_id" readonly="1" invisible="1"/>
+                            <field name="invoice_amount" options="{'currency_field': 'currency_id'}" widget="monetary" readonly="1"/>
+                            <field name="amount_due" options="{'currency_field': 'currency_id'}" widget="monetary" readonly="1"/>
+                        </tree>
+                    </field>
+                    <footer>
+                        <button string="Ok" class="oe_highlight" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_ebiz_pending_payments_form" model="ir.actions.act_window">
+            <field name="name">Pending Email Pay Requests</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">ebiz.pending.payment</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_ebiz_pending_payments_form"/>
+            <field name="context">{'compute_from_view': True}</field>
+            <field name="target">new</field>
+        </record>
+
+    </data>
+</odoo>
