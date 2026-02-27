@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="sequence_tradingpartner" model="ir.sequence">
+            <field name="name">Trading Partner Sequence Number</field>
+            <field name="code">tradingpartner.number</field>
+            <field name="prefix">TP</field>
+            <field name="padding">5</field>
+            <field name="number_increment">1</field>
+            <field name="number_next">1</field>
+        </record>
+    </data>
+</odoo>

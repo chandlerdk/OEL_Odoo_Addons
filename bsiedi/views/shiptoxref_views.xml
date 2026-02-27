@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="shiptoxref_view_form" model="ir.ui.view">
+        <field name="name">bsiedi.shiptoxref.view.form</field>
+        <field name="model">bsiedi.shiptoxref</field>
+        <field name="priority">10</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <form duplicate="True" edit="True">
+                <sheet> 
+                    <group>
+                        <group>
+                          <field name="name"/>
+                          <field name="trading_partner"/>
+                          <field name="ship_to_no"/>
+                          <field name="partner_id"/>
+                          <field name="bill_partner_id"/>
+                          <field name="zip_code"/>
+                        </group>
+                    </group>
+                </sheet>
+              </form>
+        </field>
+    </record>
+    <record id="view_shiptoxref_tree" model="ir.ui.view">
+        <field name="name">bsiedi.shiptoxref.list</field>
+        <field name="model">bsiedi.shiptoxref</field>
+        <field name="priority">5</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <tree string="Ship-to Cross-References" multi_edit="1" sample="1">
+                <field name="name" readonly="1"/>
+                <field name="trading_partner" string="Trading Partner"/>
+                <field name="ship_to_no" string="EDI Ship-to Number"/>
+              <field name="partner_id" string="Delivery Customer"/>
+              <field name="bill_partner_id" string="Billing Customer"/>
+              <field name="zip_code" string="Zip Code"/>
+            </tree>
+        </field>
+    </record>
+    <record id="view_shiptoxref_search" model="ir.ui.view">
+        <field name="name">bsiedi.shiptoxref.search</field>
+        <field name="model">bsiedi.shiptoxref</field>
+        <field name="priority">5</field>
+        <field name="mode">primary</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <search string="Cross References">
+                <field name="ship_to_no"/>
+                <separator/>
+                <field name="trading_partner"/>
+                <field name="partner_id"/>
+                <filter name="groupby_tradingpartner" string="Trading Partner" context="{'group_by':'trading_partner'}"/>
+            </search>
+        </field>
+    </record>
+</odoo>
