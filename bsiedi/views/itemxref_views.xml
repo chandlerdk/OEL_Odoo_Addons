@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="itemxref_view_form" model="ir.ui.view">
+        <field name="name">bsiedi.itemxref.view.form</field>
+        <field name="model">bsiedi.itemxref</field>
+        <field name="priority">10</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+                <form duplicate="True" edit="True">
+                    <sheet>
+                    <group>
+                        <group>
+                          <field name="name"/>
+                          <field name="trading_partner"/>
+                          <field name="partner_id"/>
+                          <field name="product_id"/>
+                          <field name="item_no_in"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Inventory Feed">
+                            <group>
+                                <group>
+                                    <field name="force_to_zero" />
+                                    <field name="suppress_on_feed" />
+                                    <field name="obsolete_flag" />
+                                </group>
+                                <group>
+                                    <field name="min_qty_report" />
+                                    <field name="max_qty_report" />
+                                </group>
+                            </group>
+                        </page>
+                        <page string="UOM Conversion">
+                          <group>
+                            <group>
+                              <field name="inb_uom"/>
+                              <field name="inb_conv_factor"/>
+                              <field name="inb_conv_type"/>
+                            </group>
+                            <group>
+                              <field name="out_uom"/>
+                              <field name="out_conv_factor"/>
+                              <field name="out_conv_type"/>
+                            </group>
+                          </group>
+                        </page>
+                        <page string="Item Identifiers">
+                          <group>
+                            <group>
+                              <field name="buyer_style_number" string="Buyer Style Number"/>
+                              <field name="buyer_sku" string="Buyer SKU"/>
+                              <field name="upc"/>
+                              <field name="gtin_14"/>
+                              <field name="gtin_12"/>
+                            </group>
+                            <group>
+                              <field name="ean" string="EAN Number"/>
+                              <field name="isbn" string="ISBN"/>
+                              <field name="ndc" string="NDC"/>
+                            </group>
+                          </group>
+                        </page>
+                        <page string="Physical Packing Parameters">
+                          <group>
+                            <group>
+                              <field name="inner_pack_quantity" string="Inner Pack Quantity"/>
+                              <field name="inners_per_outer" string="Inners per Outer"/>
+                              <field name="unit_volume" string="Unit Volume"/>
+                              <field name="volume_uom" string="Volume Unit of Measure"/>
+                              <field name="pack" string="Pack"/>
+                              <field name="pack_size" string="Pack Size"/>
+                              <field name="pack_uom" string="Pack Unit of Measure"/>
+                            </group>
+                            <group>
+                              <field name="cartons_per_pallet" string="Cartons per Pallet"/>
+                              <field name="layers_per_pallet" string="Layers per Pallet"/>
+                            </group>
+                          </group>
+                        </page>
+                        <page string="Dimensions">
+                          <group>
+                            <group>
+                              <field name="color_code" string="Color Code"/>
+                              <field name="size_code" string="Size Code"/>
+                              <field name="config_code" string="Configuration Code"/>
+                            </group>
+                            <group/>
+                          </group>
+                        </page>
+                        <page string="Effective/Expiration">
+                          <group>
+                            <group>
+                              <field name="effective_date" string="Effective Date"/>
+                            </group>
+                            <group>
+                              <field name="expiration_date" string="Expiration Date"/>
+                            </group>
+                          </group>
+                        </page>
+                        <page string="Extra Identifiers">
+                          <group>
+                            <group>
+                              <field name="extra_id_1" string="Extra Identifier 1"/>
+                              <field name="extra_id_2" string="Extra Identifier 2"/>
+                              <field name="extra_id_3" string="Extra Identifier 3"/>
+                            </group>
+                            <group/>
+                          </group>
+                        </page>
+                        <page string="JIT Delivery">
+                          <group>
+                            <group>
+                              <field name="pkg_item_no" string="Packaging Item Number"/>
+                              <field name="purchase_order_number" string="Purchase Order Number"/>
+                              <field name="last_release_number" string="Last Release Number"/>
+                              <field name="last_cume_qty" string="Last Cume Quantity"/>
+                            </group>
+                            <group>
+                              <field name="plant_code" string="Plant Code"/>
+                              <field name="model_year" string="Model Year"/>
+                            </group>
+                          </group>
+                        </page>
+                        <page string="Price UOM Conversion">
+                          <group>
+                            <group>
+                              <field name="inb_price_conv" string="Inbound Price Conv Factor"/>
+                            </group>
+                            <group>
+                              <field name="out_price_conv" string="Outbound Price Conv Factor"/>
+                            </group>
+                          </group>
+                        </page>
+                      </notebook>
+                </sheet>
+              </form>
+        </field>
+    </record>
+    <record id="view_itemxref_tree" model="ir.ui.view">
+        <field name="name">bsiedi.itemxref.list</field>
+        <field name="model">bsiedi.itemxref</field>
+        <field name="priority">5</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <tree string="Item Cross-References" multi_edit="1" sample="1">
+                <field name="name" readonly="1"/>
+                <field name="trading_partner" string="Trading Partner"/>
+                <field name="partner_id" string="Customer / Vendor"/>
+                <field name="item_no_in" string="External Item Number" required="1"/>
+                <field name="product_id"/>
+                <field name="inb_uom" string="Inbound UOM" optional="hide"/>
+                <field name="inb_conv_factor" string="Inbound Conversion Factor" optional="hide"/>          
+                <field name="inb_conv_type" string="Inbound Conversion Type" optional="hide"/>
+                <field name="out_uom" string="Outbound UOM" optional="hide"/>
+                <field name="out_conv_factor" string="Outbound Conversion Factor" optional="hide"/>
+                <field name="out_conv_type" string="Outbound Conversion Type" optional="hide"/>
+                <field name="upc" string="UPC Code" optional="hide"/>
+            </tree>
+        </field>
+    </record>
+    <record id="view_itemxref_search" model="ir.ui.view">
+        <field name="name">bsiedi.itemxref.search</field>
+        <field name="model">bsiedi.itemxref</field>
+        <field name="priority">5</field>
+        <field name="mode">primary</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <search string="Cross References">
+                <field name="item_no_in"/>
+                <separator/>
+                <field name="product_id"/>
+                <field name="trading_partner"/>
+                <field name="partner_id"/>
+                <filter name="groupby_tradingpartner" string="Trading Partner" context="{'group_by':'trading_partner'}"/>
+            </search>
+        </field>
+    </record>
+</odoo>

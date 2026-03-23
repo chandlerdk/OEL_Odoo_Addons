@@ -1,0 +1,1054 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* bsiedi
+# 
+# Translators:
+# tx_e2f_nl r10 <tx_e2f_nl_r10@ate2f.com>, 2024
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 17.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-01-09 12:52+0000\n"
+"PO-Revision-Date: 2024-01-09 13:16+0000\n"
+"Last-Translator: tx_e2f_nl r10 <tx_e2f_nl_r10@ate2f.com>, 2024\n"
+"Language-Team: Dutch (https://app.transifex.com/business-systems-integrators/teams/182320/nl/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Language: nl\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. module: bsiedi
+#: model:res.groups,comment:bsiedi.group_edi_admin
+msgid ""
+"\n"
+"            EDI Administrator\n"
+"        "
+msgstr ""
+"\n"
+"            EDI-beheerder\n"
+"        "
+
+#. module: bsiedi
+#: model:res.groups,comment:bsiedi.group_edi_user
+msgid ""
+"\n"
+"            EDI User\n"
+"        "
+msgstr ""
+"\n"
+"            EDI-gebruiker\n"
+"        "
+
+#. module: bsiedi
+#: model:ir.model.fields.selection,name:bsiedi.selection__bsiedi_outbshipviaxref__freight_terms__3p
+msgid "3rd Party"
+msgstr "Derde partij"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_purchase_order__edi_order_ack
+msgid "Acknowledged?"
+msgstr "Erkend?"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_inbshipviaxref__active
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__active
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_outbshipviaxref__active
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_shiptoxref__active
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_tradingpartner__active
+msgid "Active"
+msgstr "Actief"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_res_company__add_ediack_chatter
+#: model:ir.model.fields,field_description:bsiedi.field_res_config_settings__add_ediack_chatter
+#: model_terms:ir.ui.view,arch_db:bsiedi.res_config_settings_view_form
+msgid "Add EDI Acknowledgements to Chatter?"
+msgstr "EDI-erkenningen toevoegen aan Chatter?"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_res_company__add_edierrors_chatter
+#: model:ir.model.fields,field_description:bsiedi.field_res_config_settings__add_edierrors_chatter
+#: model_terms:ir.ui.view,arch_db:bsiedi.res_config_settings_view_form
+msgid "Add EDI Errors to Chatter?"
+msgstr "EDI-fouten toevoegen aan Chatter?"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_res_company__add_trxupds_chatter
+#: model:ir.model.fields,field_description:bsiedi.field_res_config_settings__add_trxupds_chatter
+#: model_terms:ir.ui.view,arch_db:bsiedi.res_config_settings_view_form
+msgid "Add EDI Updates from Transactions to Chatter?"
+msgstr "EDI-updates uit transacties toevoegen aan Chatter?"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_res_company__add_viewlinks_chatter
+#: model:ir.model.fields,field_description:bsiedi.field_res_config_settings__add_viewlinks_chatter
+#: model_terms:ir.ui.view,arch_db:bsiedi.res_config_settings_view_form
+msgid "Add EDI Viewing Links to Chatter?"
+msgstr "EDI-weergavelinks toevoegen aan Chatter?"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_sale_order__alt_oe_po_no
+msgid "Alternate Purchase Order"
+msgstr "Alternatieve inkooporder"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_sale_order__alt_oe_po_no2
+msgid "Alternate Purchase Order 2"
+msgstr "Alternatieve inkooporder 2"
+
+#. module: bsiedi
+#: model:ir.ui.menu,name:bsiedi.menu_bsiedi
+#: model_terms:ir.ui.view,arch_db:bsiedi.res_config_settings_view_form
+msgid "BSI EDI"
+msgstr "BSI EDI"
+
+#. module: bsiedi
+#: model_terms:ir.ui.view,arch_db:bsiedi.view_shiptoxref_tree
+msgid "Billing Customer"
+msgstr "Factureringsklant"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_shiptoxref__bill_partner_id
+msgid "Billing Partner"
+msgstr "Factureringspartner"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__buyer_sku
+#: model_terms:ir.ui.view,arch_db:bsiedi.itemxref_view_form
+msgid "Buyer SKU"
+msgstr "SKU van koper"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__buyer_style_number
+#: model_terms:ir.ui.view,arch_db:bsiedi.itemxref_view_form
+msgid "Buyer Style Number"
+msgstr "Modelnummer van koper"
+
+#. module: bsiedi
+#: model_terms:ir.ui.view,arch_db:bsiedi.view_outbshipviaxref_tree
+msgid "Carrier Routing"
+msgstr "Transportroute"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_inbshipviaxref__carrier_routing
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_outbshipviaxref__carrier_routing
+msgid "Carrier Routing Code"
+msgstr "Transportroutecode"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__cartons_per_pallet
+#: model_terms:ir.ui.view,arch_db:bsiedi.itemxref_view_form
+msgid "Cartons per Pallet"
+msgstr "Dozen per pallet"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_purchase_order__edi_chg_send_date
+msgid "Change Send Date"
+msgstr "Verzenddatum wijzigen"
+
+#. module: bsiedi
+#: model_terms:ir.ui.view,arch_db:bsiedi.res_config_settings_view_form
+msgid "Chatter Integration"
+msgstr "Chatter-integratie"
+
+#. module: bsiedi
+#: model:ir.model.fields.selection,name:bsiedi.selection__bsiedi_outbshipviaxref__freight_terms__cc
+msgid "Collect"
+msgstr "Ophalen"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__color_code
+#: model_terms:ir.ui.view,arch_db:bsiedi.itemxref_view_form
+msgid "Color Code"
+msgstr "Kleurcode"
+
+#. module: bsiedi
+#: model:ir.model,name:bsiedi.model_res_company
+msgid "Companies"
+msgstr "Bedrijven"
+
+#. module: bsiedi
+#: model_terms:ir.ui.view,arch_db:bsiedi.res_config_settings_view_form
+msgid "Company Settings"
+msgstr "Bedrijfsinstellingen"
+
+#. module: bsiedi
+#: model:ir.model,name:bsiedi.model_res_config_settings
+msgid "Config Settings"
+msgstr "Configuratie-instellingen"
+
+#. module: bsiedi
+#: model:ir.ui.menu,name:bsiedi.menu_bsiedi_config
+msgid "Configuration"
+msgstr "Configuratie"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__config_code
+#: model_terms:ir.ui.view,arch_db:bsiedi.itemxref_view_form
+msgid "Configuration Code"
+msgstr "Configuratiecode"
+
+#. module: bsiedi
+#: model:ir.model,name:bsiedi.model_res_partner
+msgid "Contact"
+msgstr "Contact"
+
+#. module: bsiedi
+#: model_terms:ir.actions.act_window,help:bsiedi.product_normal_action_purch
+msgid "Create a new product variant"
+msgstr "Nieuwe productvariant maken"
+
+#. module: bsiedi
+#: model_terms:ir.actions.act_window,help:bsiedi.action_list_inbshipviaxref
+msgid "Create the first inbound ship-via cross-reference"
+msgstr "Eerste kruisverwijzing voor verzenden-via (binnenkomend) maken"
+
+#. module: bsiedi
+#: model_terms:ir.actions.act_window,help:bsiedi.action_list_itemxref
+msgid "Create the first item cross-reference"
+msgstr "Eerste kruisverwijzing voor items maken"
+
+#. module: bsiedi
+#: model_terms:ir.actions.act_window,help:bsiedi.action_list_outbshipviaxref
+msgid "Create the first outbound ship-via cross-reference"
+msgstr "Eerste kruisverwijzing voor verzenden-via (uitgaand) maken"
+
+#. module: bsiedi
+#: model_terms:ir.actions.act_window,help:bsiedi.action_list_shiptoxref
+msgid "Create the first ship-to cross-reference"
+msgstr "Eerste kruisverwijzing voor verzenden-naar maken"
+
+#. module: bsiedi
+#: model_terms:ir.actions.act_window,help:bsiedi.action_list_tradingpartner
+msgid "Create the first trading partner"
+msgstr "Eerste handelspartner maken"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_inbshipviaxref__create_uid
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__create_uid
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_outbshipviaxref__create_uid
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_shiptoxref__create_uid
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_tradingpartner__create_uid
+msgid "Created by"
+msgstr "Gemaakt door"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_inbshipviaxref__create_date
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__create_date
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_outbshipviaxref__create_date
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_shiptoxref__create_date
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_tradingpartner__create_date
+msgid "Created on"
+msgstr "Gemaakt op"
+
+#. module: bsiedi
+#: model_terms:ir.ui.view,arch_db:bsiedi.view_itemxref_tree
+msgid "Customer / Vendor"
+msgstr "Klant/leverancier"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_sale_order_line__cus_item_no
+msgid "Customer Item Number"
+msgstr "Itemnummer van klant"
+
+#. module: bsiedi
+#: model_terms:ir.ui.view,arch_db:bsiedi.view_inbshipviaxref_tree
+#: model_terms:ir.ui.view,arch_db:bsiedi.view_outbshipviaxref_tree
+msgid "Customer/Vendor"
+msgstr "Klant/leverancier"
+
+#. module: bsiedi
+#: model:ir.ui.menu,name:bsiedi.menu_cust
+msgid "Customers"
+msgstr "Klanten"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_sale_order__dealer_order_number
+msgid "Dealer Order Order"
+msgstr "Ordernummer van dealer"
+
+#. module: bsiedi
+#: model_terms:ir.ui.view,arch_db:bsiedi.view_shiptoxref_tree
+msgid "Delivery Customer"
+msgstr "Leveringsklant"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_inbshipviaxref__ship_descr
+msgid "Description"
+msgstr "Beschrijving"
+
+#. module: bsiedi
+#: model_terms:ir.ui.view,arch_db:bsiedi.itemxref_view_form
+msgid "Dimensions"
+msgstr "Afmetingen"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_inbshipviaxref__display_name
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__display_name
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_outbshipviaxref__display_name
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_shiptoxref__display_name
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_tradingpartner__display_name
+msgid "Display Name"
+msgstr "Weergavenaam"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_res_partner__dc
+#: model:ir.model.fields,field_description:bsiedi.field_res_users__dc
+msgid "Distribution Center"
+msgstr "Distributiecentrum"
+
+#. module: bsiedi
+#: model:ir.model.fields.selection,name:bsiedi.selection__bsiedi_itemxref__inb_conv_type__d
+#: model:ir.model.fields.selection,name:bsiedi.selection__bsiedi_itemxref__out_conv_type__d
+msgid "Divide"
+msgstr "Verdelen"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_res_company__duns_number
+#: model:ir.model.fields,field_description:bsiedi.field_res_config_settings__duns_number
+#: model_terms:ir.ui.view,arch_db:bsiedi.res_config_settings_view_form
+msgid "Duns Number"
+msgstr "DUNS-nummer"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__ean
+msgid "EAN"
+msgstr "EAN"
+
+#. module: bsiedi
+#: model_terms:ir.ui.view,arch_db:bsiedi.itemxref_view_form
+msgid "EAN Number"
+msgstr "EAN-nummer"
+
+#. module: bsiedi
+#: model:res.groups,name:bsiedi.group_edi_admin
+msgid "EDI Administrator"
+msgstr "EDI-beheerder"
+
+#. module: bsiedi
+#: model_terms:ir.ui.view,arch_db:bsiedi.view_order_form_inherit_bsiedi_partner
+#: model_terms:ir.ui.view,arch_db:bsiedi.view_order_form_inherit_bsiedi_purchase
+#: model_terms:ir.ui.view,arch_db:bsiedi.view_order_form_inherit_bsiedi_sale
+msgid "EDI Info"
+msgstr "EDI-gegevens"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_sale_order__edi_order
+msgid "EDI Order?"
+msgstr "EDI-order?"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_shiptoxref__ship_to_no
+#: model_terms:ir.ui.view,arch_db:bsiedi.view_shiptoxref_tree
+msgid "EDI Ship-to Number"
+msgstr "EDI-nummer voor verzenden-naar"
+
+#. module: bsiedi
+#: model:res.groups,name:bsiedi.group_edi_user
+msgid "EDI User"
+msgstr "EDI-gebruiker"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__effective_date
+#: model_terms:ir.ui.view,arch_db:bsiedi.itemxref_view_form
+msgid "Effective Date"
+msgstr "Ingangsdatum"
+
+#. module: bsiedi
+#: model_terms:ir.ui.view,arch_db:bsiedi.itemxref_view_form
+msgid "Effective/Expiration"
+msgstr "Ingangsdatum/verloopdatum"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__expiration_date
+#: model_terms:ir.ui.view,arch_db:bsiedi.itemxref_view_form
+msgid "Expiration Date"
+msgstr "Verloopdatum"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__item_no_in
+#: model_terms:ir.ui.view,arch_db:bsiedi.view_itemxref_tree
+msgid "External Item Number"
+msgstr "Extern itemnummer"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__extra_id_1
+msgid "Extra ID 1"
+msgstr "Extra ID 1"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__extra_id_2
+msgid "Extra ID 2"
+msgstr "Extra ID 2"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__extra_id_3
+msgid "Extra ID 3"
+msgstr "Extra ID 3"
+
+#. module: bsiedi
+#: model_terms:ir.ui.view,arch_db:bsiedi.itemxref_view_form
+msgid "Extra Identifier 1"
+msgstr "Extra identifier 1"
+
+#. module: bsiedi
+#: model_terms:ir.ui.view,arch_db:bsiedi.itemxref_view_form
+msgid "Extra Identifier 2"
+msgstr "Extra identifier 2"
+
+#. module: bsiedi
+#: model_terms:ir.ui.view,arch_db:bsiedi.itemxref_view_form
+msgid "Extra Identifier 3"
+msgstr "Extra identifier 3"
+
+#. module: bsiedi
+#: model_terms:ir.ui.view,arch_db:bsiedi.itemxref_view_form
+msgid "Extra Identifiers"
+msgstr "Extra identifiers"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_outbshipviaxref__freight_terms
+msgid "Freight Terms"
+msgstr "Voorwaarden voor transport"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_res_company__gln
+#: model:ir.model.fields,field_description:bsiedi.field_res_config_settings__gln
+#: model:ir.model.fields,field_description:bsiedi.field_res_partner__gln
+#: model:ir.model.fields,field_description:bsiedi.field_res_users__gln
+msgid "GLN"
+msgstr "GLN"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__gtin_12
+msgid "GTIN 12"
+msgstr "GTIN 12"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__gtin_14
+#: model:ir.model.fields,field_description:bsiedi.field_sale_order_line__gtin_14
+msgid "GTIN 14"
+msgstr "GTIN 14"
+
+#. module: bsiedi
+#: model_terms:ir.ui.view,arch_db:bsiedi.res_config_settings_view_form
+msgid "Global Location Number (GLN)"
+msgstr "Globaal locatienummer GLN)"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_inbshipviaxref__id
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__id
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_outbshipviaxref__id
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_shiptoxref__id
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_tradingpartner__id
+msgid "ID"
+msgstr "ID"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__isbn
+#: model_terms:ir.ui.view,arch_db:bsiedi.itemxref_view_form
+msgid "ISBN"
+msgstr "ISBN"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__inb_conv_factor
+#: model_terms:ir.ui.view,arch_db:bsiedi.view_itemxref_tree
+msgid "Inbound Conversion Factor"
+msgstr "Conversiefactor (binnenkomend)"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__inb_conv_type
+#: model_terms:ir.ui.view,arch_db:bsiedi.view_itemxref_tree
+msgid "Inbound Conversion Type"
+msgstr "Conversietype (binnenkomend)"
+
+#. module: bsiedi
+#: model_terms:ir.ui.view,arch_db:bsiedi.itemxref_view_form
+msgid "Inbound Price Conv Factor"
+msgstr "Prijsconv.factor (binnenkomend)"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__inb_price_conv
+msgid "Inbound Price Conversion Factor"
+msgstr "Prijsconversiefactor (binnenkomend)"
+
+#. module: bsiedi
+#: model:ir.actions.act_window,name:bsiedi.action_list_inbshipviaxref
+#: model:ir.model,name:bsiedi.model_bsiedi_inbshipviaxref
+#: model:ir.ui.menu,name:bsiedi.menu_inbshipviaxref
+msgid "Inbound Ship-Via Cross-Reference"
+msgstr "Kruisverwijzing voor verzenden-via (binnenkomend)"
+
+#. module: bsiedi
+#: model_terms:ir.ui.view,arch_db:bsiedi.view_inbshipviaxref_tree
+msgid "Inbound Ship-Via Cross-References"
+msgstr "Kruisverwijzingen voor verzenden-via (binnenkomend)"
+
+#. module: bsiedi
+#: model_terms:ir.ui.view,arch_db:bsiedi.view_itemxref_tree
+msgid "Inbound UOM"
+msgstr "UOM (binnenkomend)"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__inb_uom
+msgid "Inbound Unit of Measure"
+msgstr "Meeteenheid (binnenkomend)"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__inner_pack_quantity
+#: model_terms:ir.ui.view,arch_db:bsiedi.itemxref_view_form
+msgid "Inner Pack Quantity"
+msgstr "Aantal producten per productbundel"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__inners_per_outer
+#: model_terms:ir.ui.view,arch_db:bsiedi.itemxref_view_form
+msgid "Inners per Outer"
+msgstr "Aantal productbundels per grootverpakking"
+
+#. module: bsiedi
+#: model_terms:ir.ui.view,arch_db:bsiedi.res_config_settings_view_form
+msgid "Inventory Feed Settings"
+msgstr "Voorraadfeedinstellingen"
+
+#. module: bsiedi
+#: model:ir.actions.act_window,name:bsiedi.action_list_itemxref
+#: model:ir.ui.menu,name:bsiedi.menu_itemxrefcust
+#: model:ir.ui.menu,name:bsiedi.menu_itemxrefpurch
+msgid "Item Cross-Reference"
+msgstr "Kruisverwijzing voor items"
+
+#. module: bsiedi
+#: model_terms:ir.ui.view,arch_db:bsiedi.view_itemxref_tree
+msgid "Item Cross-References"
+msgstr "Kruisverwijzingen voor items"
+
+#. module: bsiedi
+#: model_terms:ir.ui.view,arch_db:bsiedi.itemxref_view_form
+msgid "Item Identifiers"
+msgstr "Itemidentifiers"
+
+#. module: bsiedi
+#: model:ir.model,name:bsiedi.model_bsiedi_itemxref
+msgid "Item/Product Cross-Reference"
+msgstr "Kruisverwijzing voor items/producten"
+
+#. module: bsiedi
+#: model_terms:ir.ui.view,arch_db:bsiedi.itemxref_view_form
+msgid "JIT Delivery"
+msgstr "JIT-levering"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__last_cume_qty
+#: model_terms:ir.ui.view,arch_db:bsiedi.itemxref_view_form
+msgid "Last Cume Quantity"
+msgstr "Laatste cumulatieve hoeveelheid"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__last_release_number
+#: model_terms:ir.ui.view,arch_db:bsiedi.itemxref_view_form
+msgid "Last Release Number"
+msgstr "Laatste releasenummer"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_inbshipviaxref__write_uid
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__write_uid
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_outbshipviaxref__write_uid
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_shiptoxref__write_uid
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_tradingpartner__write_uid
+msgid "Last Updated by"
+msgstr "Laatst bijgewerkt door"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_inbshipviaxref__write_date
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__write_date
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_outbshipviaxref__write_date
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_shiptoxref__write_date
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_tradingpartner__write_date
+msgid "Last Updated on"
+msgstr "Laatst bijgewerkt op"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__layers_per_pallet
+#: model_terms:ir.ui.view,arch_db:bsiedi.itemxref_view_form
+msgid "Layers per Pallet"
+msgstr "Lagen per pallet"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__model_year
+#: model_terms:ir.ui.view,arch_db:bsiedi.itemxref_view_form
+msgid "Model Year"
+msgstr "Modeljaar"
+
+#. module: bsiedi
+#: model:ir.model.fields.selection,name:bsiedi.selection__bsiedi_itemxref__inb_conv_type__m
+#: model:ir.model.fields.selection,name:bsiedi.selection__bsiedi_itemxref__out_conv_type__m
+msgid "Multiply"
+msgstr "Vermenigvuldigen"
+
+#. module: bsiedi
+#: model_terms:ir.ui.view,arch_db:bsiedi.itemxref_view_form
+msgid "NDC"
+msgstr "NDC"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__ndc
+msgid "National Drug Code"
+msgstr "Landelijke medicijncode (NDC)"
+
+#. module: bsiedi
+#: model:ir.model.fields.selection,name:bsiedi.selection__bsiedi_itemxref__inb_conv_type__n
+#: model:ir.model.fields.selection,name:bsiedi.selection__bsiedi_itemxref__out_conv_type__n
+msgid "No Calculation"
+msgstr "Geen berekening"
+
+#. module: bsiedi
+#: model:ir.ui.menu,name:bsiedi.menu_sale_order
+msgid "Orders"
+msgstr "Orders"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_sale_order_line__orig_qty
+msgid "Original Quantity from EDI"
+msgstr "Oorspronkelijke hoeveelheid uit EDI"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_purchase_order__edi_orig_send_date
+msgid "Original Send Date"
+msgstr "Oorspronkelijke verzenddatum"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_sale_order_line__orig_ship_date
+msgid "Original Ship Date from EDI"
+msgstr "Oorspronkelijk verzenddatum van EDI"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_sale_order__orig_ship_via_cd
+msgid "Original Ship Via from EDI"
+msgstr "Oorspronkelijk verzenden-via van EDI"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_sale_order_line__orig_uom
+msgid "Original UOM from EDI"
+msgstr "Oorspronkelijke UOM van EDI"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__out_conv_factor
+#: model_terms:ir.ui.view,arch_db:bsiedi.view_itemxref_tree
+msgid "Outbound Conversion Factor"
+msgstr "Conversiefactor (uitgaand)"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__out_conv_type
+#: model_terms:ir.ui.view,arch_db:bsiedi.view_itemxref_tree
+msgid "Outbound Conversion Type"
+msgstr "Conversietype (uitgaand)"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_res_company__freight_line_accounts
+#: model:ir.model.fields,field_description:bsiedi.field_res_config_settings__freight_line_accounts
+#: model_terms:ir.ui.view,arch_db:bsiedi.res_config_settings_view_form
+msgid "Outbound Invoice Freight Accounts"
+msgstr "Transportaccounts voor facturen (uitgaand)"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_res_company__misc_line_accounts
+#: model:ir.model.fields,field_description:bsiedi.field_res_config_settings__misc_line_accounts
+#: model_terms:ir.ui.view,arch_db:bsiedi.res_config_settings_view_form
+msgid "Outbound Invoice Miscellaneous Charge Accounts"
+msgstr "Rekeningen (diversen) voor facturen (uitgaand)"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_res_company__invoice_line_accounts
+#: model:ir.model.fields,field_description:bsiedi.field_res_config_settings__invoice_line_accounts
+#: model_terms:ir.ui.view,arch_db:bsiedi.res_config_settings_view_form
+msgid "Outbound Invoice Sales Line Accounts"
+msgstr "Verkoopregelaccounts voor facturen (uitgaand)"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_res_company__tax_line_accounts
+#: model:ir.model.fields,field_description:bsiedi.field_res_config_settings__tax_line_accounts
+#: model_terms:ir.ui.view,arch_db:bsiedi.res_config_settings_view_form
+msgid "Outbound Invoice Tax Accounts"
+msgstr "Belastingaccounts voor facturen (uitgaand)"
+
+#. module: bsiedi
+#: model_terms:ir.ui.view,arch_db:bsiedi.res_config_settings_view_form
+msgid "Outbound Invoicing"
+msgstr "Factureren (uitgaand)"
+
+#. module: bsiedi
+#: model_terms:ir.ui.view,arch_db:bsiedi.itemxref_view_form
+msgid "Outbound Price Conv Factor"
+msgstr "Prijsconv.factor (uitgaand)"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__out_price_conv
+msgid "Outbound Price Conversion Factor"
+msgstr "Prijsconversiefactor (uitgaand)"
+
+#. module: bsiedi
+#: model:ir.actions.act_window,name:bsiedi.action_list_outbshipviaxref
+#: model:ir.model,name:bsiedi.model_bsiedi_outbshipviaxref
+#: model:ir.ui.menu,name:bsiedi.menu_outbshipviaxref
+msgid "Outbound Ship-Via Cross-Reference"
+msgstr "Kruisverwijzing voor verzenden-via (uitgaand)"
+
+#. module: bsiedi
+#: model_terms:ir.ui.view,arch_db:bsiedi.view_outbshipviaxref_tree
+msgid "Outbound Ship-Via Cross-References"
+msgstr "Kruisverwijzingen voor verzenden-via (uitgaand)"
+
+#. module: bsiedi
+#: model_terms:ir.ui.view,arch_db:bsiedi.view_itemxref_tree
+msgid "Outbound UOM"
+msgstr "Uitgaande UOM"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__out_uom
+msgid "Outbound Unit of Measure"
+msgstr "Meeteenheid (uitgaand)"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__pack
+#: model_terms:ir.ui.view,arch_db:bsiedi.itemxref_view_form
+msgid "Pack"
+msgstr "Verpakking"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__pack_size
+#: model_terms:ir.ui.view,arch_db:bsiedi.itemxref_view_form
+msgid "Pack Size"
+msgstr "Verpakkingsgrootte"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__pack_uom
+msgid "Pack UOM"
+msgstr "Verpakkings-UOM"
+
+#. module: bsiedi
+#: model_terms:ir.ui.view,arch_db:bsiedi.itemxref_view_form
+msgid "Pack Unit of Measure"
+msgstr "Meeteenheid (verpakking)"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__pkg_item_no
+#: model_terms:ir.ui.view,arch_db:bsiedi.itemxref_view_form
+msgid "Packaging Item Number"
+msgstr "Itemnummer (verpakking)"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_inbshipviaxref__partner_id
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__partner_id
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_outbshipviaxref__partner_id
+msgid "Partner"
+msgstr "Partner"
+
+#. module: bsiedi
+#: model_terms:ir.ui.view,arch_db:bsiedi.itemxref_view_form
+msgid "Physical Packing Parameters"
+msgstr "Parameters voor fysieke verpakking"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__plant_code
+#: model_terms:ir.ui.view,arch_db:bsiedi.itemxref_view_form
+msgid "Plant Code"
+msgstr "Fabriekscode"
+
+#. module: bsiedi
+#: model:ir.model.fields.selection,name:bsiedi.selection__bsiedi_outbshipviaxref__freight_terms__pp
+msgid "Prepaid"
+msgstr "Vooraf betaald"
+
+#. module: bsiedi
+#: model_terms:ir.ui.view,arch_db:bsiedi.itemxref_view_form
+msgid "Price UOM Conversion"
+msgstr "UOM voor prijsconversie"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__product_id
+msgid "Product"
+msgstr "Product"
+
+#. module: bsiedi
+#: model:ir.actions.act_window,name:bsiedi.product_normal_action_purch
+#: model:ir.ui.menu,name:bsiedi.menu_productscust
+#: model:ir.ui.menu,name:bsiedi.menu_productspurch
+msgid "Product Variants"
+msgstr "Productvarianten"
+
+#. module: bsiedi
+#: model:ir.ui.menu,name:bsiedi.menu_bsiedi_purchase
+msgid "Purchase"
+msgstr "Aankoop"
+
+#. module: bsiedi
+#: model:ir.model,name:bsiedi.model_purchase_order
+msgid "Purchase Order"
+msgstr "Inkooporder"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__purchase_order_number
+#: model_terms:ir.ui.view,arch_db:bsiedi.itemxref_view_form
+msgid "Purchase Order Number"
+msgstr "Inkoopordernummer"
+
+#. module: bsiedi
+#: model:ir.ui.menu,name:bsiedi.menu_purchord
+msgid "Purchase Orders"
+msgstr "Inkooporders"
+
+#. module: bsiedi
+#: model:ir.ui.menu,name:bsiedi.menu_sale_quotations
+msgid "Quotations"
+msgstr "Offertes"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_sale_order__edi_order_reject
+#: model:ir.model.fields,field_description:bsiedi.field_sale_order_line__edi_line_reject
+msgid "Reject?"
+msgstr "Afwijzen?"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_purchase_order__edi_order_rej
+msgid "Rejected?"
+msgstr "Afgewezen"
+
+#. module: bsiedi
+#: model:ir.ui.menu,name:bsiedi.menu_purchrfq
+msgid "Requests for Quotation"
+msgstr "Offerteaanvragen"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_inbshipviaxref__scac
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_outbshipviaxref__scac
+#: model_terms:ir.ui.view,arch_db:bsiedi.view_outbshipviaxref_tree
+msgid "SCAC"
+msgstr "SCAC"
+
+#. module: bsiedi
+#: model:ir.ui.menu,name:bsiedi.menu_bsiedi_sales
+msgid "Sales"
+msgstr "Verkoop"
+
+#. module: bsiedi
+#: model:ir.model,name:bsiedi.model_sale_order
+msgid "Sales Order"
+msgstr "Verkooporder"
+
+#. module: bsiedi
+#: model:ir.model,name:bsiedi.model_sale_order_line
+msgid "Sales Order Line"
+msgstr "Verkooporderregel"
+
+#. module: bsiedi
+#: model_terms:ir.ui.view,arch_db:bsiedi.res_config_settings_view_form
+msgid "Sales Order/Quotation Creation"
+msgstr "Verkooporder/offerte maken"
+
+#. module: bsiedi
+#: model_terms:ir.ui.view,arch_db:bsiedi.res_config_settings_view_form
+msgid "Sales order tags to apply for EDI"
+msgstr "Verkooporderlabels voor EDI"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_res_company__sales_ord_tags
+#: model:ir.model.fields,field_description:bsiedi.field_res_config_settings__sales_ord_tags
+msgid "Sales order tags to apply for EDI?"
+msgstr "Verkooporderlabels toepassen op EDI?"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_shiptoxref__partner_id
+msgid "Sell-To Partner"
+msgstr "Verzenden-naar-partner"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_inbshipviaxref__name
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__name
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_outbshipviaxref__name
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_shiptoxref__name
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_tradingpartner__name
+msgid "Sequence"
+msgstr "Volgorde"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_inbshipviaxref__service_level_code
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_outbshipviaxref__service_level_code
+#: model_terms:ir.ui.view,arch_db:bsiedi.view_outbshipviaxref_tree
+msgid "Service Level Code"
+msgstr "Code van serviceniveau"
+
+#. module: bsiedi
+#: model:ir.actions.act_window,name:bsiedi.action_bsiedi_config_settings
+#: model:ir.actions.act_window,name:bsiedi.configuration_action
+#: model:ir.actions.act_window,name:bsiedi.settings_action
+#: model:ir.ui.menu,name:bsiedi.menu_settings
+msgid "Settings"
+msgstr "Instellingen"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_inbshipviaxref__ship_priority
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_outbshipviaxref__ship_priority
+msgid "Ship Priority Code"
+msgstr "Code voor verzendprioriteit"
+
+#. module: bsiedi
+#: model_terms:ir.ui.view,arch_db:bsiedi.view_inbshipviaxref_tree
+#: model_terms:ir.ui.view,arch_db:bsiedi.view_outbshipviaxref_tree
+msgid "Ship Via"
+msgstr "Verzenden-via"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_inbshipviaxref__ship_via_cd
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_outbshipviaxref__ship_via_cd
+msgid "Ship Via Product"
+msgstr "Verzenden-via-product"
+
+#. module: bsiedi
+#: model:ir.actions.act_window,name:bsiedi.action_list_shiptoxref
+#: model:ir.model,name:bsiedi.model_bsiedi_shiptoxref
+#: model:ir.ui.menu,name:bsiedi.menu_shiptoxref
+msgid "Ship-to Cross-Reference"
+msgstr "Kruisverwijzing voor verzenden-naar"
+
+#. module: bsiedi
+#: model_terms:ir.ui.view,arch_db:bsiedi.view_shiptoxref_tree
+msgid "Ship-to Cross-References"
+msgstr "Kruisverwijzingen voor verzenden-naar"
+
+#. module: bsiedi
+#: model:ir.ui.menu,name:bsiedi.menu_shipping
+msgid "Shipping"
+msgstr "Verzenden"
+
+#. module: bsiedi
+#: model_terms:ir.ui.view,arch_db:bsiedi.view_inbshipviaxref_tree
+msgid "Shipping Description from EDI"
+msgstr "Verzendbeschrijving van EDI"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__size_code
+#: model_terms:ir.ui.view,arch_db:bsiedi.itemxref_view_form
+msgid "Size Code"
+msgstr "Formaatcode"
+
+#. module: bsiedi
+#: model:ir.model,name:bsiedi.model_bsiedi_tradingpartner
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_inbshipviaxref__trading_partner_id
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__trading_partner
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_outbshipviaxref__trading_partner_id
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_shiptoxref__trading_partner
+#: model:ir.model.fields,field_description:bsiedi.field_res_partner__tp_id
+#: model:ir.model.fields,field_description:bsiedi.field_res_users__tp_id
+#: model:ir.ui.menu,name:bsiedi.menu_bsiedi_tp
+#: model:ir.ui.menu,name:bsiedi.menu_tradingpartner
+#: model_terms:ir.ui.view,arch_db:bsiedi.view_inbshipviaxref_tree
+#: model_terms:ir.ui.view,arch_db:bsiedi.view_itemxref_tree
+#: model_terms:ir.ui.view,arch_db:bsiedi.view_outbshipviaxref_tree
+#: model_terms:ir.ui.view,arch_db:bsiedi.view_shiptoxref_tree
+msgid "Trading Partner"
+msgstr "Handelspartner"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_tradingpartner__trading_partner_id
+msgid "Trading Partner ID"
+msgstr "ID van handelspartner"
+
+#. module: bsiedi
+#: model_terms:ir.ui.view,arch_db:bsiedi.view_tradingpartner_tree
+msgid "Trading Partner Id"
+msgstr "ID van handelspartner"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_tradingpartner__trading_partner_name
+#: model_terms:ir.ui.view,arch_db:bsiedi.view_tradingpartner_tree
+msgid "Trading Partner Name"
+msgstr "Naam van handelspartner"
+
+#. module: bsiedi
+#: model:ir.actions.act_window,name:bsiedi.action_list_tradingpartner
+#: model_terms:ir.ui.view,arch_db:bsiedi.view_tradingpartner_tree
+msgid "Trading Partners"
+msgstr "Handelspartners"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_inbshipviaxref__trans_meth_code
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_outbshipviaxref__trans_meth_code
+msgid "Transportation Method Code"
+msgstr "Code voor transportmethode"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_res_company__ucc_company_code
+#: model:ir.model.fields,field_description:bsiedi.field_res_config_settings__ucc_company_code
+#: model_terms:ir.ui.view,arch_db:bsiedi.res_config_settings_view_form
+msgid "UCC Company Code"
+msgstr "UCC-bedrijfscode"
+
+#. module: bsiedi
+#: model_terms:ir.ui.view,arch_db:bsiedi.itemxref_view_form
+msgid "UOM Conversion"
+msgstr "UOM-conversie"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__upc
+msgid "UPC"
+msgstr "UPC"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_sale_order_line__upc_code
+#: model_terms:ir.ui.view,arch_db:bsiedi.view_itemxref_tree
+msgid "UPC Code"
+msgstr "UPC-code"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__unit_volume
+#: model_terms:ir.ui.view,arch_db:bsiedi.itemxref_view_form
+msgid "Unit Volume"
+msgstr "Eenheidsvolume"
+
+#. module: bsiedi
+#: model:ir.ui.menu,name:bsiedi.menu_vend
+msgid "Vendors"
+msgstr "Leveranciers"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_itemxref__volume_uom
+msgid "Volume UOM"
+msgstr "Volumemeeteenh."
+
+#. module: bsiedi
+#: model_terms:ir.ui.view,arch_db:bsiedi.itemxref_view_form
+msgid "Volume Unit of Measure"
+msgstr "Volumemeeteenheid"
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_res_company__inv_feed_locs
+#: model:ir.model.fields,field_description:bsiedi.field_res_config_settings__inv_feed_locs
+#: model_terms:ir.ui.view,arch_db:bsiedi.res_config_settings_view_form
+msgid "Warehouses for EDI Inventory Feed"
+msgstr "Magazijnen voor EDI-voorraadfeed"
+
+#. module: bsiedi
+#: model_terms:ir.actions.act_window,help:bsiedi.product_normal_action_purch
+msgid ""
+"You must define a product for everything you buy, whether it's a physical product,\n"
+"            a consumable or a service you offer to customers.\n"
+"            The product form contains information to simplify the buying process:\n"
+"            price, accounting data, procurement methods, etc."
+msgstr ""
+"Het is verplicht om een product op te geven voor alles dat u koopt, ongeacht of het een fysiek product,\n"
+"            een verbruiksartikel of een service die u aan klanten aanbiedt, betreft.\n"
+"            Het productformulier bevat informatie die het koopproces makkelijker maakt:\n"
+"            prijs, boekhoudgegevens, aanbestedingsmethodes, etc."
+
+#. module: bsiedi
+#: model:ir.model.fields,field_description:bsiedi.field_bsiedi_shiptoxref__zip_code
+msgid "ZIP Code"
+msgstr "Postcode"
+
+#. module: bsiedi
+#: model_terms:ir.ui.view,arch_db:bsiedi.view_shiptoxref_tree
+msgid "Zip Code"
+msgstr "Postcode"
