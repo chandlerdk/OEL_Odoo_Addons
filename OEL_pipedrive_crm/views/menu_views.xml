@@ -42,7 +42,7 @@
 
     <!-- b) Active Prospects (CONTACTS with opportunities) -->
     <menuitem id="menu_oel_active_prospects"
-              name="Active Prospects"
+              name="Active Opportunities"
               parent="menu_oel_acquisition"
               action="action_oel_crm_active_prospects"
               sequence="7"/>
