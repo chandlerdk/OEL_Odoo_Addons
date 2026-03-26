@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="outbshipviaxref_view_form" model="ir.ui.view">
+        <field name="name">bsiedi.outbshipviaxref.view.form</field>
+        <field name="model">bsiedi.outbshipviaxref</field>
+        <field name="priority">10</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <form duplicate="True" edit="True">
+                <sheet>
+                    <group>
+                        <group>
+                          <field name="name"/>
+                          <field name="ship_via_cd"/>
+                          <field name="scac"/>
+                          <field name="trans_meth_code"/>
+                          <field name="service_level_code"/>
+                          <field name="ship_priority"/>
+                          <field name="carrier_routing"/>
+                          <field name="freight_terms"/>
+                          <field name="partner_id"/>
+                          <field name="trading_partner_id"/>
+                          <field name="delivery_carrier"/>
+                        </group>
+                    </group>
+                </sheet>
+              </form>
+        </field>
+    </record>
+    <record id="view_outbshipviaxref_tree" model="ir.ui.view">
+        <field name="name">bsiedi.outbshipviaxref.list</field>
+        <field name="model">bsiedi.outbshipviaxref</field>
+        <field name="priority">5</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <tree string="Outbound Ship-Via Cross-References" multi_edit="1" sample="1">
+                <field name="name" readonly="1"/>
+                <field name="ship_via_cd" string="Ship Via"/>
+                <field name="scac" string="SCAC"/>
+                <field name="service_level_code" string="Service Level Code"/>
+                <field name="carrier_routing" string="Carrier Routing"/>
+                <field name="partner_id" string="Customer/Vendor"/>
+                <field name="trading_partner_id" string="Trading Partner"/>
+            </tree>
+        </field>
+    </record>
+</odoo>

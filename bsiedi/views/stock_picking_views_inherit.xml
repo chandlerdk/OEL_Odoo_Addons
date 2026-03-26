@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="view_picking_withbolref_bsiedi_outform">
+            <field name="name">delivery.stock.picking_withbolref_bsiedi.form.view</field>
+            <field name="model">stock.picking</field>
+            <field name="inherit_id" ref="stock_delivery.view_picking_withcarrier_out_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='state']" position="before">
+                    <button name="action_requestlabels" id="bsiedi.stock.picking.requestlabels" string="Request Carton Labels" type="object" 
+                        invisible="hide_label_button" data-hotkey="" context="{}"/>
+                </xpath>
+                <xpath expr="//field[@name='state']" position="before">
+                    <button name="action_requestroute" id="bsiedi.stock.picking.send753" string="Send Route Request" type="object" 
+                        invisible="hide_routereq_button" data-hotkey="" context="{}"/>
+                </xpath>
+                <xpath expr="//field[@name='state']" position="before">
+                    <button name="action_resent856" id="bsiedi.stock.picking.resent856" string="Send ASN" type="object" 
+                        invisible="hide_asn_button" data-hotkey="" context="{}"/>
+                </xpath>
+                <xpath expr="//group[@name='carrier_data']/field[@name='carrier_id']" position="before">
+                    <field name="bill_of_lading_ref" optional="show"/>
+                    <field name="carrier_scac" optional="show"/>
+                    <field name="trailer_number" optional="show"/>
+                    <field name="seal_number" optional="show"/>
+                    <field name="pickup_appt_number" optional="show" invisible="hide_routereq_info" />
+                    <field name="pickup_date_early" optional="show" invisible="hide_routereq_info" />
+                    <field name="pickup_date_late" optional="show" invisible="hide_routereq_info" />
+                    <field name="est_volume" optional="show" invisible="hide_routereq_info" />
+                    <field name="est_weight" optional="show" invisible="hide_routereq_info" />
+                    <field name="est_lading_qty" optional="show" invisible="hide_routereq_info" />
+                    <field name="hide_routereq_info" invisible="1"/>
+                    <field name="hide_routereq_button" invisible="1"/>
+                </xpath>
+                <xpath expr="//group[@name='other_infos']/field[@name='company_id']" position="after">
+                    <field name="carton_label_requested" optional="show" invisible="hide_label_info" />
+                    <field name="carton_label_request_queued" optional="show" invisible="hide_label_info"/>
+                    <field name="carton_labels_ready" optional="show" invisible="hide_label_info"/>
+                    <field name="hide_label_button" invisible="1"/>
+                    <field name="hide_asn_button" invisible="1"/>
+                    <field name="hide_label_info" invisible="1"/>
+                    <field name="hide_asn_info" invisible="1"/>
+                </xpath>
+                <xpath expr="//group[@name='other_infos']/field[@name='company_id']" position="after">
+                    <field name="route_send_requested" optional="show" invisible="hide_routereq_info" />
+                    <field name="route_req_sent" optional="show" invisible="hide_routereq_info" />
+                    <field name="route_resp_received" optional="show" invisible="hide_routereq_info" />
+                    <field name="asn_transmitted" optional="show" invisible="hide_asn_info"/>
+                    <field name="asn_send_requested" optional="show" invisible="hide_asn_info" />
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
