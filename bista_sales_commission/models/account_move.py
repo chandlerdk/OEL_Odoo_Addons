@@ -80,10 +80,15 @@ class AccountMove(models.Model):
         for move in self:
             move.commission_policy = move.line_ids.mapped('commission_policy')[0]
 
-    @api.depends('line_ids.commission_move_id')
+    @api.depends('line_ids.commission_move_id', 'line_ids.commission_vendor_bill_line_ids')
     def _compute_commission_move_id(self):
         for move in self:
-            move.commission_move_id = move.line_ids.filtered('commission_move_id')[:1].commission_move_id
+            bills = move.line_ids.mapped('commission_vendor_bill_line_ids.move_id')
+            if bills:
+                move.commission_move_id = bills[:1]
+            else:
+                line_with = move.line_ids.filtered('commission_move_id')[:1]
+                move.commission_move_id = line_with.commission_move_id
 
     @api.depends("partner_shipping_id.city", "partner_shipping_id.state_id")
     def _compute_shipping_city_state(self):

@@ -16,6 +16,7 @@
                 <field name="move_id" string="Related Invoice" widget="many2onebutton"/>
                 <field name="invoice_payment_state" string="Payment State"/>
                 <field name="commission_move_id" string="Related Bill" widget="many2onebutton"/>
+                <field name="commission_bill_ids" widget="many2many_tags" string="All commission bills" optional="show"/>
                 <field name="commission_move_line_id" optional="hide"/>
                 <field name="reversed_move_id" optional="hide"/>
                 <field name="commission_payment_state"/>
@@ -39,7 +40,7 @@
                 <field name="commission_user_id"/>
                 <field name="commission_amount"/>
                 <filter string="Commission To Bill" name="to_bill"
-                        domain="[('commission_to_bill', '=', True), ('is_commission_billed', '=', False)]"/>
+                        domain="[('commission_to_bill', '=', True)]"/>
             </xpath>
             <xpath expr="//group" position="inside">
                 <filter string="Commission Date" name="group_commission_date" domain="[]"
@@ -59,8 +60,6 @@
             0),('out_commission_amount','>', 0),('display_type', 'in', ['product', 'line_section',
             'line_note'])]
         </field>
-
-
         <field name="context">{'create': 0, 'delete': 0, 'edit': 0, 'search_default_to_bill': 1,
             'search_group_commission_user_id': 1}
         </field>
