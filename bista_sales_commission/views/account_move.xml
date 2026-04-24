@@ -15,6 +15,13 @@
                 <field name="commission_amount" optional="hide" groups="bista_sales_commission.group_sales_commission"/>
                 <field name="in_commission_amount" optional="hide" groups="bista_sales_commission.group_sales_commission"/>
                 <field name="out_commission_amount" optional="hide" groups="bista_sales_commission.group_sales_commission"/>
+                <field name="epd_paid_on_line" optional="show" string="EPD (payment)"/>
+            </xpath>
+            <xpath expr="//group[@id='header_right_group']//field[@name='payment_reference']" position="after">
+<!--                <field name="epd_paid_total" readonly="1" groups="account.group_account_readonly"-->
+<!--                       invisible="move_type not in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund', 'out_receipt', 'in_receipt')"/>-->
+                <field name="epd_paid_aml_info" readonly="1" groups="account.group_account_readonly" colspan="2"
+                       invisible="move_type not in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund', 'out_receipt', 'in_receipt')"/>
             </xpath>
             <xpath expr="//field[@name='invoice_user_id']" position="attributes">
                 <attribute name="domain">[]</attribute>

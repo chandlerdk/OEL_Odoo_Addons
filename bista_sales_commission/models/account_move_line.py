@@ -90,6 +90,39 @@ class AccountMoveLine(models.Model):
     current_line_id = fields.Integer()
     user_id = fields.Many2one('res.users', related="move_id.invoice_user_id")
     is_commission_billed = fields.Boolean(string="Commission Billed", default=False, copy=False)
+    epd_paid_on_line = fields.Monetary(
+        string="EPD (payment j.e. share)",
+        compute="_compute_epd_paid_on_line",
+        currency_field="currency_id",
+        help="Proportional share of early payment discount (EPD) posted on reconciled payment/statement "
+        "journal entries, allocated from line untaxed / invoice untaxed.",
+    )
+
+    @api.depends(
+        "move_id.epd_paid_total",
+        "move_id.amount_untaxed",
+        "move_id.state",
+        "move_id.invoice_line_ids",
+        "move_id",
+        "price_subtotal",
+        "display_type",
+    )
+    def _compute_epd_paid_on_line(self):
+        for line in self:
+            line.epd_paid_on_line = 0.0
+            move = line.move_id
+            if not move or move.state != "posted" or not move.is_invoice(include_receipts=True):
+                continue
+            if line.display_type != "product":
+                continue
+            if line not in move.invoice_line_ids or move.currency_id.is_zero(move.epd_paid_total or 0.0):
+                continue
+            untaxed = move.amount_untaxed
+            if move.currency_id.is_zero(untaxed):
+                continue
+            line.epd_paid_on_line = move.currency_id.round(
+                (move.epd_paid_total or 0.0) * (line.price_subtotal / untaxed)
+            )
 
     @api.depends(
         "commission_vendor_bill_line_ids",
@@ -126,10 +159,47 @@ class AccountMoveLine(models.Model):
             n += 1
         return n
 
+    def _get_commission_amount_bases(self):
+        """Return (amount_before_tax, amount_after_tax) for commission, net of this line EPD share (payment j.e.)."""
+        self.ensure_one()
+        cur = self.currency_id
+        if not cur:
+            cur = self.env.company.currency_id
+        ps = self.price_subtotal or 0.0
+        pt = self.price_total or 0.0
+        epd = 0.0
+        if "epd_paid_on_line" in self._fields:
+            epd = self.epd_paid_on_line or 0.0
+        if not epd or float_is_zero(epd, precision_rounding=cur.rounding or 0.0001):
+            return (ps, pt)
+        if not float_is_zero(pt, precision_rounding=cur.rounding or 0.0001):
+            at_net = cur.round(pt - epd)
+            epd_untax = cur.round(epd * (ps / pt))
+            bt_net = cur.round(ps - epd_untax)
+        else:
+            bt_net = cur.round(ps - epd)
+            at_net = pt
+        return (bt_net, at_net)
+
+    def _get_commission_calc_data(self, rule=None):
+        """Data dict for sale.commission.calculate_amount; `rule` is kept for bista_rep compatibility."""
+        self.ensure_one()
+        b_before, b_after = self._get_commission_amount_bases()
+        return {
+            "product_id": self.product_id,
+            "partner_id": self.partner_id,
+            "quantity": self.quantity,
+            "amount_after_tax": b_after,
+            "amount_before_tax": b_before,
+        }
+
     @api.depends(
         "sale_person_id",
         "team_id",
         "price_total",
+        "price_subtotal",
+        "epd_paid_on_line",
+        "move_id.epd_paid_total",
         "partner_id",
         "product_id",
     )
@@ -140,12 +210,13 @@ class AccountMoveLine(models.Model):
                 line.commission_amount = 0
                 continue
 
+            b_before, b_after = line._get_commission_amount_bases()
             data = {
                 'product_id': line.product_id,
                 'partner_id': line.partner_id,
                 'quantity': line.quantity,
-                'amount_after_tax': line.price_total,
-                'amount_before_tax': line.price_subtotal,
+                'amount_after_tax': b_after,
+                'amount_before_tax': b_before,
                 'percentage': line.commission_percent
             }
             amount = 0

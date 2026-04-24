@@ -65,6 +65,96 @@ class AccountMove(models.Model):
         string="Payment Date",
         compute="compute_payment_date_final",
     )
+    epd_paid_total = fields.Monetary(
+        string="EPD (payment j.e.)",
+        compute="_compute_epd_paid",
+        currency_field="currency_id",
+        help="Sum of early payment discount lines (display on payment journal entry) in invoice currency, "
+        "for moves reconciled with this invoice.",
+    )
+    epd_paid_aml_info = fields.Char(
+        string="EPD (payment) detail",
+        compute="_compute_epd_paid",
+        help="Reconciled payment/statement entry names and EPD line amounts in invoice currency.",
+    )
+
+    def _reconciled_counterpart_epd_aml(self):
+        """AMLs on counterpart moves of receivable/payable lines with EPD (from payment/statement journal)."""
+        self.ensure_one()
+        if not self.is_invoice(include_receipts=True) or not self:
+            return self.env["account.move.line"]
+        moves = self._get_reconciled_amls().move_id
+        if not moves:
+            return self.env["account.move.line"]
+        return moves.line_ids.filtered(lambda l: l.display_type == "epd")
+
+    def _sum_epd_amls_in_move_currency(self, amls, move, date_ref):
+        """Net EPD in invoice currency: sum signed EPD lines (base + tax), not sum(abs() per line).
+
+        Odoo posts e.g. base discount 239.05 and tax 11.95; net = 227.10. Summing abs() gave 251.
+        """
+        self.ensure_one()
+        if not amls or not move.currency_id:
+            return 0.0
+        ref_date = date_ref or move.invoice_date or move.date
+        comp = move.company_id
+        cur = move.currency_id
+        total_signed = 0.0
+        for aml in amls:
+            if not aml or aml._name != "account.move.line":
+                continue
+            if aml.currency_id and aml.amount_currency is not None:
+                if aml.currency_id == cur:
+                    line_amt = cur.round(aml.amount_currency)
+                else:
+                    line_amt = cur.round(aml.currency_id._convert(aml.amount_currency, cur, comp, ref_date))
+                total_signed += line_amt
+            else:
+                ccur = comp.currency_id
+                b = aml.balance
+                if ccur == cur:
+                    total_signed += ccur.round(b)
+                else:
+                    total_signed += cur.round(
+                        ccur._convert(aml.balance, cur, comp, ref_date or aml.date)
+                    )
+        # One positive magnitude for total discount in invoice terms (inbound / outbound safe)
+        return cur.round(abs(total_signed))
+
+    @api.depends(
+        "line_ids.matched_debit_ids",
+        "line_ids.matched_credit_ids",
+        # debit_move_id / credit_move_id are account.move.line; EPD lines live on the move, not the aml
+        "line_ids.matched_debit_ids.debit_move_id.move_id.line_ids.display_type",
+        "line_ids.matched_credit_ids.credit_move_id.move_id.line_ids.display_type",
+        "line_ids.matched_debit_ids.debit_move_id.move_id.line_ids.amount_currency",
+        "line_ids.matched_credit_ids.credit_move_id.move_id.line_ids.amount_currency",
+        "currency_id",
+        "payment_state",
+        "state",
+    )
+    def _compute_epd_paid(self):
+        for move in self:
+            if not move.is_invoice(include_receipts=True) or move.state != "posted" or not move:
+                move.epd_paid_total = 0.0
+                move.epd_paid_aml_info = False
+                continue
+            amls = move._reconciled_counterpart_epd_aml()
+            date_ref = move.invoice_date or move.date
+            total = move._sum_epd_amls_in_move_currency(amls, move, date_ref) if amls else 0.0
+            move.epd_paid_total = total
+            parts = []
+            for pmove in move._get_reconciled_amls().move_id:
+                p_epd = pmove.line_ids.filtered(lambda l: l.display_type == "epd")
+                if not p_epd:
+                    continue
+                sub = move._sum_epd_amls_in_move_currency(p_epd, move, date_ref)
+                if move.currency_id:
+                    sub_fmt = move.currency_id.format(sub)
+                else:
+                    sub_fmt = str(sub)
+                parts.append("%s: %s" % (pmove.name, sub_fmt))
+            move.epd_paid_aml_info = " | ".join(parts) if parts else False
 
     @api.depends('line_ids.matched_debit_ids.debit_move_id', 'line_ids.matched_credit_ids.credit_move_id')
     def compute_payment_date_final(self):
@@ -113,12 +203,13 @@ class AccountMove(models.Model):
         # )
         for invoice in records:
             for line in invoice.invoice_line_ids:
+                b_before, b_after = line._get_commission_amount_bases()
                 data = {
                     'product_id': line.product_id,
                     'partner_id': invoice.partner_id,
                     'quantity': line.quantity,
-                    'amount_after_tax': line.price_total,
-                    'amount_before_tax': line.price_subtotal,
+                    'amount_after_tax': b_after,
+                    'amount_before_tax': b_before,
                     'percentage': 0
                 }
                 if line.product_id.detailed_type == 'service':

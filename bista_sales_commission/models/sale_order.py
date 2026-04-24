@@ -78,12 +78,13 @@ class SaleOrder(models.Model):
                     invoice.write({'sale_rep_id': order.sale_rep_id.id})
                 for line in invoice.invoice_line_ids:
                     if line.product_id:
+                        b_before, b_after = line._get_commission_amount_bases()
                         data = {
                             'product_id': line.product_id,
                             'partner_id': invoice.partner_id,
                             'quantity': line.quantity,
-                            'amount_after_tax': line.price_total,
-                            'amount_before_tax': line.price_subtotal,
+                            'amount_after_tax': b_after,
+                            'amount_before_tax': b_before,
                             'percentage': 0
                         }
                         if line.product_id.detailed_type == 'service':
