@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_move_tree_commission_review" model="ir.ui.view">
+            <field name="name">account.move.tree.commission.review</field>
+            <field name="model">account.move</field>
+            <field name="arch" type="xml">
+                <tree string="Sales Commission Review" create="false" edit="false">
+                    <field name="name" string="Invoice" decoration-bf="1"/>
+                    <field name="partner_id"/>
+                    <field name="invoice_date"/>
+                    <field name="invoice_user_id" widget="many2one_avatar_user" string="Salesperson"/>
+                    <field name="x_commission_payment_date" string="Payment Date"/>
+                    <field name="amount_untaxed" sum="Untaxed Total" widget="monetary"/>
+                    <field name="x_freight_total" sum="Freight Total" widget="monetary"/>
+                    <field name="x_amount_commissionable" sum="Commissionable Total" widget="monetary" decoration-bf="1"/>
+                    <field name="currency_id" column_invisible="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_move_search_commission_review" model="ir.ui.view">
+            <field name="name">account.move.search.commission.review</field>
+            <field name="model">account.move</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name"/>
+                    <field name="partner_id"/>
+                    <field name="invoice_user_id"/>
+                    <field name="x_commission_payment_date"/>
+                    <separator/>
+                    <filter string="Paid" name="paid_only" domain="[('payment_state', '=', 'paid')]"/>
+                    <group expand="1" string="Group By">
+                        <filter string="Salesperson" name="group_by_salesperson" context="{'group_by':'invoice_user_id'}"/>
+                        <filter string="Payment Month" name="group_by_payment_month" context="{'group_by':'x_commission_payment_date:month'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_commission_review_report" model="ir.actions.act_window">
+            <field name="name">Sales Commission Review</field>
+            <field name="res_model">account.move</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_move_tree_commission_review"/>
+            <field name="search_view_id" ref="view_move_search_commission_review"/>
+            <field name="domain">[('move_type', '=', 'out_invoice'), ('state', '=', 'posted')]</field>
+        </record>
+
+    </data>
+</odoo>

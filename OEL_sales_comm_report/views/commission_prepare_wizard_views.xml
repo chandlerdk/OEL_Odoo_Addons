@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_sales_commission_prepare_wizard_form" model="ir.ui.view">
+            <field name="name">sales.commission.prepare.wizard.form</field>
+            <field name="model">sales.commission.prepare.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Sales Commission Review">
+                    <group>
+                        <field name="month"/>
+                        <field name="year"/>
+                    </group>
+                    <footer>
+                        <button string="Prepare &amp; Open"
+                                type="object"
+                                name="action_prepare_and_open"
+                                class="btn-primary"/>
+                        <button string="Cancel"
+                                special="cancel"
+                                class="btn-secondary"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_sales_commission_prepare_wizard" model="ir.actions.act_window">
+            <field name="name">Sales Commission Review</field>
+            <field name="res_model">sales.commission.prepare.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="view_id" ref="view_sales_commission_prepare_wizard_form"/>
+        </record>
+
+        <menuitem id="menu_sales_commission_review"
+                  name="Sales Commission Review"
+                  parent="account.menu_finance"
+                  action="action_sales_commission_prepare_wizard"
+                  sequence="110"
+                  groups="account.group_account_invoice"/>
+
+    </data>
+</odoo>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="action_report_credit_memo" model="ir.actions.report">
+            <field name="name">Credit Memo</field>
+            <field name="model">account.move</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">OEL_credit_memo_report.report_credit_memo_with_payments</field>
+            <field name="report_file">OEL_credit_memo_report.report_credit_memo_with_payments</field>
+            <field name="print_report_name">(object.move_type == 'out_refund') and 'Credit Memo - %s' % (object.name) or 'Credit Memo'</field>
+            <field name="binding_model_id" ref="account.model_account_move"/>
+            <field name="binding_type">report</field>
+        </record>
+    </data>
+</odoo>

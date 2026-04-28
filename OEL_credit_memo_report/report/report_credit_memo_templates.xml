@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- =====================================================
+             ROOT TEMPLATE
+             ===================================================== -->
+        <template id="report_credit_memo_with_payments">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-set="lang" t-value="o.partner_id.lang or o.company_id.partner_id.lang"/>
+                    <t t-set="print_with_payments" t-value="True"/>
+                    <t t-call="OEL_credit_memo_report.report_credit_memo_document" t-lang="lang"/>
+                </t>
+            </t>
+        </template>
+
+        <!-- =====================================================
+             DOCUMENT TEMPLATE
+             ===================================================== -->
+        <template id="report_credit_memo_document" inherit_id="account.report_invoice_document">
+
+            <!-- 1. Fix Line Item Subtotal -->
+            <xpath expr="//td[@name='td_subtotal']/span[@class='text-nowrap']" position="replace">
+                <t t-if="o.move_type == 'out_refund' and line.price_subtotal &gt; 0">
+                    <span class="text-nowrap">-<t t-out="line.price_subtotal" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></span>
+                </t>
+                <t t-else="">
+                    <span t-field="line.price_subtotal" class="text-nowrap"/>
+                </t>
+            </xpath>
+
+            <!-- 2. Fix Section Subtotal Row -->
+            <xpath expr="//tr[contains(@class, 'is-subtotal')]//span[@t-out='current_subtotal']" position="replace">
+                <t t-if="o.move_type == 'out_refund' and current_subtotal &gt; 0">
+                    -<span t-out="current_subtotal" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                </t>
+                <t t-else="">
+                    <span t-out="current_subtotal" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                </t>
+            </xpath>
+
+            <!-- 3. Fix Totals Block (Subtotal, Taxes, Grand Total)
+                 We replace the standard t-call with a custom inline version
+                 to guarantee the "-" sign logic works regardless of Studio 
+            -->
+            <xpath expr="//t[@t-call='account.document_tax_totals']" position="replace">
+                <!-- Subtotals -->
+                <t t-foreach="tax_totals.get('subtotals')" t-as="subtotal">
+                    <tr class="border-black o_subtotal">
+                        <td><strong t-out="subtotal['name']">Untaxed Amount</strong></td>
+                        <td class="text-end">
+                            <t t-if="o.move_type == 'out_refund' and subtotal.get('amount', 0) &gt; 0">-</t>
+                            <span t-out="subtotal['formatted_amount']"/>
+                        </td>
+                    </tr>
+                </t>
+
+                <!-- Tax Group -->
+                <t t-foreach="tax_totals.get('groups_by_subtotal', {}).get(tax_totals.get('subtotals', [{}])[0].get('name'))" t-as="tax_group">
+                    <tr>
+                        <t t-if="tax_totals.get('display_tax_base')">
+                            <td>
+                                <span t-out="tax_group['tax_group_name']"/>
+                                <span class="text-nowrap"> on
+                                    <t t-if="o.move_type == 'out_refund' and tax_group.get('tax_group_base_amount', 0) &gt; 0">-</t>
+                                    <t t-out="tax_group['formatted_tax_group_base_amount']"/>
+                                </span>
+                            </td>
+                            <td class="text-end o_price_total">
+                                <t t-if="o.move_type == 'out_refund' and tax_group.get('tax_group_amount', 0) &gt; 0">-</t>
+                                <span t-out="tax_group['formatted_tax_group_amount']"/>
+                            </td>
+                        </t>
+                        <t t-else="">
+                            <td><span class="text-nowrap" t-out="tax_group['tax_group_name']"/></td>
+                            <td class="text-end o_price_total">
+                                <t t-if="o.move_type == 'out_refund' and tax_group.get('tax_group_amount', 0) &gt; 0">-</t>
+                                <span t-out="tax_group['formatted_tax_group_amount']"/>
+                            </td>
+                        </t>
+                    </tr>
+                </t>
+
+                <!-- Grand Total -->
+                <tr class="border-black o_total">
+                    <td><strong>Total</strong></td>
+                    <td class="text-end">
+                        <t t-if="o.move_type == 'out_refund' and tax_totals.get('amount_total', 0) &gt; 0">-</t>
+                        <strong t-out="tax_totals['formatted_amount_total']"/>
+                    </td>
+                </tr>
+            </xpath>
+
+        </template>
+    </data>
+</odoo>
