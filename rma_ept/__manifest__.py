@@ -1,16 +1,12 @@
 # -*- coding: utf-8 -*-
 # See LICENSE file for full copyright and licensing details.
 {
-
-    # App information
     'name': 'RMA (Return Merchandise Authorization) in Odoo',
     'version': '17.0.1.0',
     'category': 'Sales',
     'license': 'OPL-1',
     'summary': "Manage Return Merchandize Authorization (RMA) in Odoo. Allow users to manage Return Orders, "
                "Replacement, Refund & Repair in Odoo.",
-
-    # Author
     'author': 'Emipro Technologies Pvt. Ltd.',
     'maintainer': 'Emipro Technologies Pvt. Ltd.',
     'website': "https://www.emiprotechnologies.com/",

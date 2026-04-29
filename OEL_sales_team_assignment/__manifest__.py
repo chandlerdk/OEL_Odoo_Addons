@@ -16,7 +16,7 @@
         'sale','OEL_sales_team_restriction',  # ensure restriction logic is available
     ],
 
-    'data': [],  # no XML views or security needed for auto-assignment
+    'data': [],
 
     'installable': True,
     'application': False,
