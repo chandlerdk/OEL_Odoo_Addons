@@ -103,10 +103,10 @@ class AccountMoveLine(models.Model):
             }
             if line.product_id.detailed_type == 'service':
                 user_rules = sale_commission.search(
-                    [('user_ids', 'in', line.user_id.id), ('sale_partner_type', '=', 'user'),
+                    [('user_ids', 'in', line.sale_person_id.id), ('sale_partner_type', '=', 'user'),
                      ('product_ids', 'in', line.product_id.id), ('product_ids.detailed_type', '=', 'service')
                      ],
-                    order='sequence') if line.user_id else sale_commission.browse()
+                    order='sequence') if line.sale_person_id else sale_commission.browse()
 
                 for user_rule in user_rules:
                     data = line._get_commission_calc_data(user_rule)
@@ -130,7 +130,7 @@ class AccountMoveLine(models.Model):
             else:
                 user_rules = sale_commission.search(
                     [('user_ids', 'in', line.sale_person_id.id), ('sale_partner_type', '=', 'user')],
-                    order='sequence') if line.user_id else sale_commission.browse()
+                    order='sequence') if line.sale_person_id else sale_commission.browse()
                 for user_rule in user_rules:
                     data = line._get_commission_calc_data(user_rule)
                     data['percentage'] = line.in_commission_percent if line.manual_in_commission else user_rule.percentage
@@ -228,6 +228,7 @@ class AccountMoveLine(models.Model):
     @api.depends(
         "sale_person_id", "team_id", "user_id", "sale_rep_id",
         "price_total", "price_subtotal", "partner_id", "product_id",
+        "commission_percent", "in_commission_percent", "out_commission_percent",
         "manual_commission", "manual_in_commission", "manual_out_commission",
         "epd_paid_on_line", "move_id.epd_paid_total",
     )
@@ -241,10 +242,10 @@ class AccountMoveLine(models.Model):
                      ('product_ids', 'in', line.product_id.id),('product_ids.detailed_type','=','service')],
                     order='sequence') if line.sale_rep_id else sale_commission.browse()
                 user_rules = sale_commission.search(
-                    [('user_ids', 'in', line.user_id.id), ('sale_partner_type', '=', 'user'),
+                    [('user_ids', 'in', line.sale_person_id.id), ('sale_partner_type', '=', 'user'),
                     ('product_ids', 'in', line.product_id.id), ('product_ids.detailed_type', '=', 'service')
                      ],
-                    order='sequence') if line.user_id else sale_commission.browse()
+                    order='sequence') if line.sale_person_id else sale_commission.browse()
                 team_rules = sale_commission.search(
                     [('sale_team_rep', '=', line.team_id.user_id.id), ('sale_partner_type', '=', 'sale_team'),
                      ('product_ids', 'in', line.product_id.id), ('product_ids.detailed_type', '=', 'service')
@@ -288,7 +289,7 @@ class AccountMoveLine(models.Model):
                         line.in_commission_amount = amount
                         break
                 else:
-                    if line.manual_in_commission and line.in_commission_percent:
+                    if line.in_commission_percent:
                         generic = line._get_generic_commission()
                         if generic:
                             data = line._get_commission_calc_data(generic)
@@ -338,7 +339,7 @@ class AccountMoveLine(models.Model):
                 rep_rules = sale_commission.search([('sale_rep_id', '=', line.sale_rep_id.id),('sale_partner_type','=','sale_rep')],
                                                    order='sequence') if line.sale_rep_id else sale_commission.browse()
                 user_rules = sale_commission.search([('user_ids', 'in', line.sale_person_id.id),('sale_partner_type','=','user')],
-                                                    order='sequence') if line.user_id else sale_commission.browse()
+                                                    order='sequence') if line.sale_person_id else sale_commission.browse()
                 team_rules = sale_commission.search([('sale_team_rep', '=', line.team_id.user_id.id),('sale_partner_type','=','sale_team')],
                                                     order='sequence') if line.team_id else sale_commission.browse()
 
@@ -379,7 +380,7 @@ class AccountMoveLine(models.Model):
                         line.in_commission_amount = amount
                         break
                 else:
-                    if line.manual_in_commission and line.in_commission_percent:
+                    if line.in_commission_percent:
                         generic = line._get_generic_commission()
                         if generic:
                             data = line._get_commission_calc_data(generic)
