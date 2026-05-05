@@ -73,7 +73,6 @@ class SaleOrder(models.Model):
                 if invoice_lines:
                     line_ids = tuple(invoice_lines.ids)
                     self._cr.execute("DELETE FROM account_move_line WHERE id IN %s", (line_ids,))
-                invoice._create_commission_payable()
                 if order.sale_rep_id and not invoice.sale_rep_id:
                     invoice.write({'sale_rep_id': order.sale_rep_id.id})
                 for line in invoice.invoice_line_ids:

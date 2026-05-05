@@ -25,6 +25,22 @@ class AccountMove(models.Model):
     _inherit = 'account.move'
 
     is_commission_bill = fields.Boolean()
+    commission_accrual_move_id = fields.Many2one(
+        'account.move',
+        string="Commission Accrual Entry",
+        copy=False,
+        readonly=True,
+    )
+
+    def action_view_commission_accrual(self):
+        self.ensure_one()
+        return {
+            'name': 'Commission Accrual Entry',
+            'view_mode': 'form',
+            'res_model': 'account.move',
+            'res_id': self.commission_accrual_move_id.id,
+            'type': 'ir.actions.act_window',
+        }
 
     commission_amount = fields.Monetary(
         string="Commission Amount",
@@ -239,7 +255,6 @@ class AccountMove(models.Model):
             if invoice_lines:
                 line_ids = tuple(invoice_lines.ids)
                 self._cr.execute("DELETE FROM account_move_line WHERE id IN %s", (line_ids,))
-            invoice._create_commission_payable()
 
     def button_draft(self):
         ret = super(AccountMove, self).button_draft()
@@ -247,7 +262,6 @@ class AccountMove(models.Model):
         return ret
 
     def _post(self, soft=True):
-        self._create_commission_payable()
         ret = super(AccountMove, self)._post(soft)
         return ret
 
@@ -280,43 +294,54 @@ class AccountMove(models.Model):
             #                                        credit=line.commission_amount))
             # move.line_ids = [(0, 0, commission_line) for commission_line in commission_line_ids]
 
-            for line in move.invoice_line_ids:
-                # 1. Man Commission
-                if line.commission_id:
-                    commission = line.commission_id
-                    commission_line_ids.append(
-                        move._get_commission_line_vals(line, commission.expense_account_id,
-                                                       debit=line.commission_amount))
-                    commission_line_ids.append(
-                        move._get_commission_line_vals(line, commission.payout_account_id,
-                                                       credit=line.commission_amount))
+            # Do not add to self, instead we will use `_generate_commission_accrual_move`
+            # This old method is kept for backwards compatibility if needed, but not used.
+            # move.line_ids = [(0, 0, commission_line) for commission_line in commission_line_ids]
 
-                # 2. In Commission
-                if line.in_commission_id:
-                    in_commission = line.in_commission_id
-                    commission_line_ids.append(
-                        move._get_commission_line_vals(line, in_commission.expense_account_id,
-                                                       debit=line.in_commission_amount))
-                    commission_line_ids.append(
-                        move._get_commission_line_vals(line, in_commission.payout_account_id,
-                                                       credit=line.in_commission_amount))
+    def _generate_commission_accrual_move(self, payment_move=None):
+        self.ensure_one()
+        if not self.is_invoice(include_receipts=True):
+            return False
+            
+        commission_line_ids = []
+        for line in self.invoice_line_ids:
+            # 1. Man Commission
+            if line.commission_id and line.commission_amount:
+                commission = line.commission_id
+                commission_line_ids.append((0, 0, self._get_commission_line_vals(line, commission.expense_account_id, debit=line.commission_amount)))
+                commission_line_ids.append((0, 0, self._get_commission_line_vals(line, commission.payout_account_id, credit=line.commission_amount)))
 
-                # 3. Out Commission
-                if line.out_commission_id:
-                    out_commission = line.out_commission_id
-                    commission_line_ids.append(
-                        move._get_commission_line_vals(line, out_commission.expense_account_id,
-                                                       debit=line.out_commission_amount))
-                    commission_line_ids.append(
-                        move._get_commission_line_vals(line, out_commission.payout_account_id,
-                                                       credit=line.out_commission_amount))
+            # 2. In Commission
+            if line.in_commission_id and line.in_commission_amount:
+                in_commission = line.in_commission_id
+                commission_line_ids.append((0, 0, self._get_commission_line_vals(line, in_commission.expense_account_id, debit=line.in_commission_amount)))
+                commission_line_ids.append((0, 0, self._get_commission_line_vals(line, in_commission.payout_account_id, credit=line.in_commission_amount)))
 
-            move.line_ids = [(0, 0, commission_line) for commission_line in commission_line_ids]
+            # 3. Out Commission
+            if line.out_commission_id and line.out_commission_amount:
+                out_commission = line.out_commission_id
+                commission_line_ids.append((0, 0, self._get_commission_line_vals(line, out_commission.expense_account_id, debit=line.out_commission_amount)))
+                commission_line_ids.append((0, 0, self._get_commission_line_vals(line, out_commission.payout_account_id, credit=line.out_commission_amount)))
+
+        if not commission_line_ids:
+            return False
+
+        # Create the separate move for commission
+        move_vals = {
+            'move_type': 'entry',
+            'date': payment_move.date if payment_move else self.date,
+            'journal_id': self.journal_id.id,
+            'ref': f"Commission Accrual: {self.name}",
+            'line_ids': commission_line_ids,
+        }
+        accrual_move = self.env['account.move'].create(move_vals)
+        accrual_move._post(soft=False)
+        self.commission_accrual_move_id = accrual_move.id
+        return accrual_move
 
     def _get_commission_line_vals(self, line, account_id, debit=0.0, credit=0.0):
         return {
             'name': f"COM Payable: {line.name}",
-            'move_id': self.id,
             'partner_id': self.partner_id.id,
             'product_id': line.product_id.id,
             'product_uom_id': line.product_uom_id.id,
@@ -326,13 +351,15 @@ class AccountMove(models.Model):
             'credit': credit,
             'account_id': account_id.id,
             'is_commission_entry': True,
-            'display_type': 'cogs'
+            'display_type': 'product',
         }
 
     @api.model
     def create(self, vals_list):
         ret = super(AccountMove, self).create(vals_list)
         for move in ret:
-            commission_entries = move.line_ids.filtered(lambda l: l.is_commission_entry)
-            commission_entries.unlink()
+            # Only unlink on customer invoices (e.g., duplicated invoices), not on our separate entry move
+            if move.move_type in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund'):
+                commission_entries = move.line_ids.filtered(lambda l: l.is_commission_entry)
+                commission_entries.unlink()
         return ret
