@@ -316,8 +316,8 @@ class AccountMoveLine(models.Model):
                         line.out_commission_amount = amount
                         break
                 else:
-                    # Fallback logic if manual_out_commission is True but no rule is found
-                    if line.manual_out_commission and line.out_commission_percent:
+                    # Preserve explicit C% OUT values even when no team rule is matched.
+                    if line.out_commission_percent:
                         generic = line._get_generic_commission()
                         if generic:
                             data = line._get_commission_calc_data(generic)
@@ -407,8 +407,8 @@ class AccountMoveLine(models.Model):
                         line.out_commission_amount = amount
                         break
                 else:
-                    # Fallback logic if manual_out_commission is True but no rule is found
-                    if line.manual_out_commission and line.out_commission_percent:
+                    # Preserve explicit C% OUT values even when no team rule is matched.
+                    if line.out_commission_percent:
                         generic = line._get_generic_commission()
                         if generic:
                             data = line._get_commission_calc_data(generic)
