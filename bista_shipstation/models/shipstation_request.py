@@ -30,43 +30,42 @@ class ShipStationRequest():
     def _make_api_request(self, endpoint, request_type='get', data=None, timeout=False):
 
         json_data = json.dumps(data)
-
         access_url = url_join(API_BASE_URL, endpoint)
         if access_url == 'https://ssapi.shipstation.com/shipments' and data.get('pages'):
             access_url = access_url + '?page=' + str(data.get('pages'))
 
-        # try:
-        self.debug_logger("%s\n%s\n%s" % (access_url, request_type, data if data else None),
-                          'shipstation_request_%s' % endpoint)
-        data = "%s:%s" % (self.api_key, self.api_secret)
-        encode_data = base64.b64encode(data.encode("utf-8"))
-        authrization_data = "Basic %s" % (encode_data.decode("utf-8"))
-        headers = {"Authorization": authrization_data, "Content-Type": "application/json", }
-        _logger.info(json_data)
-        if request_type == 'get':
-            response = requests.get(access_url, params=data, headers=headers)
-        elif request_type == 'post':
-            response = requests.post(access_url, data=json_data, headers=headers)
-        else:
-            response = requests.put(access_url, auth=(self.api_key, self.api_secret), data=json_data,
-                                    headers=headers)
-        self.debug_logger("%s\n%s" % (response.status_code, response.text), 'shipstation_response_%s' % endpoint)
-        if response.status_code == 400:
-            error_message = response.text
-            raise UserError(_('ShipStation returned an error: ') + '%d\nError message: %s' % (
-            response.status_code, error_message))
-        result = response.json()
-        if response.status_code != 200:
-            error_message = result.get('ExceptionMessage', "Empty.")
-            raise UserError(_('ShipStation returned an error: ') + '%d\nError message: %s' % (
-            response.status_code, error_message))
-        return result
-    # except ReadTimeout as e:
-    #     raise UserError("It's taking too long to connect to the carrier. Please retry.")
-    # except UserError as e:
-    #     raise e
-    # except Exception as e:
-    #     raise UserError("Error: %s" % str(e))
+        try:
+            self.debug_logger("%s\n%s\n%s" % (access_url, request_type, data if data else None),
+                              'shipstation_request_%s' % endpoint)
+            data = "%s:%s" % (self.api_key, self.api_secret)
+            encode_data = base64.b64encode(data.encode("utf-8"))
+            authrization_data = "Basic %s" % (encode_data.decode("utf-8"))
+            headers = {"Authorization": authrization_data, "Content-Type": "application/json", }
+
+            if request_type == 'get':
+                response = requests.get(access_url, params=data, headers=headers)
+            elif request_type == 'post':
+                response = requests.post(access_url, data=json_data, headers=headers)
+            else:
+                response = requests.put(access_url, auth=(self.api_key, self.api_secret), data=json_data,
+                                        headers=headers)
+            self.debug_logger("%s\n%s" % (response.status_code, response.text), 'shipstation_response_%s' % endpoint)
+            if response.status_code == 400:
+                error_message = response.text
+                raise UserError(_('ShipStation returned an error: ') + '%d\nError message: %s' % (
+                response.status_code, error_message))
+            result = response.json()
+            if response.status_code != 200:
+                error_message = result.get('ExceptionMessage', "Empty.")
+                raise UserError(_('ShipStation returned an error: ') + '%d\nError message: %s' % (
+                response.status_code, error_message))
+            return result
+        except ReadTimeout as e:
+            raise UserError("It's taking too long to connect to the carrier. Please retry.")
+        except UserError as e:
+            raise e
+        except Exception as e:
+            raise UserError("Error: %s" % str(e))
 
     def fetch_shipstation_carrier(self):
         ##https://www.shipstation.com/docs/api/carriers/list/
