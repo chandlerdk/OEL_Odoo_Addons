@@ -30,6 +30,7 @@ class ShipStationRequest():
     def _make_api_request(self, endpoint, request_type='get', data=None, timeout=False):
 
         json_data = json.dumps(data)
+
         access_url = url_join(API_BASE_URL, endpoint)
         if access_url == 'https://ssapi.shipstation.com/shipments' and data.get('pages'):
             access_url = access_url + '?page=' + str(data.get('pages'))
@@ -41,7 +42,7 @@ class ShipStationRequest():
             encode_data = base64.b64encode(data.encode("utf-8"))
             authrization_data = "Basic %s" % (encode_data.decode("utf-8"))
             headers = {"Authorization": authrization_data, "Content-Type": "application/json", }
-
+            _logger.info(json_data)
             if request_type == 'get':
                 response = requests.get(access_url, params=data, headers=headers)
             elif request_type == 'post':
