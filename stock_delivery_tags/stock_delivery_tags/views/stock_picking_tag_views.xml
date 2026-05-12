@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View -->
+    <record id="view_stock_picking_tag_form" model="ir.ui.view">
+        <field name="name">stock.picking.tag.form</field>
+        <field name="model">stock.picking.tag</field>
+        <field name="arch" type="xml">
+            <form string="Picking Tag">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="color" widget="color_picker"/>
+                        <field name="active"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View -->
+    <record id="view_stock_picking_tag_list" model="ir.ui.view">
+        <field name="name">stock.picking.tag.list</field>
+        <field name="model">stock.picking.tag</field>
+        <field name="arch" type="xml">
+            <tree string="Picking Tags">
+                <field name="name"/>
+                <field name="color" widget="color_picker"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_stock_picking_tag" model="ir.actions.act_window">
+        <field name="name">Picking Tags</field>
+        <field name="res_model">stock.picking.tag</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Menu under Inventory > Configuration -->
+    <menuitem
+        id="menu_stock_picking_tag"
+        name="Picking Tags"
+        parent="stock.menu_stock_config_settings"
+        action="action_stock_picking_tag"
+        sequence="50"
+        groups="stock.group_stock_user"/>
+
+</odoo>
