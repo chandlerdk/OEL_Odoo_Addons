@@ -272,7 +272,10 @@ class SaleOrderLine(models.Model):
                     if line.manual_commission and line.commission_percent:
                         generic = line._get_generic_commission()
                         data['percentage'] = line.commission_percent
-                        amount = line.env['sale.commission'].calculate_amount(data)
+                        if generic:
+                            amount = generic.calculate_amount(data)
+                        else:
+                            amount = 0.0
                         line.commission_id = generic.id if generic else False
                         line.commission_amount = amount
                     else:
@@ -292,7 +295,10 @@ class SaleOrderLine(models.Model):
                     if line.manual_in_commission and line.in_commission_percent:
                         generic = line._get_generic_commission()
                         data['percentage'] = line.in_commission_percent
-                        amount = line.env['sale.commission'].calculate_amount(data)
+                        if generic:
+                            amount = generic.calculate_amount(data)
+                        else:
+                            amount = 0.0
                         line.in_commission_id = generic.id if generic else False
                         line.in_commission_amount = amount
                     else:
@@ -313,7 +319,10 @@ class SaleOrderLine(models.Model):
                     if line.manual_out_commission and line.out_commission_percent:
                         generic = line._get_generic_commission()
                         data['percentage'] = line.out_commission_percent
-                        amount = line.env['sale.commission'].calculate_amount(data)
+                        if generic:
+                            amount = generic.calculate_amount(data)
+                        else:
+                            amount = 0.0
                         line.out_commission_id = generic.id if generic else False
                         line.out_commission_amount = amount
                     else:
@@ -340,7 +349,10 @@ class SaleOrderLine(models.Model):
                     if line.manual_commission and line.commission_percent:
                         generic = line._get_generic_commission()
                         data['percentage'] = line.commission_percent
-                        amount = line.env['sale.commission'].calculate_amount(data)
+                        if generic:
+                            amount = generic.calculate_amount(data)
+                        else:
+                            amount = 0.0
                         line.commission_id = generic.id if generic else False
                         line.commission_amount = amount
                     else:
@@ -360,7 +372,10 @@ class SaleOrderLine(models.Model):
                     if line.manual_in_commission and line.in_commission_percent:
                         generic = line._get_generic_commission()
                         data['percentage'] = line.in_commission_percent
-                        amount = line.env['sale.commission'].calculate_amount(data)
+                        if generic:
+                            amount = generic.calculate_amount(data)
+                        else:
+                            amount = 0.0
                         line.in_commission_id = generic.id if generic else False
                         line.in_commission_amount = amount
                     else:
@@ -381,7 +396,10 @@ class SaleOrderLine(models.Model):
                     if line.manual_out_commission and line.out_commission_percent:
                         generic = line._get_generic_commission()
                         data['percentage'] = line.out_commission_percent
-                        amount = line.env['sale.commission'].calculate_amount(data)
+                        if generic:
+                            amount = generic.calculate_amount(data)
+                        else:
+                            amount = 0.0
                         line.out_commission_id = generic.id if generic else False
                         line.out_commission_amount = amount
                     else:

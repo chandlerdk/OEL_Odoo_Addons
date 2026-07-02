@@ -6,9 +6,10 @@
 #
 ##############################################################################
 
-from odoo import api, fields, models, _
+from odoo import api, fields, models, _, Command
 from datetime import date
 from odoo.exceptions import ValidationError, UserError
+from odoo.tools.float_utils import float_compare, float_is_zero
 
 
 class AccountMoveLine(models.Model):
@@ -21,10 +22,26 @@ class AccountMoveLine(models.Model):
     commission_move_id = fields.Many2one('account.move', string="Commission Bill", copy=False)
     reversed_move_id = fields.Many2one('account.move', related="move_id.reversed_entry_id", store=True)
     commission_move_line_id = fields.Many2one('account.move.line', string="Commission Bill Line", copy=False)
+    # Vendor bill line(s) pointing to this (customer) line — inverse of commission_reverse_move_line_id.
+    commission_vendor_bill_line_ids = fields.One2many(
+        'account.move.line',
+        'commission_reverse_move_line_id',
+        string="Commission bill lines",
+        copy=False,
+        readonly=True,
+    )
+    # All distinct vendor commission bills (one per bill move; a move may have several lines to this source).
+    commission_bill_ids = fields.Many2many(
+        'account.move',
+        string="Commission bills",
+        compute="_compute_commission_bill_ids",
+        copy=False,
+    )
     commission_reverse_move_line_id = fields.Many2one(
         'account.move.line',
         string="Commission Reverse Move Line",
-        copy=False
+        copy=False,
+        ondelete="set null",
     )
     commission_amount = fields.Float(
         compute="_compute_commission_amount",
@@ -73,14 +90,118 @@ class AccountMoveLine(models.Model):
     current_line_id = fields.Integer()
     user_id = fields.Many2one('res.users', related="move_id.invoice_user_id")
     is_commission_billed = fields.Boolean(string="Commission Billed", default=False, copy=False)
+    epd_paid_on_line = fields.Monetary(
+        string="EPD (payment j.e. share)",
+        compute="_compute_epd_paid_on_line",
+        currency_field="currency_id",
+        help="Proportional share of early payment discount (EPD) posted on reconciled payment/statement "
+        "journal entries, allocated from line untaxed / invoice untaxed.",
+    )
 
+    @api.depends(
+        "move_id.epd_paid_total",
+        "move_id.amount_untaxed",
+        "move_id.state",
+        "move_id.invoice_line_ids",
+        "move_id",
+        "price_subtotal",
+        "display_type",
+    )
+    def _compute_epd_paid_on_line(self):
+        for line in self:
+            line.epd_paid_on_line = 0.0
+            move = line.move_id
+            if not move or move.state != "posted" or not move.is_invoice(include_receipts=True):
+                continue
+            if line.display_type != "product":
+                continue
+            if line not in move.invoice_line_ids or move.currency_id.is_zero(move.epd_paid_total or 0.0):
+                continue
+            untaxed = move.amount_untaxed
+            if move.currency_id.is_zero(untaxed):
+                continue
+            line.epd_paid_on_line = move.currency_id.round(
+                (move.epd_paid_total or 0.0) * (line.price_subtotal / untaxed)
+            )
+
+    @api.depends(
+        "commission_vendor_bill_line_ids",
+        "commission_vendor_bill_line_ids.move_id",
+    )
+    def _compute_commission_bill_ids(self):
+        for line in self:
+            line.commission_bill_ids = [Command.set(line.commission_vendor_bill_line_ids.move_id.ids)]
+
+    def _add_commission_bill_link(self, vendor_line):
+        """Link this (customer) line to a created vendor bill line: set primary m2o once, never overwrite."""
+        self.ensure_one()
+        if not vendor_line or not vendor_line.move_id:
+            return
+        if not vendor_line.commission_reverse_move_line_id or vendor_line.commission_reverse_move_line_id != self:
+            vendor_line.sudo().write({'commission_reverse_move_line_id': self.id})
+        vals = {}
+        if not self.commission_move_line_id:
+            vals['commission_move_line_id'] = vendor_line.id
+        if not self.commission_move_id:
+            vals['commission_move_id'] = vendor_line.move_id.id
+        if vals:
+            self.sudo().write(vals)
+
+    def _expected_commission_bill_slot_count(self):
+        """How many separate commission bill lines this source line may need (man / in / out)."""
+        self.ensure_one()
+        n = 0
+        if self.commission_id and self.commission_amount:
+            n += 1
+        if self.in_commission_id and self.in_commission_amount:
+            n += 1
+        if self.out_commission_id and self.out_commission_amount:
+            n += 1
+        return n
+
+    def _get_commission_amount_bases(self):
+        """Return (amount_before_tax, amount_after_tax) for commission, net of this line EPD share (payment j.e.)."""
+        self.ensure_one()
+        cur = self.currency_id
+        if not cur:
+            cur = self.env.company.currency_id
+        ps = self.price_subtotal or 0.0
+        pt = self.price_total or 0.0
+        epd = 0.0
+        if "epd_paid_on_line" in self._fields:
+            epd = self.epd_paid_on_line or 0.0
+        if not epd or float_is_zero(epd, precision_rounding=cur.rounding or 0.0001):
+            return (ps, pt)
+        if not float_is_zero(pt, precision_rounding=cur.rounding or 0.0001):
+            at_net = cur.round(pt - epd)
+            epd_untax = cur.round(epd * (ps / pt))
+            bt_net = cur.round(ps - epd_untax)
+        else:
+            bt_net = cur.round(ps - epd)
+            at_net = pt
+        return (bt_net, at_net)
+
+    def _get_commission_calc_data(self, rule=None):
+        """Data dict for sale.commission.calculate_amount; `rule` is kept for bista_rep compatibility."""
+        self.ensure_one()
+        b_before, b_after = self._get_commission_amount_bases()
+        return {
+            "product_id": self.product_id,
+            "partner_id": self.partner_id,
+            "quantity": self.quantity,
+            "amount_after_tax": b_after,
+            "amount_before_tax": b_before,
+        }
 
     @api.depends(
         "sale_person_id",
         "team_id",
         "price_total",
+        "price_subtotal",
+        "epd_paid_on_line",
+        "move_id.epd_paid_total",
         "partner_id",
-        "product_id"
+        "product_id",
     )
     def _compute_commission_amount(self):
         for line in self:
@@ -89,12 +210,13 @@ class AccountMoveLine(models.Model):
                 line.commission_amount = 0
                 continue
 
+            b_before, b_after = line._get_commission_amount_bases()
             data = {
                 'product_id': line.product_id,
                 'partner_id': line.partner_id,
                 'quantity': line.quantity,
-                'amount_after_tax': line.price_total,
-                'amount_before_tax': line.price_subtotal,
+                'amount_after_tax': b_after,
+                'amount_before_tax': b_before,
                 'percentage': line.commission_percent
             }
             amount = 0
@@ -117,186 +239,11 @@ class AccountMoveLine(models.Model):
                 amount = -(amount or 0.0)
             line.commission_amount = amount
 
-    # def get_commission_rules(self):
-    #     """Return applicable commission rules by type for this line."""
-    #     self.ensure_one()
-    #     sale_commission = self.env['sale.commission']
-    #
-    #     return {
-    #         'rep_rule': sale_commission.search([
-    #             ('sale_rep_id', '=', self.sale_rep_id.id),
-    #             ('sale_partner_type', '=', 'sale_rep')
-    #         ], order='sequence', limit=1) if self.sale_rep_id else False,
-    #
-    #         'user_rule': sale_commission.search([
-    #             ('user_ids', 'in', self.user_id.id),
-    #             ('sale_partner_type', '=', 'user')
-    #         ], order='sequence', limit=1) if self.user_id else False,
-    #
-    #         'team_rule': sale_commission.search([
-    #             ('sale_team_rep', '=', self.team_id.user_id.id),
-    #             ('sale_partner_type', '=', 'sale_team')
-    #         ], order='sequence', limit=1) if self.team_id else False,
-    #     }
-
-    # def generate_bill(self):
-    #     grouped_lines = {}
-    #     sale_commission = self.env['sale.commission']
-    #     billed_partners = {}
-    #
-    #     for line in self:
-    #         if line.is_commission_billed:
-    #             continue
-    #         rules = line.get_commission_rules()
-    #         if not rules:
-    #             rules = line._get_generic_commission()
-    #
-    #         for rule_key, rule in rules.items():
-    #             if not rule:
-    #                 continue
-    #
-    #             partner = None
-    #             amount_field = None
-    #
-    #             if rule_key == 'rep_rule' and line.sale_rep_id and line.commission_amount:
-    #                 partner = line.sale_rep_id
-    #                 amount_field = 'commission_amount'
-    #
-    #             elif rule_key == 'user_rule' and line.sale_person_id and line.in_commission_amount:
-    #                 partner = line.sale_person_id.partner_id
-    #                 amount_field = 'in_commission_amount'
-    #
-    #             elif rule_key == 'team_rule' and line.team_id and line.out_commission_amount:
-    #                 partner = line.team_id.user_id.partner_id
-    #                 amount_field = 'out_commission_amount'
-    #
-    #             if not partner or not amount_field:
-    #                 continue
-    #
-    #             # Assign the exact commission rule to the line (based on partner type)
-    #             if rule_key == 'rep_rule':
-    #                 rep_rules = sale_commission.search([
-    #                     ('sale_rep_id', '=', line.sale_rep_id.id),
-    #                     ('sale_partner_type', '=', 'sale_rep')
-    #                 ], order='sequence')
-    #             elif rule_key == 'user_rule':
-    #                 rep_rules = sale_commission.search([
-    #                     ('user_ids', 'in', line.user_id.id),
-    #                     ('sale_partner_type', '=', 'user')
-    #                 ], order='sequence')
-    #             elif rule_key == 'team_rule':
-    #                 rep_rules = sale_commission.search([
-    #                     ('sale_team_rep', '=', line.team_id.user_id.id),
-    #                     ('sale_partner_type', '=', 'sale_team')
-    #                 ], order='sequence')
-    #             else:
-    #                 rep_rules = line._get_generic_commission()
-    #
-    #             data = {
-    #                 'percentage': 0,
-    #                 'quantity': line.quantity,
-    #                 'amount_after_tax': line.price_total,
-    #                 'amount_before_tax': line.price_subtotal,
-    #                 'product_id': line.product_id,
-    #                 'partner_id': partner,
-    #             }
-    #
-    #             for commission_rule in rep_rules:
-    #                 data['percentage'] = commission_rule.percentage
-    #                 amount = commission_rule.calculate_amount(data)
-    #                 if amount:
-    #                     # line.commission_id = commission_rule.id
-    #                     key = (partner.id, commission_rule.id, amount_field)
-    #                     grouped_lines.setdefault(key, []).append(line)
-    #                     line.is_commission_billed = True
-    #                     break
-    #
-    #     def create_bill(partner_id, rule_id, amount_field, lines):
-    #         rule = self.env['sale.commission'].browse(rule_id)
-    #         payout_account = rule.payout_account_id
-    #
-    #         if not payout_account:
-    #             raise UserError(f"Payout account not set on commission rule '{rule.name}'.")
-    #
-    #         existing_bill = self.env['account.move'].search([
-    #             ('partner_id', '=', partner_id),
-    #             ('move_type', '=', 'in_invoice'),
-    #             ('state', '=', 'draft'),
-    #         ], limit=1)
-    #
-    #         invoice_lines = []
-    #         for line in lines:
-    #             invoice_lines.append((0, 0, {
-    #                 'name': f"Com: {line.move_id.name}/{line.name}",
-    #                 'quantity': 1,
-    #                 'price_unit': getattr(line, amount_field),
-    #                 'account_id': payout_account.id,
-    #                 'commission_reverse_move_line_id': line.id,
-    #             }))
-    #
-    #         if existing_bill:
-    #             existing_bill.write({
-    #                 'invoice_line_ids': invoice_lines
-    #             })
-    #             billed_partners[partner_id] = existing_bill.name
-    #             for rec in existing_bill.invoice_line_ids:
-    #                 rec.commission_reverse_move_line_id.write({
-    #                     'commission_move_line_id': rec.id,
-    #                     'commission_move_id': existing_bill.id
-    #                 })
-    #             return existing_bill
-    #         else:
-    #             move_vals = {
-    #                 'move_type': 'in_invoice',
-    #                 'is_commission_bill': True,
-    #                 'partner_id': partner_id,
-    #                 'invoice_line_ids': invoice_lines,
-    #             }
-    #             bill = self.env['account.move'].create(move_vals)
-    #             bill._set_next_sequence()
-    #             billed_partners[partner_id] = bill.name
-    #             for rec in bill.invoice_line_ids:
-    #                 rec.commission_reverse_move_line_id.write({
-    #                     'commission_move_line_id': rec.id,
-    #                     'commission_move_id': bill.id
-    #                 })
-    #             return bill
-    #
-    #     for (partner_id, rule_id, amount_field), lines in grouped_lines.items():
-    #         create_bill(partner_id, rule_id, amount_field, lines)
-    #
-    #     if billed_partners:
-    #         partner_names = ", ".join(billed_partners.values())
-    #         message = _("Vendor Bills created successfully for: %s") % partner_names
-    #         return {
-    #             'type': 'ir.actions.client',
-    #             'tag': 'display_notification',
-    #             'params': {
-    #                 'title': _('Vendor Bill(s) Created'),
-    #                 'message': message,
-    #                 'sticky': False,
-    #                 'type': 'success',
-    #             }
-    #         }
-    #     return {
-    #         'type': 'ir.actions.client',
-    #         'tag': 'display_notification',
-    #         'params': {
-    #             'title': _('No Vendor Bills Created'),
-    #             'message': _('No eligible lines found or all commissions already billed.'),
-    #             'sticky': False,
-    #             'type': 'warning',
-    #         }
-    #     }
-
     def generate_bill(self):
         grouped_lines = {}
         billed_partners = {}
 
         for line in self:
-            if line.is_commission_billed:
-                continue
-
             # Map commission type → (commission rule, partner, amount)
             commission_map = [
                 (line.commission_id, line.sale_rep_id, line.commission_amount),
@@ -319,12 +266,11 @@ class AccountMoveLine(models.Model):
                     'partner': partner,
                 })
 
-                line.is_commission_billed = True
-
         # -------------------------------------------------------------------------
         # Bill Creation
         # -------------------------------------------------------------------------
         def create_bill(partner_id, rule_id, lines):
+            """lines: list of dicts with keys line, amount, rule, partner (same as grouped)."""
             rule = self.env['sale.commission'].browse(rule_id)
             payout_account = rule.payout_account_id
 
@@ -339,51 +285,49 @@ class AccountMoveLine(models.Model):
                 ('state', '=', 'draft'),
             ], limit=1)
 
-            invoice_lines = []
+            invoice_line_cmds = []
             for item in lines:
-                line = item['line']
+                cline = item['line']
                 amount = item['amount']
+                c_rule = item['rule']
 
-                invoice_lines.append((0, 0, {
-                    'name': f"Com: {line.move_id.name}/{line.name}",
+                invoice_line_cmds.append((0, 0, {
+                    'name': f"Com: {cline.move_id.name}/{cline.name}",
                     'quantity': 1,
                     'price_unit': amount,
                     'account_id': payout_account.id,
-                    'commission_reverse_move_line_id': line.id,
+                    'commission_reverse_move_line_id': cline.id,
+                    'commission_id': c_rule.id,
                 }))
 
             if existing_bill:
-                existing_bill.write({'invoice_line_ids': invoice_lines})
-                billed_partners[partner_id] = existing_bill.name
-
-                # Link invoice lines back to source commission line
-                for rec in existing_bill.invoice_line_ids:
-                    rec.commission_reverse_move_line_id.write({
-                        'commission_move_line_id': rec.id,
-                        'commission_move_id': existing_bill.id,
-                    })
-
-                return existing_bill
-
-            # No bill exists → create a new one
-            bill_vals = {
-                'move_type': 'in_invoice',
-                'is_commission_bill': True,
-                'partner_id': partner_id,
-                'invoice_line_ids': invoice_lines,
-            }
-            bill = self.env['account.move'].create(bill_vals)
-            bill._set_next_sequence()
+                n_new = len(invoice_line_cmds)
+                existing_bill.write({'invoice_line_ids': invoice_line_cmds})
+                bill = existing_bill
+                to_process = bill.invoice_line_ids[-n_new:]
+            else:
+                bill = self.env['account.move'].create({
+                    'move_type': 'in_invoice',
+                    'is_commission_bill': True,
+                    'partner_id': partner_id,
+                    'invoice_line_ids': invoice_line_cmds,
+                })
+                bill._set_next_sequence()
+                to_process = bill.invoice_line_ids
 
             billed_partners[partner_id] = bill.name
 
-            # Reverse linkage
-            for rec in bill.invoice_line_ids:
-                rec.commission_reverse_move_line_id.write({
-                    'commission_move_line_id': rec.id,
-                    'commission_move_id': bill.id,
-                })
-
+            for rec, item in zip(to_process, lines):
+                src = item['line']
+                c_rule = item['rule']
+                fix_vals = {}
+                if rec.commission_reverse_move_line_id != src:
+                    fix_vals['commission_reverse_move_line_id'] = src.id
+                if c_rule and rec.commission_id != c_rule:
+                    fix_vals['commission_id'] = c_rule.id
+                if fix_vals:
+                    rec.write(fix_vals)
+                src._add_commission_bill_link(rec)
             return bill
 
         # -------------------------------------------------------------------------
@@ -419,16 +363,26 @@ class AccountMoveLine(models.Model):
             }
         }
 
-    @api.depends("invoice_payment_state", "commission_payment_state", "commission_policy")
+    @api.depends(
+        "invoice_payment_state",
+        "commission_payment_state",
+        "commission_policy",
+        "commission_move_id",
+        "commission_move_id.state",
+        "commission_vendor_bill_line_ids",
+        "commission_vendor_bill_line_ids.move_id.state",
+        "move_id.state",
+    )
     def _get_commission_state(self):
         paid_state = ['paid', 'in_payment']
-        reversed_state = 'reversed'
 
         for line in self:
-            bill = line.commission_move_id
-            if bill and bill.state != 'cancel':
-                # Ignore If Commission is already paid or bill is generated
-                # Bill state is not cancelled
+            slots = line._expected_commission_bill_slot_count()
+            vendor_lines = line.commission_vendor_bill_line_ids
+            open_vendor = vendor_lines.filtered(
+                lambda a: a.move_id and a.move_id.state not in ('cancel',)
+            )
+            if slots and len(open_vendor) >= slots:
                 line.commission_to_bill = False
                 continue
 

@@ -12,7 +12,6 @@ class AccountMoveLine(models.Model):
     _inherit = 'account.move.line'
 
     sale_rep_id = fields.Many2one('res.partner', string='Sale Rep', related="move_id.sale_rep_id")
-    is_commission_billed = fields.Boolean(string="Commission Billed", default=False,copy=False)
     manual_commission = fields.Boolean(string="Manual C% Man", copy=False)
     manual_in_commission = fields.Boolean(string="Manual C% In", copy=False)
     manual_out_commission = fields.Boolean(string="Manual C% Out", copy=False)
@@ -27,12 +26,13 @@ class AccountMoveLine(models.Model):
             if not line._origin or not line._origin.id:
                 return
             self.manual_commission = True
+            b_before, b_after = line._get_commission_amount_bases()
             data = {
                 'product_id': line.product_id,
                 'partner_id': line.partner_id,
                 'quantity': line.quantity,
-                'amount_after_tax': line.price_total,
-                'amount_before_tax': line.price_subtotal,
+                'amount_after_tax': b_after,
+                'amount_before_tax': b_before,
                 'percentage': line.commission_percent
             }
             if line.product_id.detailed_type == 'service':
@@ -42,6 +42,7 @@ class AccountMoveLine(models.Model):
                     order='sequence') if line.sale_rep_id else sale_commission.browse()
 
                 for rule in rep_rules:
+                    data = line._get_commission_calc_data(rule)
                     data['percentage'] = line.commission_percent if line.manual_commission else rule.percentage
                     amount = rule.calculate_amount(data)
                     if amount:
@@ -64,8 +65,8 @@ class AccountMoveLine(models.Model):
                 rep_rules = sale_commission.search(
                     [('sale_rep_id', '=', line.sale_rep_id.id), ('sale_partner_type', '=', 'sale_rep')],
                     order='sequence') if line.sale_rep_id else sale_commission.browse()
-                data['percentage'] = line.commission_percent if line.manual_commission else rule.percentage
                 for rule in rep_rules:
+                    data = line._get_commission_calc_data(rule)
                     data['percentage'] = line.commission_percent if line.manual_commission else rule.percentage
                     amount = rule.calculate_amount(data)
                     if amount:
@@ -91,24 +92,25 @@ class AccountMoveLine(models.Model):
             if not line._origin or not line._origin.id:
                 return
             self.manual_in_commission = True
+            b_before, b_after = line._get_commission_amount_bases()
             data = {
                 'product_id': line.product_id,
                 'partner_id': line.partner_id,
                 'quantity': line.quantity,
-                'amount_after_tax': line.price_total,
-                'amount_before_tax': line.price_subtotal,
+                'amount_after_tax': b_after,
+                'amount_before_tax': b_before,
                 'percentage': line.commission_percent
             }
             if line.product_id.detailed_type == 'service':
                 user_rules = sale_commission.search(
-                    [('user_ids', 'in', line.user_id.id), ('sale_partner_type', '=', 'user'),
+                    [('user_ids', 'in', line.sale_person_id.id), ('sale_partner_type', '=', 'user'),
                      ('product_ids', 'in', line.product_id.id), ('product_ids.detailed_type', '=', 'service')
                      ],
-                    order='sequence') if line.user_id else sale_commission.browse()
+                    order='sequence') if line.sale_person_id else sale_commission.browse()
 
                 for user_rule in user_rules:
-                    data[
-                        'percentage'] = line.in_commission_percent if line.manual_in_commission else user_rule.percentage
+                    data = line._get_commission_calc_data(user_rule)
+                    data['percentage'] = line.in_commission_percent if line.manual_in_commission else user_rule.percentage
                     amount = user_rule.calculate_amount(data)
                     if amount:
                         line.in_commission_id = user_rule.id if user_rule else False
@@ -128,8 +130,9 @@ class AccountMoveLine(models.Model):
             else:
                 user_rules = sale_commission.search(
                     [('user_ids', 'in', line.sale_person_id.id), ('sale_partner_type', '=', 'user')],
-                    order='sequence') if line.user_id else sale_commission.browse()
+                    order='sequence') if line.sale_person_id else sale_commission.browse()
                 for user_rule in user_rules:
+                    data = line._get_commission_calc_data(user_rule)
                     data['percentage'] = line.in_commission_percent if line.manual_in_commission else user_rule.percentage
                     amount = user_rule.calculate_amount(data)
                     if amount:
@@ -156,12 +159,13 @@ class AccountMoveLine(models.Model):
             if not line._origin or not line._origin.id:
                 return
             self.manual_out_commission = True
+            b_before, b_after = line._get_commission_amount_bases()
             data = {
                 'product_id': line.product_id,
                 'partner_id': line.partner_id,
                 'quantity': line.quantity,
-                'amount_after_tax': line.price_total,
-                'amount_before_tax': line.price_subtotal,
+                'amount_after_tax': b_after,
+                'amount_before_tax': b_before,
                 'percentage': line.commission_percent
             }
             if line.product_id.detailed_type == 'service':
@@ -171,8 +175,8 @@ class AccountMoveLine(models.Model):
                      ],
                     order='sequence') if line.team_id else sale_commission.browse()
                 for team_rule in team_rules:
-                    data[
-                        'percentage'] = line.out_commission_percent if line.manual_out_commission else team_rule.percentage
+                    data = line._get_commission_calc_data(team_rule)
+                    data['percentage'] = line.out_commission_percent if line.manual_out_commission else team_rule.percentage
                     amount = team_rule.calculate_amount(data)
                     if amount:
                         line.out_commission_id = team_rule.id if team_rule else False
@@ -195,6 +199,7 @@ class AccountMoveLine(models.Model):
                     [('sale_team_rep', '=', line.team_id.user_id.id), ('sale_partner_type', '=', 'sale_team')],
                     order='sequence') if line.team_id else sale_commission.browse()
                 for team_rule in team_rules:
+                    data = line._get_commission_calc_data(team_rule)
                     data['percentage'] = line.out_commission_percent if line.manual_out_commission else team_rule.percentage
                     amount = team_rule.calculate_amount(data)
                     if amount:
@@ -220,29 +225,15 @@ class AccountMoveLine(models.Model):
 
 
 
-    @api.depends("sale_person_id", "team_id","user_id",
-                 "sale_rep_id",
-                 "price_total",
-                 "partner_id",
-                 "product_id")
+    @api.depends(
+        "sale_person_id", "team_id", "user_id", "sale_rep_id",
+        "price_total", "price_subtotal", "partner_id", "product_id",
+        "commission_percent", "in_commission_percent", "out_commission_percent",
+        "manual_commission", "manual_in_commission", "manual_out_commission",
+        "epd_paid_on_line", "move_id.epd_paid_total",
+    )
     def _compute_commission_amount(self):
         for line in self:
-            # if not line.commission_percent:
-            #     line.commission_amount = 0
-            #     continue
-
-            data = {
-                'product_id': line.product_id,
-                'partner_id': line.partner_id,
-                'quantity': line.quantity,
-                'amount_after_tax': line.price_total,
-                'amount_before_tax': line.price_subtotal,
-                'percentage': line.commission_percent
-            }
-            amount = 0
-            if line.commission_id:
-                amount = line.commission_id.calculate_amount(data)
-            # else:
             sale_commission = self.env['sale.commission']
             rules = []
             if line.product_id.detailed_type == 'service':
@@ -251,10 +242,10 @@ class AccountMoveLine(models.Model):
                      ('product_ids', 'in', line.product_id.id),('product_ids.detailed_type','=','service')],
                     order='sequence') if line.sale_rep_id else sale_commission.browse()
                 user_rules = sale_commission.search(
-                    [('user_ids', 'in', line.user_id.id), ('sale_partner_type', '=', 'user'),
+                    [('user_ids', 'in', line.sale_person_id.id), ('sale_partner_type', '=', 'user'),
                     ('product_ids', 'in', line.product_id.id), ('product_ids.detailed_type', '=', 'service')
                      ],
-                    order='sequence') if line.user_id else sale_commission.browse()
+                    order='sequence') if line.sale_person_id else sale_commission.browse()
                 team_rules = sale_commission.search(
                     [('sale_team_rep', '=', line.team_id.user_id.id), ('sale_partner_type', '=', 'sale_team'),
                      ('product_ids', 'in', line.product_id.id), ('product_ids.detailed_type', '=', 'service')
@@ -262,6 +253,7 @@ class AccountMoveLine(models.Model):
                     order='sequence') if line.team_id else sale_commission.browse()
 
                 for rule in rep_rules:
+                    data = line._get_commission_calc_data(rule)
                     data['percentage'] = line.commission_percent if line.manual_commission else rule.percentage
                     amount = rule.calculate_amount(data)
                     if amount:
@@ -272,8 +264,14 @@ class AccountMoveLine(models.Model):
                 else:
                     if line.manual_commission and line.commission_percent:
                         generic = line._get_generic_commission()
-                        data['percentage'] = line.commission_percent
-                        amount = line.env['sale.commission'].calculate_amount(data)
+                        if generic:
+                            data = line._get_commission_calc_data(generic)
+                            data['percentage'] = line.commission_percent
+                            amount = generic.calculate_amount(data)
+                        else:
+                            data = line._get_commission_calc_data(False)
+                            data['percentage'] = line.commission_percent
+                            amount = 0.0
                         line.commission_id = generic.id if generic else False
                         line.commission_amount = amount
                     else:
@@ -282,8 +280,8 @@ class AccountMoveLine(models.Model):
                         line.commission_amount = 0.0
 
                 for user_rule in user_rules:
-                    data[
-                        'percentage'] = line.in_commission_percent if line.manual_in_commission else user_rule.percentage
+                    data = line._get_commission_calc_data(user_rule)
+                    data['percentage'] = line.in_commission_percent if line.manual_in_commission else user_rule.percentage
                     amount = user_rule.calculate_amount(data)
                     if amount:
                         line.in_commission_id = user_rule.id if user_rule else False
@@ -291,10 +289,16 @@ class AccountMoveLine(models.Model):
                         line.in_commission_amount = amount
                         break
                 else:
-                    if line.manual_in_commission and line.in_commission_percent:
+                    if line.in_commission_percent:
                         generic = line._get_generic_commission()
-                        data['percentage'] = line.in_commission_percent
-                        amount = line.env['sale.commission'].calculate_amount(data)
+                        if generic:
+                            data = line._get_commission_calc_data(generic)
+                            data['percentage'] = line.in_commission_percent
+                            amount = generic.calculate_amount(data)
+                        else:
+                            data = line._get_commission_calc_data(False)
+                            data['percentage'] = line.in_commission_percent
+                            amount = 0.0
                         line.in_commission_id = generic.id if generic else False
                         line.in_commission_amount = amount
                     else:
@@ -303,8 +307,8 @@ class AccountMoveLine(models.Model):
                         line.in_commission_amount = 0.0
                     # ================= TEAM COMMISSION =================
                 for team_rule in team_rules:
-                    data[
-                        'percentage'] = line.out_commission_percent if line.manual_out_commission else team_rule.percentage
+                    data = line._get_commission_calc_data(team_rule)
+                    data['percentage'] = line.out_commission_percent if line.manual_out_commission else team_rule.percentage
                     amount = team_rule.calculate_amount(data)
                     if amount:
                         line.out_commission_id = team_rule.id if team_rule else False
@@ -312,11 +316,17 @@ class AccountMoveLine(models.Model):
                         line.out_commission_amount = amount
                         break
                 else:
-                    # Fallback logic if manual_out_commission is True but no rule is found
-                    if line.manual_out_commission and line.out_commission_percent:
+                    # Preserve explicit C% OUT values even when no team rule is matched.
+                    if line.out_commission_percent:
                         generic = line._get_generic_commission()
-                        data['percentage'] = line.out_commission_percent
-                        amount = line.env['sale.commission'].calculate_amount(data)
+                        if generic:
+                            data = line._get_commission_calc_data(generic)
+                            data['percentage'] = line.out_commission_percent
+                            amount = generic.calculate_amount(data)
+                        else:
+                            data = line._get_commission_calc_data(False)
+                            data['percentage'] = line.out_commission_percent
+                            amount = 0.0
                         line.out_commission_id = generic.id if generic else False
                         line.out_commission_amount = amount
                     else:
@@ -329,11 +339,12 @@ class AccountMoveLine(models.Model):
                 rep_rules = sale_commission.search([('sale_rep_id', '=', line.sale_rep_id.id),('sale_partner_type','=','sale_rep')],
                                                    order='sequence') if line.sale_rep_id else sale_commission.browse()
                 user_rules = sale_commission.search([('user_ids', 'in', line.sale_person_id.id),('sale_partner_type','=','user')],
-                                                    order='sequence') if line.user_id else sale_commission.browse()
+                                                    order='sequence') if line.sale_person_id else sale_commission.browse()
                 team_rules = sale_commission.search([('sale_team_rep', '=', line.team_id.user_id.id),('sale_partner_type','=','sale_team')],
                                                     order='sequence') if line.team_id else sale_commission.browse()
 
                 for rule in rep_rules:
+                    data = line._get_commission_calc_data(rule)
                     data['percentage'] = line.commission_percent if line.manual_commission else rule.percentage
                     amount = rule.calculate_amount(data)
                     if amount:
@@ -344,8 +355,14 @@ class AccountMoveLine(models.Model):
                 else:
                     if line.manual_commission and line.commission_percent:
                         generic = line._get_generic_commission()
-                        data['percentage'] = line.commission_percent
-                        amount = line.env['sale.commission'].calculate_amount(data)
+                        if generic:
+                            data = line._get_commission_calc_data(generic)
+                            data['percentage'] = line.commission_percent
+                            amount = generic.calculate_amount(data)
+                        else:
+                            data = line._get_commission_calc_data(False)
+                            data['percentage'] = line.commission_percent
+                            amount = 0.0
                         line.commission_id = generic.id if generic else False
                         line.commission_amount = amount
                     else:
@@ -354,6 +371,7 @@ class AccountMoveLine(models.Model):
                         line.commission_amount = 0.0
 
                 for user_rule in user_rules:
+                    data = line._get_commission_calc_data(user_rule)
                     data['percentage'] = line.in_commission_percent if line.manual_in_commission else user_rule.percentage
                     amount = user_rule.calculate_amount(data)
                     if amount:
@@ -362,10 +380,16 @@ class AccountMoveLine(models.Model):
                         line.in_commission_amount = amount
                         break
                 else:
-                    if line.manual_in_commission and line.in_commission_percent:
+                    if line.in_commission_percent:
                         generic = line._get_generic_commission()
-                        data['percentage'] = line.in_commission_percent
-                        amount = line.env['sale.commission'].calculate_amount(data)
+                        if generic:
+                            data = line._get_commission_calc_data(generic)
+                            data['percentage'] = line.in_commission_percent
+                            amount = generic.calculate_amount(data)
+                        else:
+                            data = line._get_commission_calc_data(False)
+                            data['percentage'] = line.in_commission_percent
+                            amount = 0.0
                         line.in_commission_id = generic.id if generic else False
                         line.in_commission_amount = amount
                     else:
@@ -374,6 +398,7 @@ class AccountMoveLine(models.Model):
                         line.in_commission_amount = 0.0
                     # ================= TEAM COMMISSION =================
                 for team_rule in team_rules:
+                    data = line._get_commission_calc_data(team_rule)
                     data['percentage'] = line.out_commission_percent if line.manual_out_commission else team_rule.percentage
                     amount = team_rule.calculate_amount(data)
                     if amount:
@@ -382,11 +407,17 @@ class AccountMoveLine(models.Model):
                         line.out_commission_amount = amount
                         break
                 else:
-                    # Fallback logic if manual_out_commission is True but no rule is found
-                    if line.manual_out_commission and line.out_commission_percent:
+                    # Preserve explicit C% OUT values even when no team rule is matched.
+                    if line.out_commission_percent:
                         generic = line._get_generic_commission()
-                        data['percentage'] = line.out_commission_percent
-                        amount = line.env['sale.commission'].calculate_amount(data)
+                        if generic:
+                            data = line._get_commission_calc_data(generic)
+                            data['percentage'] = line.out_commission_percent
+                            amount = generic.calculate_amount(data)
+                        else:
+                            data = line._get_commission_calc_data(False)
+                            data['percentage'] = line.out_commission_percent
+                            amount = 0.0
                         line.out_commission_id = generic.id if generic else False
                         line.out_commission_amount = amount
                     else:

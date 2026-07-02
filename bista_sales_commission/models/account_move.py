@@ -25,6 +25,22 @@ class AccountMove(models.Model):
     _inherit = 'account.move'
 
     is_commission_bill = fields.Boolean()
+    commission_accrual_move_id = fields.Many2one(
+        'account.move',
+        string="Commission Accrual Entry",
+        copy=False,
+        readonly=True,
+    )
+
+    def action_view_commission_accrual(self):
+        self.ensure_one()
+        return {
+            'name': 'Commission Accrual Entry',
+            'view_mode': 'form',
+            'res_model': 'account.move',
+            'res_id': self.commission_accrual_move_id.id,
+            'type': 'ir.actions.act_window',
+        }
 
     commission_amount = fields.Monetary(
         string="Commission Amount",
@@ -65,6 +81,96 @@ class AccountMove(models.Model):
         string="Payment Date",
         compute="compute_payment_date_final",
     )
+    epd_paid_total = fields.Monetary(
+        string="EPD (payment j.e.)",
+        compute="_compute_epd_paid",
+        currency_field="currency_id",
+        help="Sum of early payment discount lines (display on payment journal entry) in invoice currency, "
+        "for moves reconciled with this invoice.",
+    )
+    epd_paid_aml_info = fields.Char(
+        string="EPD (payment) detail",
+        compute="_compute_epd_paid",
+        help="Reconciled payment/statement entry names and EPD line amounts in invoice currency.",
+    )
+
+    def _reconciled_counterpart_epd_aml(self):
+        """AMLs on counterpart moves of receivable/payable lines with EPD (from payment/statement journal)."""
+        self.ensure_one()
+        if not self.is_invoice(include_receipts=True) or not self:
+            return self.env["account.move.line"]
+        moves = self._get_reconciled_amls().move_id
+        if not moves:
+            return self.env["account.move.line"]
+        return moves.line_ids.filtered(lambda l: l.display_type == "epd")
+
+    def _sum_epd_amls_in_move_currency(self, amls, move, date_ref):
+        """Net EPD in invoice currency: sum signed EPD lines (base + tax), not sum(abs() per line).
+
+        Odoo posts e.g. base discount 239.05 and tax 11.95; net = 227.10. Summing abs() gave 251.
+        """
+        self.ensure_one()
+        if not amls or not move.currency_id:
+            return 0.0
+        ref_date = date_ref or move.invoice_date or move.date
+        comp = move.company_id
+        cur = move.currency_id
+        total_signed = 0.0
+        for aml in amls:
+            if not aml or aml._name != "account.move.line":
+                continue
+            if aml.currency_id and aml.amount_currency is not None:
+                if aml.currency_id == cur:
+                    line_amt = cur.round(aml.amount_currency)
+                else:
+                    line_amt = cur.round(aml.currency_id._convert(aml.amount_currency, cur, comp, ref_date))
+                total_signed += line_amt
+            else:
+                ccur = comp.currency_id
+                b = aml.balance
+                if ccur == cur:
+                    total_signed += ccur.round(b)
+                else:
+                    total_signed += cur.round(
+                        ccur._convert(aml.balance, cur, comp, ref_date or aml.date)
+                    )
+        # One positive magnitude for total discount in invoice terms (inbound / outbound safe)
+        return cur.round(abs(total_signed))
+
+    @api.depends(
+        "line_ids.matched_debit_ids",
+        "line_ids.matched_credit_ids",
+        # debit_move_id / credit_move_id are account.move.line; EPD lines live on the move, not the aml
+        "line_ids.matched_debit_ids.debit_move_id.move_id.line_ids.display_type",
+        "line_ids.matched_credit_ids.credit_move_id.move_id.line_ids.display_type",
+        "line_ids.matched_debit_ids.debit_move_id.move_id.line_ids.amount_currency",
+        "line_ids.matched_credit_ids.credit_move_id.move_id.line_ids.amount_currency",
+        "currency_id",
+        "payment_state",
+        "state",
+    )
+    def _compute_epd_paid(self):
+        for move in self:
+            if not move.is_invoice(include_receipts=True) or move.state != "posted" or not move:
+                move.epd_paid_total = 0.0
+                move.epd_paid_aml_info = False
+                continue
+            amls = move._reconciled_counterpart_epd_aml()
+            date_ref = move.invoice_date or move.date
+            total = move._sum_epd_amls_in_move_currency(amls, move, date_ref) if amls else 0.0
+            move.epd_paid_total = total
+            parts = []
+            for pmove in move._get_reconciled_amls().move_id:
+                p_epd = pmove.line_ids.filtered(lambda l: l.display_type == "epd")
+                if not p_epd:
+                    continue
+                sub = move._sum_epd_amls_in_move_currency(p_epd, move, date_ref)
+                if move.currency_id:
+                    sub_fmt = move.currency_id.format(sub)
+                else:
+                    sub_fmt = str(sub)
+                parts.append("%s: %s" % (pmove.name, sub_fmt))
+            move.epd_paid_aml_info = " | ".join(parts) if parts else False
 
     @api.depends('line_ids.matched_debit_ids.debit_move_id', 'line_ids.matched_credit_ids.credit_move_id')
     def compute_payment_date_final(self):
@@ -80,10 +186,15 @@ class AccountMove(models.Model):
         for move in self:
             move.commission_policy = move.line_ids.mapped('commission_policy')[0]
 
-    @api.depends('line_ids.commission_move_id')
+    @api.depends('line_ids.commission_move_id', 'line_ids.commission_vendor_bill_line_ids')
     def _compute_commission_move_id(self):
         for move in self:
-            move.commission_move_id = move.line_ids.filtered('commission_move_id')[:1].commission_move_id
+            bills = move.line_ids.mapped('commission_vendor_bill_line_ids.move_id')
+            if bills:
+                move.commission_move_id = bills[:1]
+            else:
+                line_with = move.line_ids.filtered('commission_move_id')[:1]
+                move.commission_move_id = line_with.commission_move_id
 
     @api.depends("partner_shipping_id.city", "partner_shipping_id.state_id")
     def _compute_shipping_city_state(self):
@@ -108,12 +219,13 @@ class AccountMove(models.Model):
         # )
         for invoice in records:
             for line in invoice.invoice_line_ids:
+                b_before, b_after = line._get_commission_amount_bases()
                 data = {
                     'product_id': line.product_id,
                     'partner_id': invoice.partner_id,
                     'quantity': line.quantity,
-                    'amount_after_tax': line.price_total,
-                    'amount_before_tax': line.price_subtotal,
+                    'amount_after_tax': b_after,
+                    'amount_before_tax': b_before,
                     'percentage': 0
                 }
                 if line.product_id.detailed_type == 'service':
@@ -143,7 +255,6 @@ class AccountMove(models.Model):
             if invoice_lines:
                 line_ids = tuple(invoice_lines.ids)
                 self._cr.execute("DELETE FROM account_move_line WHERE id IN %s", (line_ids,))
-            invoice._create_commission_payable()
 
     def button_draft(self):
         ret = super(AccountMove, self).button_draft()
@@ -151,7 +262,6 @@ class AccountMove(models.Model):
         return ret
 
     def _post(self, soft=True):
-        self._create_commission_payable()
         ret = super(AccountMove, self)._post(soft)
         return ret
 
@@ -184,43 +294,54 @@ class AccountMove(models.Model):
             #                                        credit=line.commission_amount))
             # move.line_ids = [(0, 0, commission_line) for commission_line in commission_line_ids]
 
-            for line in move.invoice_line_ids:
-                # 1. Man Commission
-                if line.commission_id:
-                    commission = line.commission_id
-                    commission_line_ids.append(
-                        move._get_commission_line_vals(line, commission.expense_account_id,
-                                                       debit=line.commission_amount))
-                    commission_line_ids.append(
-                        move._get_commission_line_vals(line, commission.payout_account_id,
-                                                       credit=line.commission_amount))
+            # Do not add to self, instead we will use `_generate_commission_accrual_move`
+            # This old method is kept for backwards compatibility if needed, but not used.
+            # move.line_ids = [(0, 0, commission_line) for commission_line in commission_line_ids]
 
-                # 2. In Commission
-                if line.in_commission_id:
-                    in_commission = line.in_commission_id
-                    commission_line_ids.append(
-                        move._get_commission_line_vals(line, in_commission.expense_account_id,
-                                                       debit=line.in_commission_amount))
-                    commission_line_ids.append(
-                        move._get_commission_line_vals(line, in_commission.payout_account_id,
-                                                       credit=line.in_commission_amount))
+    def _generate_commission_accrual_move(self, payment_move=None):
+        self.ensure_one()
+        if not self.is_invoice(include_receipts=True):
+            return False
+            
+        commission_line_ids = []
+        for line in self.invoice_line_ids:
+            # 1. Man Commission
+            if line.commission_id and line.commission_amount:
+                commission = line.commission_id
+                commission_line_ids.append((0, 0, self._get_commission_line_vals(line, commission.expense_account_id, debit=line.commission_amount)))
+                commission_line_ids.append((0, 0, self._get_commission_line_vals(line, commission.payout_account_id, credit=line.commission_amount)))
 
-                # 3. Out Commission
-                if line.out_commission_id:
-                    out_commission = line.out_commission_id
-                    commission_line_ids.append(
-                        move._get_commission_line_vals(line, out_commission.expense_account_id,
-                                                       debit=line.out_commission_amount))
-                    commission_line_ids.append(
-                        move._get_commission_line_vals(line, out_commission.payout_account_id,
-                                                       credit=line.out_commission_amount))
+            # 2. In Commission
+            if line.in_commission_id and line.in_commission_amount:
+                in_commission = line.in_commission_id
+                commission_line_ids.append((0, 0, self._get_commission_line_vals(line, in_commission.expense_account_id, debit=line.in_commission_amount)))
+                commission_line_ids.append((0, 0, self._get_commission_line_vals(line, in_commission.payout_account_id, credit=line.in_commission_amount)))
 
-            move.line_ids = [(0, 0, commission_line) for commission_line in commission_line_ids]
+            # 3. Out Commission
+            if line.out_commission_id and line.out_commission_amount:
+                out_commission = line.out_commission_id
+                commission_line_ids.append((0, 0, self._get_commission_line_vals(line, out_commission.expense_account_id, debit=line.out_commission_amount)))
+                commission_line_ids.append((0, 0, self._get_commission_line_vals(line, out_commission.payout_account_id, credit=line.out_commission_amount)))
+
+        if not commission_line_ids:
+            return False
+
+        # Create the separate move for commission
+        move_vals = {
+            'move_type': 'entry',
+            'date': payment_move.date if payment_move else self.date,
+            'journal_id': self.journal_id.id,
+            'ref': f"Commission Accrual: {self.name}",
+            'line_ids': commission_line_ids,
+        }
+        accrual_move = self.env['account.move'].create(move_vals)
+        accrual_move._post(soft=False)
+        self.commission_accrual_move_id = accrual_move.id
+        return accrual_move
 
     def _get_commission_line_vals(self, line, account_id, debit=0.0, credit=0.0):
         return {
             'name': f"COM Payable: {line.name}",
-            'move_id': self.id,
             'partner_id': self.partner_id.id,
             'product_id': line.product_id.id,
             'product_uom_id': line.product_uom_id.id,
@@ -230,13 +351,15 @@ class AccountMove(models.Model):
             'credit': credit,
             'account_id': account_id.id,
             'is_commission_entry': True,
-            'display_type': 'cogs'
+            'display_type': 'product',
         }
 
     @api.model
     def create(self, vals_list):
         ret = super(AccountMove, self).create(vals_list)
         for move in ret:
-            commission_entries = move.line_ids.filtered(lambda l: l.is_commission_entry)
-            commission_entries.unlink()
+            # Only unlink on customer invoices (e.g., duplicated invoices), not on our separate entry move
+            if move.move_type in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund'):
+                commission_entries = move.line_ids.filtered(lambda l: l.is_commission_entry)
+                commission_entries.unlink()
         return ret

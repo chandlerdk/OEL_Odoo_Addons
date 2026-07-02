@@ -51,15 +51,20 @@ class CommissionBillWizard(models.TransientModel):
                     'quantity': 1,
                     'price_unit': line.commission_amount,
                     'account_id': line.commission_id.payout_account_id.id,
-                    'commission_reverse_move_line_id': line.id
+                    'commission_reverse_move_line_id': line.id,
+                    'commission_id': line.commission_id.id,
                 }) for line in moves],
             })
 
-            for rec in bill.invoice_line_ids:
-                rec.commission_reverse_move_line_id.write({
-                    'commission_move_line_id': rec.id,
-                    'commission_move_id': bill.id
-                })
+            for rec, cline in zip(bill.invoice_line_ids, moves):
+                if rec.commission_reverse_move_line_id != cline:
+                    rec.write({
+                        'commission_reverse_move_line_id': cline.id,
+                        'commission_id': cline.commission_id.id,
+                    })
+                if cline.commission_id and rec.commission_id != cline.commission_id:
+                    rec.write({'commission_id': cline.commission_id.id})
+                cline._add_commission_bill_link(rec)
             bill.action_post()
             bill_ids.append(bill.id)
         result = self.env['ir.actions.act_window']._for_xml_id('account.action_move_in_invoice_type')
