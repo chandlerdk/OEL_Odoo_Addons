@@ -104,6 +104,53 @@ class AccountMove(models.Model):
             return self.env["account.move.line"]
         return moves.line_ids.filtered(lambda l: l.display_type == "epd")
 
+    def _get_move_reconciled_receivable_total(self, move):
+        """Sum reconciled amounts on receivable/payable lines of ``move`` (currency amounts)."""
+        total = 0.0
+        recv_lines = move.line_ids.filtered(
+            lambda l: l.account_id.account_type in ("asset_receivable", "liability_payable")
+        )
+        for rl in recv_lines:
+            for partial in rl.matched_debit_ids:
+                if partial.debit_move_id == rl:
+                    total += abs(partial.debit_amount_currency)
+                else:
+                    total += abs(partial.credit_amount_currency)
+            for partial in rl.matched_credit_ids:
+                if partial.credit_move_id == rl:
+                    total += abs(partial.credit_amount_currency)
+                else:
+                    total += abs(partial.debit_amount_currency)
+        return total
+
+    def _get_invoice_reconciled_amount_on_payment(self, payment_move):
+        """Portion of this invoice reconciled with ``payment_move``, in invoice currency."""
+        self.ensure_one()
+        total = 0.0
+        invoice_partials, _exchange = self._get_reconciled_invoices_partials()
+        for _partial, amount, counterpart_line in invoice_partials:
+            if counterpart_line.move_id == payment_move:
+                total += abs(amount)
+        return total
+
+    def _get_allocated_epd_from_payment_move(self, payment_move, date_ref):
+        """This invoice's proportional share of EPD lines on a reconciled payment move."""
+        self.ensure_one()
+        cur = self.currency_id
+        if not cur:
+            return 0.0
+        epd_lines = payment_move.line_ids.filtered(lambda l: l.display_type == "epd")
+        if not epd_lines:
+            return 0.0
+        pay_epd_total = self._sum_epd_amls_in_move_currency(epd_lines, self, date_ref)
+        if cur.is_zero(pay_epd_total):
+            return 0.0
+        inv_reconciled = self._get_invoice_reconciled_amount_on_payment(payment_move)
+        pay_reconciled = self._get_move_reconciled_receivable_total(payment_move)
+        if cur.is_zero(pay_reconciled) or cur.is_zero(inv_reconciled):
+            return 0.0
+        return cur.round(pay_epd_total * (inv_reconciled / pay_reconciled))
+
     def _sum_epd_amls_in_move_currency(self, amls, move, date_ref):
         """Net EPD in invoice currency: sum signed EPD lines (base + tax), not sum(abs() per line).
 
@@ -155,21 +202,24 @@ class AccountMove(models.Model):
                 move.epd_paid_total = 0.0
                 move.epd_paid_aml_info = False
                 continue
-            amls = move._reconciled_counterpart_epd_aml()
             date_ref = move.invoice_date or move.date
-            total = move._sum_epd_amls_in_move_currency(amls, move, date_ref) if amls else 0.0
-            move.epd_paid_total = total
+            total = 0.0
             parts = []
+            seen_payment_ids = set()
             for pmove in move._get_reconciled_amls().move_id:
-                p_epd = pmove.line_ids.filtered(lambda l: l.display_type == "epd")
-                if not p_epd:
+                if pmove == move or pmove.id in seen_payment_ids:
                     continue
-                sub = move._sum_epd_amls_in_move_currency(p_epd, move, date_ref)
+                seen_payment_ids.add(pmove.id)
+                sub = move._get_allocated_epd_from_payment_move(pmove, date_ref)
+                if move.currency_id.is_zero(sub):
+                    continue
+                total += sub
                 if move.currency_id:
                     sub_fmt = move.currency_id.format(sub)
                 else:
                     sub_fmt = str(sub)
                 parts.append("%s: %s" % (pmove.name, sub_fmt))
+            move.epd_paid_total = move.currency_id.round(total) if move.currency_id else total
             move.epd_paid_aml_info = " | ".join(parts) if parts else False
 
     @api.depends('line_ids.matched_debit_ids.debit_move_id', 'line_ids.matched_credit_ids.credit_move_id')
