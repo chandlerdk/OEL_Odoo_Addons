@@ -8,6 +8,11 @@
             <xpath expr="//field[@name='invoice_user_id']" position="after">
                 <field name="sale_rep_id"/>
             </xpath>
+            <xpath expr="//field[@name='invoice_line_ids']//tree//field[@name='commission_percent']" position="before">
+                <field name="manual_commission" column_invisible="1" force_save="1"/>
+                <field name="manual_in_commission" column_invisible="1" force_save="1"/>
+                <field name="manual_out_commission" column_invisible="1" force_save="1"/>
+            </xpath>
         </field>
     </record>
 

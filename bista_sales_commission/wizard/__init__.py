@@ -7,3 +7,4 @@
 ##############################################################################
 
 from . import comission_bill_wizard
+from . import commission_update_wizard

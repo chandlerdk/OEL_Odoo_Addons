@@ -9,13 +9,13 @@
             <xpath expr="//field[@name='invoice_line_ids']//tree//field[@name='name']" position="after">
                 <field name="move_id" column_invisible="1"/>
                 <field name="commission_id" column_invisible="1"/>
-                <field name="commission_percent"/>
-                <field name="in_commission_percent"/>
-                <field name="out_commission_percent"/>
+                <field name="commission_percent" groups="bista_sales_commission.group_sales_commission"/>
+                <field name="in_commission_percent" groups="bista_sales_commission.group_sales_commission"/>
+                <field name="out_commission_percent" groups="bista_sales_commission.group_sales_commission"/>
                 <field name="commission_amount" optional="hide" groups="bista_sales_commission.group_sales_commission"/>
                 <field name="in_commission_amount" optional="hide" groups="bista_sales_commission.group_sales_commission"/>
                 <field name="out_commission_amount" optional="hide" groups="bista_sales_commission.group_sales_commission"/>
-                <field name="epd_paid_on_line" optional="show" string="EPD (payment)"/>
+                <field name="epd_paid_on_line" optional="show" string="EPD (payment)" readonly="1"/>
             </xpath>
             <xpath expr="//group[@id='header_right_group']//field[@name='payment_reference']" position="after">
 <!--                <field name="epd_paid_total" readonly="1" groups="account.group_account_readonly"-->
@@ -36,6 +36,14 @@
                         <span class="o_stat_text">Accrual</span>
                     </div>
                 </button>
+            </xpath>
+            <xpath expr="//header" position="inside">
+                <button name="action_open_commission_update_wizard"
+                        type="object"
+                        string="Update Commission"
+                        class="btn-secondary"
+                        groups="bista_sales_commission.group_sales_commission"
+                        invisible="state != 'posted' or move_type not in ('out_invoice', 'out_refund', 'out_receipt')"/>
             </xpath>
             <xpath expr="//field[@name='invoice_user_id']" position="attributes">
                 <attribute name="domain">[]</attribute>
