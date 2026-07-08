@@ -320,6 +320,76 @@ class AccountMove(models.Model):
         commission_line_ids = moves.mapped("line_ids").filtered(lambda line: line.is_commission_entry)
         commission_line_ids.unlink()
 
+    def action_open_commission_update_wizard(self):
+        """Open wizard to change commission % after payment without resetting invoice to draft."""
+        self.ensure_one()
+        if not self.is_invoice(include_receipts=True):
+            raise UserError(_("Commission update is only available on invoices."))
+        if self.state != "posted":
+            raise UserError(_("Commission update is only available on posted invoices."))
+
+        # Create the transient wizard server-side so move_line_id is already stored
+        # (readonly One2many columns are often dropped by the web client on save).
+        line_cmds = []
+        for line in self.invoice_line_ids.filtered(lambda l: l.display_type == "product"):
+            line_cmds.append((0, 0, {
+                "move_line_id": line.id,
+                "name": line.name,
+                "price_subtotal": line.price_subtotal,
+                "epd_paid_on_line": line.epd_paid_on_line,
+                "commission_percent": line.commission_percent,
+                "in_commission_percent": line.in_commission_percent,
+                "out_commission_percent": line.out_commission_percent,
+                "commission_amount": line.commission_amount,
+                "in_commission_amount": line.in_commission_amount,
+                "out_commission_amount": line.out_commission_amount,
+            }))
+        wizard_vals = {
+            "move_id": self.id,
+            "line_ids": line_cmds,
+        }
+        if "sale_rep_id" in self._fields:
+            wizard_vals["sale_rep_id"] = self.sale_rep_id.id
+        wizard = self.env["account.move.commission.update.wizard"].create(wizard_vals)
+
+        return {
+            "name": _("Update Commission"),
+            "type": "ir.actions.act_window",
+            "res_model": "account.move.commission.update.wizard",
+            "res_id": wizard.id,
+            "view_mode": "form",
+            "target": "new",
+            "context": {
+                "active_id": self.id,
+                "active_model": "account.move",
+            },
+        }
+
+    def _cancel_commission_accrual(self):
+        """Cancel linked commission accrual entry and clear the link (invoice stays posted/paid)."""
+        for move in self:
+            accrual = move.commission_accrual_move_id
+            if not accrual:
+                continue
+            if accrual.state == "posted":
+                accrual.button_draft()
+            if accrual.state != "cancel":
+                accrual.button_cancel()
+            move.commission_accrual_move_id = False
+
+    def _replace_commission_accrual(self):
+        """Rebuild accrual JE from current line commission amounts.
+
+        Used after post-payment commission corrections. Does not touch payment reconciliation.
+        """
+        for move in self:
+            if not move.is_invoice(include_receipts=True) or move.state != "posted":
+                continue
+            payment_move = move._get_reconciled_amls().move_id.filtered(lambda m: m != move)[:1]
+            move._cancel_commission_accrual()
+            if move.payment_state in ("paid", "in_payment"):
+                move._generate_commission_accrual_move(payment_move=payment_move or False)
+
     def _create_commission_payable(self):
         active_model = self.env.context.get("active_model")
         active_ids = self.env.context.get("active_ids", [])

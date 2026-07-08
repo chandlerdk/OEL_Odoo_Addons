@@ -19,6 +19,7 @@
         'views/account_move.xml',
         'views/account_move_invoice_commision.xml',
         'wizard/commission_bill_wizard.xml',
+        'wizard/commission_update_wizard.xml',
     ],
     "auto_install": False,
     "installable": True,
