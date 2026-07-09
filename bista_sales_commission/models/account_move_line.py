@@ -244,12 +244,14 @@ class AccountMoveLine(models.Model):
         billed_partners = {}
 
         for line in self:
+            if not line.commission_to_bill:
+                continue
             # Map commission type → (commission rule, partner, amount)
             commission_map = [
                 (line.commission_id, line.sale_rep_id, line.commission_amount),
                 (line.in_commission_id, line.sale_person_id.partner_id if line.sale_person_id else False,
                  line.in_commission_amount),
-                (line.out_commission_id, line.team_id.user_id.partner_id if line.team_id else False,
+                (line.out_commission_id, line.team_id.user_id.partner_id if line.team_id and line.team_id.user_id else False,
                  line.out_commission_amount),
             ]
 
