@@ -81,14 +81,14 @@
         <field name="view_mode">tree,kanban,form,activity</field>
         <field name="view_id" ref="account.view_in_invoice_bill_tree"/>
         <field name="search_view_id" ref="account.view_account_invoice_filter"/>
-        <field name="domain">[('move_type', '=', 'in_invoice'), ('is_commission_bill','!=', False)]</field>
+        <field name="domain">[('move_type', 'in', ('in_invoice', 'in_refund')), ('is_commission_bill','!=', False)]</field>
         <field name="context">{'default_move_type': 'in_invoice', 'display_account_trust': True}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                Create a vendor bill
+                Create a vendor bill or vendor credit note
             </p>
             <p>
-                Create invoices, register payments and keep track of the discussions with your vendors.
+                Vendor bills for invoice commissions; vendor credit notes for customer credit note commissions.
             </p>
         </field>
     </record>

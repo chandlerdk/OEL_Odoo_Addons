@@ -102,10 +102,15 @@ class AccountMoveLine(models.Model):
         "move_id.epd_paid_total",
         "move_id.amount_untaxed",
         "move_id.state",
+        "move_id.move_type",
+        "move_id.reversed_entry_id",
+        "move_id.reversed_entry_id.epd_paid_total",
         "move_id.invoice_line_ids",
         "move_id",
         "price_subtotal",
         "display_type",
+        "product_id",
+        "sale_line_ids",
     )
     def _compute_epd_paid_on_line(self):
         for line in self:
@@ -115,14 +120,55 @@ class AccountMoveLine(models.Model):
                 continue
             if line.display_type != "product":
                 continue
-            if line not in move.invoice_line_ids or move.currency_id.is_zero(move.epd_paid_total or 0.0):
+            if line not in move.invoice_line_ids:
+                continue
+            cur = move.currency_id
+
+            # Credit note: prefer matching original invoice line EPD (handles partial refunds).
+            if move.move_type == "out_refund" and move.reversed_entry_id:
+                origin_line = line._get_origin_invoice_line_for_epd()
+                if origin_line and not cur.is_zero(origin_line.epd_paid_on_line or 0.0):
+                    o_sub = abs(origin_line.price_subtotal or 0.0)
+                    r_sub = abs(line.price_subtotal or 0.0)
+                    if not cur.is_zero(o_sub):
+                        line.epd_paid_on_line = cur.round(
+                            (origin_line.epd_paid_on_line or 0.0) * (r_sub / o_sub)
+                        )
+                    else:
+                        line.epd_paid_on_line = origin_line.epd_paid_on_line or 0.0
+                    continue
+
+            if cur.is_zero(move.epd_paid_total or 0.0):
                 continue
             untaxed = move.amount_untaxed
-            if move.currency_id.is_zero(untaxed):
+            if cur.is_zero(untaxed):
                 continue
-            line.epd_paid_on_line = move.currency_id.round(
-                (move.epd_paid_total or 0.0) * (line.price_subtotal / untaxed)
+            # Use abs so credit-note (negative) subtotals still get a positive EPD share magnitude.
+            line.epd_paid_on_line = cur.round(
+                (move.epd_paid_total or 0.0) * (abs(line.price_subtotal) / abs(untaxed))
             )
+
+    def _get_origin_invoice_line_for_epd(self):
+        """Best-effort match of this credit-note line to a line on the reversed invoice."""
+        self.ensure_one()
+        origin = self.move_id.reversed_entry_id
+        if not origin:
+            return self.env["account.move.line"]
+        candidates = origin.invoice_line_ids.filtered(lambda l: l.display_type == "product")
+        if not candidates:
+            return self.env["account.move.line"]
+        if self.sale_line_ids:
+            matched = candidates.filtered(lambda l: l.sale_line_ids & self.sale_line_ids)
+            if len(matched) == 1:
+                return matched
+            if matched:
+                matched = matched.filtered(lambda l: l.product_id == self.product_id)
+                if len(matched) == 1:
+                    return matched
+        matched = candidates.filtered(lambda l: l.product_id == self.product_id)
+        if len(matched) == 1:
+            return matched
+        return self.env["account.move.line"]
 
     @api.depends(
         "commission_vendor_bill_line_ids",
@@ -151,16 +197,31 @@ class AccountMoveLine(models.Model):
         """How many separate commission bill lines this source line may need (man / in / out)."""
         self.ensure_one()
         n = 0
-        if self.commission_id and self.commission_amount:
+        # float_is_zero so negative credit-note commissions still count as billable slots.
+        if self.commission_id and not float_is_zero(self.commission_amount, precision_digits=2):
             n += 1
-        if self.in_commission_id and self.in_commission_amount:
+        if self.in_commission_id and not float_is_zero(self.in_commission_amount, precision_digits=2):
             n += 1
-        if self.out_commission_id and self.out_commission_amount:
+        if self.out_commission_id and not float_is_zero(self.out_commission_amount, precision_digits=2):
             n += 1
         return n
 
+    def _get_commission_vendor_move_type(self):
+        """Customer credit notes → vendor credit notes; invoices → vendor bills."""
+        self.ensure_one()
+        if self.move_id.move_type == 'out_refund':
+            return 'in_refund'
+        return 'in_invoice'
+
     def _get_commission_amount_bases(self):
-        """Return (amount_before_tax, amount_after_tax) for commission, net of this line EPD share (payment j.e.)."""
+        """Return (amount_before_tax, amount_after_tax) for commission, net of this line EPD share.
+
+        EPD share is a positive magnitude. It reduces the commission base:
+        - positive bases (invoice / typical credit note lines): subtract EPD
+        - negative bases: add EPD so clawback magnitude still reflects the discount
+        Credit notes usually keep positive price_subtotal and apply the sign later
+        in _compute_commission_amount; EPD still must reduce that base the same way.
+        """
         self.ensure_one()
         cur = self.currency_id
         if not cur:
@@ -169,15 +230,24 @@ class AccountMoveLine(models.Model):
         pt = self.price_total or 0.0
         epd = 0.0
         if "epd_paid_on_line" in self._fields:
-            epd = self.epd_paid_on_line or 0.0
+            epd = abs(self.epd_paid_on_line or 0.0)
         if not epd or float_is_zero(epd, precision_rounding=cur.rounding or 0.0001):
             return (ps, pt)
+
+        negative_base = ps < 0 or pt < 0
         if not float_is_zero(pt, precision_rounding=cur.rounding or 0.0001):
-            at_net = cur.round(pt - epd)
-            epd_untax = cur.round(epd * (ps / pt))
-            bt_net = cur.round(ps - epd_untax)
+            epd_untax = cur.round(epd * (abs(ps) / abs(pt)))
+            if negative_base:
+                at_net = cur.round(pt + epd)
+                bt_net = cur.round(ps + epd_untax)
+            else:
+                at_net = cur.round(pt - epd)
+                bt_net = cur.round(ps - epd_untax)
         else:
-            bt_net = cur.round(ps - epd)
+            if negative_base:
+                bt_net = cur.round(ps + epd)
+            else:
+                bt_net = cur.round(ps - epd)
             at_net = pt
         return (bt_net, at_net)
 
@@ -241,11 +311,12 @@ class AccountMoveLine(models.Model):
 
     def generate_bill(self):
         grouped_lines = {}
-        billed_partners = {}
+        created_moves = {}
 
         for line in self:
             if not line.commission_to_bill:
                 continue
+            vendor_move_type = line._get_commission_vendor_move_type()
             # Map commission type → (commission rule, partner, amount)
             commission_map = [
                 (line.commission_id, line.sale_rep_id, line.commission_amount),
@@ -256,23 +327,27 @@ class AccountMoveLine(models.Model):
             ]
 
             for commission_rule, partner, amount in commission_map:
-                if not commission_rule or not partner or not amount:
+                if not commission_rule or not partner:
+                    continue
+                if float_is_zero(amount, precision_digits=2):
                     continue
 
-                key = (partner.id, commission_rule.id)
+                # Keep bills and vendor credit notes in separate documents.
+                key = (partner.id, commission_rule.id, vendor_move_type)
 
                 grouped_lines.setdefault(key, []).append({
                     'line': line,
                     'amount': amount,
                     'rule': commission_rule,
                     'partner': partner,
+                    'vendor_move_type': vendor_move_type,
                 })
 
         # -------------------------------------------------------------------------
-        # Bill Creation
+        # Bill / vendor credit note creation
         # -------------------------------------------------------------------------
-        def create_bill(partner_id, rule_id, lines):
-            """lines: list of dicts with keys line, amount, rule, partner (same as grouped)."""
+        def create_bill(partner_id, rule_id, vendor_move_type, lines):
+            """lines: list of dicts with keys line, amount, rule, partner, vendor_move_type."""
             rule = self.env['sale.commission'].browse(rule_id)
             payout_account = rule.payout_account_id
 
@@ -283,14 +358,16 @@ class AccountMoveLine(models.Model):
 
             existing_bill = self.env['account.move'].search([
                 ('partner_id', '=', partner_id),
-                ('move_type', '=', 'in_invoice'),
+                ('move_type', '=', vendor_move_type),
+                ('is_commission_bill', '=', True),
                 ('state', '=', 'draft'),
             ], limit=1)
 
             invoice_line_cmds = []
             for item in lines:
                 cline = item['line']
-                amount = item['amount']
+                # Vendor credit notes use a positive unit price; sign is carried by move type.
+                amount = abs(item['amount'])
                 c_rule = item['rule']
 
                 invoice_line_cmds.append((0, 0, {
@@ -309,7 +386,7 @@ class AccountMoveLine(models.Model):
                 to_process = bill.invoice_line_ids[-n_new:]
             else:
                 bill = self.env['account.move'].create({
-                    'move_type': 'in_invoice',
+                    'move_type': vendor_move_type,
                     'is_commission_bill': True,
                     'partner_id': partner_id,
                     'invoice_line_ids': invoice_line_cmds,
@@ -317,7 +394,7 @@ class AccountMoveLine(models.Model):
                 bill._set_next_sequence()
                 to_process = bill.invoice_line_ids
 
-            billed_partners[partner_id] = bill.name
+            created_moves[bill.id] = bill.name
 
             for rec, item in zip(to_process, lines):
                 src = item['line']
@@ -335,20 +412,20 @@ class AccountMoveLine(models.Model):
         # -------------------------------------------------------------------------
         # Process groups
         # -------------------------------------------------------------------------
-        for (partner_id, rule_id), lines in grouped_lines.items():
-            create_bill(partner_id, rule_id, lines)
+        for (partner_id, rule_id, vendor_move_type), lines in grouped_lines.items():
+            create_bill(partner_id, rule_id, vendor_move_type, lines)
 
         # -------------------------------------------------------------------------
         # Notification
         # -------------------------------------------------------------------------
-        if billed_partners:
-            partner_names = ", ".join(billed_partners.values())
+        if created_moves:
+            names = ", ".join(created_moves.values())
             return {
                 'type': 'ir.actions.client',
                 'tag': 'display_notification',
                 'params': {
                     'title': 'Vendor Bill(s) Created',
-                    'message': f"Vendor Bills created successfully for: {partner_names}",
+                    'message': f"Vendor Bills/Credit created successfully for: {names}",
                     'sticky': False,
                     'type': 'success',
                 }
@@ -358,7 +435,7 @@ class AccountMoveLine(models.Model):
             'type': 'ir.actions.client',
             'tag': 'display_notification',
             'params': {
-                'title': 'No Vendor Bills Created',
+                'title': 'No Vendor Documents Created',
                 'message': 'No eligible lines found or all commissions already billed.',
                 'sticky': False,
                 'type': 'warning',

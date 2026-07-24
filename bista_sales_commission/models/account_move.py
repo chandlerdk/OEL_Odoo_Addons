@@ -195,6 +195,11 @@ class AccountMove(models.Model):
         "currency_id",
         "payment_state",
         "state",
+        "move_type",
+        "amount_untaxed",
+        "reversed_entry_id",
+        "reversed_entry_id.epd_paid_total",
+        "reversed_entry_id.amount_untaxed",
     )
     def _compute_epd_paid(self):
         for move in self:
@@ -202,6 +207,24 @@ class AccountMove(models.Model):
                 move.epd_paid_total = 0.0
                 move.epd_paid_aml_info = False
                 continue
+
+            # Customer credit notes do not carry payment EPD lines. Inherit proportional EPD
+            # from the reversed invoice so commission clawback matches what was accrued.
+            if move.move_type == "out_refund" and move.reversed_entry_id:
+                origin = move.reversed_entry_id
+                origin_epd = origin.epd_paid_total or 0.0
+                cur = move.currency_id
+                if cur and not cur.is_zero(origin_epd):
+                    o_untax = abs(origin.amount_untaxed or 0.0)
+                    r_untax = abs(move.amount_untaxed or 0.0)
+                    if not cur.is_zero(o_untax):
+                        total = cur.round(origin_epd * (r_untax / o_untax))
+                    else:
+                        total = cur.round(origin_epd)
+                    move.epd_paid_total = total
+                    move.epd_paid_aml_info = "From %s: %s" % (origin.name, cur.format(total))
+                    continue
+
             date_ref = move.invoice_date or move.date
             total = 0.0
             parts = []
