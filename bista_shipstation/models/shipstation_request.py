@@ -93,6 +93,39 @@ class ShipStationRequest():
             "residential": True
         }
 
+    def _select_shipstation_rate(self, carrier, rates):
+        """Pick default service rate, or the cheapest available rate.
+
+        Website checkout has no rate picker (unlike the backend wizard), so
+        rate_request must return a concrete price.
+        """
+        flat_rates = []
+        for carrier_rates in rates:
+            for rate in carrier_rates.get('rates') or []:
+                flat_rates.append({
+                    'carrierCode': carrier_rates.get('code'),
+                    'serviceCode': rate.get('serviceCode'),
+                    'serviceName': rate.get('serviceName'),
+                    'price': float(rate.get('shipmentCost') or 0.0) + float(rate.get('otherCost') or 0.0),
+                })
+        if not flat_rates:
+            return False
+
+        default_service = carrier.shipstation_default_service_id
+        if default_service:
+            default_codes = {
+                code for code in (default_service.name, default_service.service) if code
+            }
+            matching = [r for r in flat_rates if r['serviceCode'] in default_codes]
+            if matching:
+                return matching[0]
+            _logger.warning(
+                "ShipStation default service %s not found in rates; using cheapest rate.",
+                default_service.name or default_service.service,
+            )
+
+        return sorted(flat_rates, key=lambda r: r['price'])[0]
+
     def rate_request(self, carrier, recipient, shipper, order=False):
         """https://www.shipstation.com/docs/api/shipments/get-rates/"""
         weight = 0
@@ -145,11 +178,28 @@ class ShipStationRequest():
                 _logger.warn('Unable to get rate from ShipStation. Carrier Code: %s' % code)
                 _logger.warn(e)
                 rates.append({'code': code, 'rates': []})
+        selected_rate = self._select_shipstation_rate(carrier, rates)
+        if not selected_rate:
+            return {
+                'error_message': _(
+                    "No shipping rates available from ShipStation for this order. "
+                    "Check address, product weight, package, and carrier type."
+                ),
+                'rate': {
+                    'rate': 0,
+                    'currency': 'USD',
+                    'rates': rates,
+                }
+            }
+
         return {
             'rate': {
-                'rate': 0,
+                'rate': selected_rate['price'],
                 'currency': 'USD',
-                'rates': rates
+                'rates': rates,
+                'serviceCode': selected_rate.get('serviceCode'),
+                'serviceName': selected_rate.get('serviceName'),
+                'carrierCode': selected_rate.get('carrierCode'),
             }
         }
 
