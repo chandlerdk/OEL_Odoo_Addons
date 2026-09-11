@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- List View -->
+    <record id="view_purchase_fob_tree" model="ir.ui.view">
+        <field name="name">purchase.fob.tree</field>
+        <field name="model">purchase.fob</field>
+        <field name="arch" type="xml">
+            <tree string="FOB Numbers" multi_edit="1"
+                  decoration-muted="not active">
+                <field name="sequence" widget="handle"/>
+<!--                <field name="is_favorite" widget="boolean_favorite"/>-->
+                <field name="name"/>
+                <field name="purchase_order_count" string="Used On"/>
+                <field name="active" column_invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_purchase_fob_form" model="ir.ui.view">
+        <field name="name">purchase.fob.form</field>
+        <field name="model">purchase.fob</field>
+        <field name="arch" type="xml">
+            <form string="FOB Number">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_purchase_orders"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-shopping-cart"
+                                invisible="purchase_order_count == 0">
+                            <field name="purchase_order_count" widget="statinfo" string="Purchase Orders"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name" placeholder="e.g. Origin, Destination, ..."/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="is_favorite" widget="boolean_toggle"/>
+                            <field name="sequence"/>
+
+                        </group>
+                        <group>
+                            <field name="active" invisible="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_purchase_fob_search" model="ir.ui.view">
+        <field name="name">purchase.fob.search</field>
+        <field name="model">purchase.fob</field>
+        <field name="arch" type="xml">
+            <search string="FOB Numbers">
+                <field name="name"/>
+                <filter string="Favorites" name="filter_favorites" domain="[('is_favorite', '=', True)]"/>
+
+                <separator/>
+                <filter string="Archived" name="filter_inactive" domain="[('active', '=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Name" name="group_name" context="{'group_by': 'name'}"/>
+                    <filter string="Favorite" name="group_favorite" context="{'group_by': 'is_favorite'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_purchase_fob" model="ir.actions.act_window">
+        <field name="name">FOB Numbers</field>
+        <field name="res_model">purchase.fob</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_purchase_fob_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a FOB number
+            </p>
+            <p>
+                Manage FOB numbers used on purchase orders. Mark frequently used
+                values as favorites and set their sequence so they appear first
+                in the FOB dropdown on purchase orders.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu: Purchase > Configuration > FOB Numbers -->
+    <menuitem
+        id="menu_purchase_fob"
+        name="FOB Numbers"
+        parent="purchase.menu_purchase_config"
+        action="action_purchase_fob"
+        sequence="50"
+        groups="purchase.group_purchase_manager"/>
+
+</odoo>
