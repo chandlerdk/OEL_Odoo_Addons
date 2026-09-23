@@ -4,11 +4,20 @@
     <field name="model">sale.order.confirm.date.wizard</field>
     <field name="arch" type="xml">
       <form string="Confirm Order Date">
-        <group>
+        <group string="Order Date">
           <field name="original_date_order" readonly="1"/>
           <field name="keep_original"/>
           <field name="update_to_today"/>
         </group>
+        <group string="Delivery Scheduled Date">
+          <field name="original_delivery_date" readonly="1"/>
+          <field name="keep_original" invisible="1"/>
+        </group>
+        <div class="alert alert-info" role="alert">
+          If "Keep the existing order date" is selected, the original delivery
+          scheduled date above will also be preserved on the new delivery.
+          Otherwise, Odoo will compute the delivery date based on current lead times.
+        </div>
         <footer>
           <button string="Cancel" special="cancel" class="btn-secondary"/>
           <button string="Confirm" type="object" name="confirm" class="btn-primary"/>
@@ -17,4 +26,3 @@
     </field>
   </record>
 </odoo>
-

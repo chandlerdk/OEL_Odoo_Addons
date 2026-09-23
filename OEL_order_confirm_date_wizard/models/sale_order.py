@@ -8,16 +8,26 @@ class SaleOrder(models.Model):
         default=False,
         help="Set when an order is cancelled, so we prompt on reconfirm."
     )
+    original_delivery_date = fields.Datetime(
+        string="Original Delivery Scheduled Date",
+        help="Stores the outgoing picking scheduled date before cancellation."
+    )
 
     def action_cancel(self):
-        # call the original cancel logic
+        for order in self:
+            # Capture scheduled date BEFORE super() cancels the pickings
+            outgoing = order.picking_ids.filtered(
+                lambda p: p.picking_type_code == 'outgoing'
+                and p.state not in ('done', 'cancel')
+            )
+            if outgoing:
+                order.original_delivery_date = outgoing[0].scheduled_date
+
         res = super().action_cancel()
-        # mark for reconfirm wizard
         self.write({"was_cancelled": True})
         return res
 
     def action_confirm(self):
-        # if it was cancelled before, pop up our wizard
         for order in self:
             if order.was_cancelled:
                 return {
@@ -28,6 +38,4 @@ class SaleOrder(models.Model):
                     "target": "new",
                     "context": {"active_id": order.id},
                 }
-        # otherwise fall back to normal confirm
         return super().action_confirm()
-

@@ -26,7 +26,7 @@ class ProductTemplate(models.Model):
         if not self.enable_customer_visibility_rules:
             return True
         commercial_partner = partner.commercial_partner_id
-              if commercial_partner in self.disallowed_partner_ids:
+        if commercial_partner in self.disallowed_partner_ids:
             return False
         if self.allowed_partner_ids and commercial_partner not in self.allowed_partner_ids:
             return False
@@ -34,15 +34,16 @@ class ProductTemplate(models.Model):
 
     @api.model
     def _search(self, domain, offset=0, limit=None, order=None, access_rights_uid=None):
-        # Capture the customer context passed from the Sale Order View
-        partner_id = self.env.context.get('sale_order_partner_id') or self.env.context.get('partner_id')
+        # ONLY trigger on our own explicit flag, never the generic 'partner_id'
+        # (purchase order lines also set 'partner_id' in context, which caused
+        # this filter to incorrectly apply to POs as well).
+        partner_id = self.env.context.get('sale_order_partner_id')
 
         if partner_id and isinstance(partner_id, int):
             partner = self.env['res.partner'].browse(partner_id)
             if partner.exists():
                 c_id = partner.commercial_partner_id.id
 
-                # Logic: Visible if (Rules Off) OR (Not Disallowed AND (Allowed list empty OR In Allowed list))
                 visibility_domain = [
                     '|',
                     ('enable_customer_visibility_rules', '=', False),
@@ -53,5 +54,5 @@ class ProductTemplate(models.Model):
                     ('allowed_partner_ids', 'in', c_id)
                 ]
                 domain = expression.AND([domain, visibility_domain])
-              
+
         return super()._search(domain, offset, limit, order, access_rights_uid)
