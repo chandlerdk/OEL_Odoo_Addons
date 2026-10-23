@@ -1,0 +1,29 @@
+// .ckus_middle_page {
+//
+//     .ckus_check .ckus_date {
+//         top: 0.10in;
+//         left: 6.75in;
+//         width: 0.98in;
+//         text-align: center;
+// }
+
+// Must stay more specific than `.ckus_page .ckus_stub .sequence_number`
+// from l10n_us_check_printing, which pushes the number to the right edge.
+.ckus_page .ckus_stub .sequence_number {
+    position: absolute;
+    top: auto;
+    right: auto;
+    bottom: 11px;
+    left: 0.2in;
+    width: auto;
+    height: auto;
+    padding: 10px;
+    text-align: left;
+    font-size: 12px;
+}
+
+.ckus_page .ckus_stub .stub_total_amount {
+    right: 0.44in;
+    margin-top: -0.14in;
+    white-space: nowrap;
+}
