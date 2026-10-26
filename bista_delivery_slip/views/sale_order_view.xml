@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sale_order_form_inherit_discount" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.discount</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <!-- Insert discount_total before the tax_totals field -->
+            <field name="tax_totals" position="before">
+                <field name="discount_total" widget="monetary" options="{'currency_field': 'currency_id'}"
+                       readonly="1" invisible="discount_total == 0.0"/>
+            </field>
+        </field>
+    </record>
+</odoo>
