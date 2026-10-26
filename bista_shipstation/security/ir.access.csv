@@ -1,0 +1,15 @@
+id,name,model_id,group_id/id,operation,domain
+access_delivery_shipstation_service,shipstation.service,shipstation.service,sales_team.group_sale_salesman,crud,
+access_ship_station_rate,access_ship_station_rate,ship.station.rate,sales_team.group_sale_salesman,crud,
+access_delivery_shipstation_service_manager,shipstation.service service_manager,shipstation.service,sales_team.group_sale_manager,crud,
+access_delivery_shipstation_service_partner_manager,shipstation.service partner_manager,shipstation.service,base.group_partner_manager,r,
+access_delivery_shipstation_service_stock_user,shipstation.service stock_user,shipstation.service,stock.group_stock_user,r,
+access_delivery_shipstation_service_stock_manager,shipstation.service stock_manager,shipstation.service,stock.group_stock_manager,crud,
+access_shipstation_order,access.shipstation.order,shipstation.store,base.group_everyone,crud,
+access_shipstation_carrier,access.shipstation.carrier,shipstation.delivery.carrier,base.group_everyone,crud,
+acces_shipstation_service,access.shipstation.service,shipstation.carrier.service,base.group_everyone,crud,
+access_choose_delivery_carrier_sale,access.choose.delivery.carrier.sale,choose.delivery.carrier,sales_team.group_sale_salesman_all_leads,cru,
+access_delivery_carrier_sale,access.delivery.carrier.sale,delivery.carrier,sales_team.group_sale_salesman_all_leads,cru,
+delivery_store_id,Shipstation store,shipstation.store,,crud,"['|', ('company_id', 'in', company_ids), ('company_id', '=', False)]"
+delivery_carrier_id,Shipstation Carrier,shipstation.delivery.carrier,,crud,"['|', ('company_id', 'in', company_ids), ('company_id', '=', False)]"
+delivery_carrier_service_id,Shipstation carrier service,shipstation.carrier.service,,crud,"['|', ('company_id', 'in', company_ids), ('company_id', '=', False)]"
