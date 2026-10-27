@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Server Action -->
+    <record id="action_create_accounting_entry_picking" model="ir.actions.server">
+        <field name="name">Create Accounting Entry</field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="state">code</field>
+        <field name="binding_model_id" ref="stock.model_stock_picking"/>
+        <field name="binding_type">action</field>
+        <field name="binding_view_types">list,form</field>
+        <field name="code">
+            for record in records:
+                record.button_validate_custom()
+        </field>
+    </record>
+
+
+
+
+</odoo>

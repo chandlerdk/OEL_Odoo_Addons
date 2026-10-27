@@ -1,0 +1,17 @@
+<odoo>
+    <record id="view_form_sale_order_inherit" model="ir.ui.view">
+        <field name="name">view.sale.order.form.inherit</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <field name="client_order_ref" position="attributes">
+                <attribute name="string">Customer PO</attribute>
+            </field>
+
+            <xpath expr="//field[@name='payment_term_id']" position="after">
+                <xpath expr="//field[@name='client_order_ref']" position="move"/>
+            </xpath>
+
+        </field>
+    </record>
+</odoo>
