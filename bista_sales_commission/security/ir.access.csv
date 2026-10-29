@@ -1,0 +1,5 @@
+id,name,model_id,group_id/id,operation,domain
+access_sale_commission,access_sale_commission,sale.commission,group_sales_commission,crud,
+access_commission_bill_wizard,access_commission_bill_wizard,commission.bill.wizard,group_sales_commission,crud,
+access_commission_update_wizard,access_commission_update_wizard,account.move.commission.update.wizard,group_sales_commission,crud,
+access_commission_update_wizard_line,access_commission_update_wizard_line,account.move.commission.update.wizard.line,group_sales_commission,crud,

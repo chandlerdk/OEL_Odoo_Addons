@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <record id="inherit_purchase_order_form_for_purchase_adv_payment" model="ir.ui.view">
+            <field name="name">purchase.order.form.inherit.advance.payment</field>
+            <field name="model">purchase.order</field>
+            <field name="priority">99</field>
+            <field name="inherit_id" ref="purchase.purchase_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//header/widget[@name='purchase_file_uploader']" position="before">
+                    <button name="%(bista_vendor_advance_payment.action_view_purchase_advance_payment_inv)d"
+                            string="CREATE BILL/PREPAY" type="action" class="oe_highlight"
+                            invisible="state != 'purchase' or invoice_status != 'to invoice'"
+                            groups="account.group_account_user,purchase.group_purchase_manager"/>
+                    <button name="%(bista_vendor_advance_payment.action_view_purchase_advance_payment_inv)d"
+                            string="CREATE BILL/PREPAY" type="action"
+                            context="{'default_advance_payment_method': 'percentage'}"
+                            invisible="state != 'purchase' or invoice_status != 'no'"
+                            groups="account.group_account_user,purchase.group_purchase_manager"/>
+                </xpath>
+                <xpath expr="//div[@name='button_box']/button[@name='action_view_invoice']" position="attributes">
+                    <attribute name="name">action_view_invoice_advance_payment</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/list/field[@name='qty_invoiced']" position="after">
+                    <field name="qty_to_invoice" column_invisible="True"/>
+                    <field name="is_prepayment" column_invisible="True"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

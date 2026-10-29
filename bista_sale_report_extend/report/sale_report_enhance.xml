@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="custom_report_sale_order_document" inherit_id="sale.report_saleorder_document">
+        <xpath expr="//t[@t-set='address']" position="replace">
+            <t t-set="address">
+                <strong>Ship To:</strong>
+                <div t-field="doc.partner_shipping_id"
+                     t-options='{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True, "phone_icons": True}'/>
+            </t>
+        </xpath>
+
+        <xpath expr="//t[t[@t-set='information_block']]" position="replace">
+            <t t-set="information_block">
+                <strong>Sold To:</strong>
+                <div t-field="doc.partner_id"
+                     t-options='{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True, "phone_icons": True}'/>
+            </t>
+        </xpath>
+
+        <xpath expr="//div[@id='informations']" position="replace">
+            <div class="row mb-4" id="informations">
+                <div t-if="doc.name" class="col" name="informations_reference">
+                    <strong>Sales Order:</strong>
+                    <div t-field="doc.name">SO0000</div>
+                </div>
+                <div class="col" name="informations_date">
+                    <strong>Customer PO:</strong>
+                    <div t-field="doc.client_order_ref"/>
+                </div>
+                <div class="col" name="expiration_date">
+                    <strong>Ship Via:</strong>
+                    <div t-field="doc.ship_via"/>
+                </div>
+                <div class="col" name="fob">
+                    <strong>FOB:</strong>
+                    <div>
+                        <t t-if="doc.bill_account">
+                            <t t-out="doc.bill_account"/>
+                        </t>
+                        <t t-elif="doc.no_ship_cost_synced">
+                            <span>Allowed</span>
+                        </t>
+                        <t t-else="">
+                            <span>PP&amp;Add</span>
+                        </t>
+                    </div>
+                </div>
+            </div>
+            <div name="customer_number" class="mb-4"
+                 t-if="'partner_reference_no' in doc.partner_id._fields">
+                <strong>Customer Number:</strong>
+                <div t-out="doc.partner_id.partner_reference_no"/>
+            </div>
+        </xpath>
+
+        <!-- Odoo 20 keeps these two headers as aria-labels only, so they do not print -->
+        <xpath expr="//th[@name='th_description']" position="inside">
+            <span>Description</span>
+        </xpath>
+        <xpath expr="//th[@name='th_quantity']" position="inside">
+            <span>Quantity</span>
+        </xpath>
+
+        <!-- Hide the Taxes column -->
+        <xpath expr="//t[@t-set='display_taxes']" position="attributes">
+            <attribute name="t-value">False</attribute>
+        </xpath>
+    </template>
+</odoo>
