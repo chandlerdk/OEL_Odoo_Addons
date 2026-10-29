@@ -1,0 +1,23 @@
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+venv/
+.venv/
+*-venv/
+
+# Odoo
+*.log
+*.pid
+.sessions/
+filestore/
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
