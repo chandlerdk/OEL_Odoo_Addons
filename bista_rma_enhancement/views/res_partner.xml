@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="inherit_view_partner_form" model="ir.ui.view">
+        <field name="name">res.partner.form.inherit</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_rma" type="object" class="oe_stat_button" icon="fa-mail-reply" invisible="rma_count == 0">
+                    <field name="rma_count" string="RMA" widget="statinfo" />
+                </button>
+                <button class="oe_stat_button" name="show_picking" type="object" icon="fa-truck" invisible="delivery_count == 0">
+                    <field name="delivery_count" string="Deliveries" widget="statinfo" />
+                </button>
+            </xpath>
+        </field>
+    </record>
+</odoo>

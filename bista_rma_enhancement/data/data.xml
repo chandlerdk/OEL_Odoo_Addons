@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo noupdate="1">
+    <!-- RMA Reason -->
+    <record id="rma_scrap_refund" model="rma.reason.ept">
+        <field name="name">Refund with Scrap</field>
+        <field name="action">refund_scrap</field>
+    </record>
+    <record id="rma_replace_same_scrap_product" model="rma.reason.ept">
+        <field name="name">Replace with Same Product and Scrap (No Refund)</field>
+        <field name="action">replace_same_scrap_product</field>
+    </record>
+    <record id="rma_replace_other_scrap_product" model="rma.reason.ept">
+        <field name="name">Replace with Other Product and Scrap (No Refund)</field>
+        <field name="action">replace_other_scrap_product</field>
+    </record>
+
+    <!-- Quality Point Test Type -->
+    <record id="bista_rma_enhancement.disposition" model="quality.point.test_type">
+        <field name="name">Disposition - 2</field>
+        <field name="technical_name">disposition_2</field>
+    </record>
+    <record id="bista_rma_enhancement.disposition_4" model="quality.point.test_type">
+        <field name="name">Disposition - 4</field>
+        <field name="technical_name">disposition_4</field>
+    </record>
+</odoo>

@@ -1,0 +1,12 @@
+id,name,model_id,group_id/id,operation,domain
+access_crm_claim_ept,crm.claim.ept,crm.claim.ept,rma_ept.group_rma_user_ept,crud,
+access_claim_line_ept,claim.line.ept,claim.line.ept,rma_ept.group_rma_user_ept,crud,"['|',('claim_id.user_id','=',user.id),('claim_id.user_id','=',False)]"
+access_claim_line_ept_manager,All Claim Lines,claim.line.ept,rma_ept.group_rma_manager_ept,crud,
+access_claim_reject_message,claim.reject.message,claim.reject.message,base.group_everyone,crud,
+access_rma_reason_ept_manager,rma.reason.ept,rma.reason.ept,rma_ept.group_rma_manager_ept,crud,
+access_rma_reason_ept_user,rma.reason.ept,rma.reason.ept,rma_ept.group_rma_user_ept,r,
+access_portal_crm_claim_ept,Personal Claims,crm.claim.ept,base.group_portal,cru,"[('message_partner_ids','child_of',[user.commercial_partner_id.id])]"
+access_portal_claim_line_ept,Personal Claim Lines,claim.line.ept,base.group_portal,cru,"[('claim_id.message_partner_ids','child_of',[user.commercial_partner_id.id])]"
+access_claim_process_wizard,claim.process.wizard,claim.process.wizard,base.group_everyone,crud,
+access_create_partner_delivery_address_ept,create.partner.delivery.address.ept,create.partner.delivery.address.ept,base.group_everyone,crud,
+crm_claim_ept_comp_rule,All Claims multi-company,crm.claim.ept,,crud,"['|',('company_id','=',False),('company_id','in',company_ids)]"

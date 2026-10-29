@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="inherit_view_account_invoice_filter" model="ir.ui.view">
+        <field name="name">account.move.search.view.inherit</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_account_invoice_filter" />
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='myinvoices']" position="after">
+                <filter string="RMA Refund" name="rma_refund" domain="[('claim_id', '!=', False)]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="inherit_view_move_form" model="ir.ui.view">
+        <field name="name">account.move.form.refund.view.inherit</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <field name="claim_count" invisible="1" />
+                <field name="helpdesk_ticket_count" invisible="1" />
+                <button name="action_view_claim" type="object" class="oe_stat_button" icon="fa-mail-reply" invisible="claim_count == 0">
+                    <span class="o_stat_text">RMA</span>
+                </button>
+                <button name="action_see_helpdesk_ticket" type="object" class="oe_stat_button" icon="fa-life-ring" invisible="helpdesk_ticket_count == 0">
+                    <span class="o_stat_text">Tickets</span>
+                </button>
+            </xpath>
+        </field>
+    </record>
+</odoo>
