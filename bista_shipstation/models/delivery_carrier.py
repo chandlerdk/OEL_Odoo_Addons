@@ -20,8 +20,8 @@ class DeliverCarrier(models.Model):
 
     delivery_type = fields.Selection(selection_add=[('shipstation', 'ShipStation')], ondelete={
         'shipstation': lambda recs: recs.write({'delivery_type': 'fixed', 'fixed_price': 0})})
-    shipstation_production_api_key = fields.Char("Production API Key", groups="base.group_system",
-                                                 help="Enter your API production key from ShipStation account")
+    # shipstation_production_api_key = fields.Char("Production API Key", groups="base.group_system",
+    #                                              help="Enter your API production key from ShipStation account")
     shipstation_production_api_secret = fields.Char("Production API Secret", groups="base.group_system",
                                                     help="Enter your API production secret from ShipStation account")
     shipstation_delivery_type = fields.Char('ShipStation Carrier Type')
@@ -64,25 +64,6 @@ class DeliverCarrier(models.Model):
                             'shipper_package_code':carrier_code
                         })
         return True
-
-    # def import_package_from_ship_station(self):
-    #     for line in self:
-    #         url = 'https://ssapi.shipstation.com/carriers/listpackages?carrierCode=' + line.carrier_code
-    #         api_key = self.shipstation_production_api_key
-    #         api_secret = self.shipstation_production_api_secret
-    #         resp = requests.get(url, auth=HTTPBasicAuth(api_key, api_secret))
-    #         if resp.status_code == 200:
-    #             rec = json.loads(resp.text)
-    #             for line in rec:
-    #                 carrier_code = line.get('carrierCode')
-    #                 name = line.get('name')
-    #                 package_type_id = self.env['stock.package.type'].search([('name', '=', name)])
-    #                 if not package_type_id:
-    #                     self.env['stock.package.type'].create({
-    #                         'name': name,
-    #                         'shipper_package_code': carrier_code
-    #                     })
-    #     return True
 
     def get_api_function(self, url, store=False, payload=False):
         """ Fetch response data based on URL using request GET. """
@@ -135,42 +116,6 @@ class DeliverCarrier(models.Model):
             }
         }
 
-    # def import_dc_from_ship_station(self):
-    #     """This function import delivery carriers from ShipStation"""
-    #     url = "/carriers"
-    #     response = self._get_shipstation_data(url)
-    #     print("responseresponseresponseresponseresponse",response)
-    #     if response.status_code != 200:
-    #         desc = ("Error while fetching carriers - %s : %s" % (
-    #             response.status_code, response.reason))
-    #     shipstation_delivery_carrier = self.env['shipstation.delivery.carrier']
-    #     try:
-    #         responses = response.json()
-    #         for response in responses:
-    #             delivery_carrier = shipstation_delivery_carrier.search([('code', '=', response.get('code', False))])
-    #             if not delivery_carrier:
-    #                 shipstation_delivery_carrier.create(
-    #                     {'name': response.get('name', False),
-    #                      'code': response.get('code', False),
-    #                      'account_number': response.get('accountNumber', False),
-    #                      'shipping_provider_id': response.get('shippingProviderId',
-    #                                                           False),
-    #                      'balance': response.get('balance', False),
-    #                      'company_id': self.env.company.id
-    #                      })
-    #
-    #             else:
-    #                 delivery_carrier.write({'balance': response.get('balance', False)})
-    #     except Exception as e:
-    #         desc = ("Error while fetching store - %s" % e)
-    #     return {
-    #         'effect': {
-    #             'fadeout': 'slow',
-    #             'message': 'Import Carriers Successfully!',
-    #             'type': 'rainbow_man',
-    #         }
-    #     }
-
     def import_cs_from_ship_station(self):
         shipstation_carrier_service = self.env['shipstation.carrier.service']
         ship_log_line_dict = {'error': [], 'success': []}
@@ -217,55 +162,6 @@ class DeliverCarrier(models.Model):
                 'type': 'rainbow_man',
             }
         }
-
-    # def import_cs_from_ship_station(self):
-    #     shipstation_carrier_service = self.env['shipstation.carrier.service']
-    #     ship_log_line_dict = {'error': [], 'success': []}
-    #     self.env.cr.execute("""SELECT distinct(code) FROM shipstation_delivery_carrier""")
-    #     for codes in self.env.cr.fetchall():
-    #         url = "/carriers/listservices?carrierCode=" + str(codes[0])
-    #         response_data = self._get_shipstation_data(url)
-    #         print("response_dataresponse_dataresponse_dataresponse_data",response_data)
-    #         if response_data.status_code != 200:
-    #             desc = ("Error while fetching carriers - %s : %s" % (
-    #                 response_data.status_code, response_data.reason))
-    #             ship_log_line_dict['error'].append({'error_message': 'Carrier Service Import: %s' % desc})
-    #         if response_data.status_code == 401:
-    #             error_msg = 'Error response - ' + response_data.text + '. Please check the credentials'
-    #             raise ValidationError(error_msg)
-    #         try:
-    #             for response in response_data.json():
-    #                 carrier_id = self.env['shipstation.delivery.carrier'].search(
-    #                     [('code', '=', response.get('carrierCode', False))]).id
-    #                 delivery_carrier = shipstation_carrier_service.search(
-    #                     [('code', '=', response.get('code', False)), ('delivery_carrier_id', '=', carrier_id)])
-    #                 if not delivery_carrier:
-    #                     shipstation_carrier_service.create(
-    #                         {'name': response.get('name', False),
-    #                          'code': response.get('code', False),
-    #                          'carrier_code': response.get('carrierCode', False),
-    #                          'domestic': response.get('domestic', False),
-    #                          'international': response.get('international',
-    #                                                        False),
-    #                          'delivery_carrier_id': carrier_id,
-    #                          'company_id': self.env.company.id
-    #                          })
-    #
-    #                     ship_log_line_dict['success'].append(
-    #                         {'error_message': 'Carrier Service created: %s' % response.get('name', False)})
-    #
-    #         except Exception as e:
-    #             desc = ("Error while fetching Carrier Service - %s" % e)
-    #             ship_log_line_dict['error'].append(
-    #                 {'error_message': 'Exception error: %s' % desc})
-    #     return {
-    #         'effect': {
-    #             'fadeout': 'slow',
-    #             'message': 'Import Services Successfully!',
-    #             'img_url': 'bista_shipstation_connector/static/description/smile.svg',
-    #             'type': 'rainbow_man',
-    #         }
-    #     }
 
     def import_store_from_ship_station(self):
         """This function import store from ShipStation"""
@@ -318,35 +214,35 @@ class DeliverCarrier(models.Model):
             }
         }
 
-    def shipstation_rate_shipment(self, order):
-        sp = ShipStationRequest(self.sudo().shipstation_production_api_key,
-                                self.sudo().shipstation_production_api_secret, self.log_xml)
-        response = sp.rate_request(self, order.partner_shipping_id, order.warehouse_id.partner_id, order)
-        # Return error message
-        if response.get('error_message'):
-            return {
-                'success': False,
-                'price': 0.0,
-                'error_message': response.get('error_message'),
-                'warning_message': False
-            }
-
-        # Update price with the order currency
-        rate = response.get('rate')
-        if order.currency_id.name == rate['currency']:
-            price = float(rate['rate'])
-        else:
-            quote_currency = self.env['res.currency'].search([('name', '=', rate['currency'])], limit=1)
-            price = quote_currency._convert(float(rate['rate']), order.currency_id, self.env.company,
-                                            fields.Date.today())
-
-        return {
-            'success': True,
-            'price': price,
-            'error_message': False,
-            'warning_message': response.get('warning_message', False),
-            'rates': rate.get('rates', [])
-        }
+    # def shipstation_rate_shipment(self, order):
+    #     sp = ShipStationRequest(self.sudo().shipstation_production_api_key,
+    #                             self.sudo().shipstation_production_api_secret, self.log_xml)
+    #     response = sp.rate_request(self, order.partner_shipping_id, order.warehouse_id.partner_id, order)
+    #     # Return error message
+    #     if response.get('error_message'):
+    #         return {
+    #             'success': False,
+    #             'price': 0.0,
+    #             'error_message': response.get('error_message'),
+    #             'warning_message': False
+    #         }
+    #
+    #     # Update price with the order currency
+    #     rate = response.get('rate')
+    #     if order.currency_id.name == rate['currency']:
+    #         price = float(rate['rate'])
+    #     else:
+    #         quote_currency = self.env['res.currency'].search([('name', '=', rate['currency'])], limit=1)
+    #         price = quote_currency._convert(float(rate['rate']), order.currency_id, self.env.company,
+    #                                         fields.Date.today())
+    #
+    #     return {
+    #         'success': True,
+    #         'price': price,
+    #         'error_message': False,
+    #         'warning_message': response.get('warning_message', False),
+    #         'rates': rate.get('rates', [])
+    #     }
 
     def _shipstation_convert_weight(self, weight):
         weight_uom_id = self.env['product.template']._get_weight_uom_id_from_ir_config_parameter()
@@ -356,25 +252,20 @@ class DeliverCarrier(models.Model):
         return weight
 
     def shipstation_send_shipping(self, pickings):
-        res = []
-        sp = ShipStationRequest(self.sudo().shipstation_production_api_key,
-                                self.sudo().shipstation_production_api_secret, self.log_xml)
-
-        for picking in pickings.filtered(lambda l: l.state == "done" and not l.shipstation_order_id):
-            result = sp.send_shipping(self, picking.partner_id, picking.picking_type_id.warehouse_id.partner_id,
-                                      picking=picking)
+        # Label, tracking number and price come from Odoo's ShipStation method.
+        res = super().shipstation_send_shipping(pickings)
+        for picking, result in zip(pickings, res):
+            if picking.state != "done" or picking.shipstation_order_id:
+                continue
             _logger.info("Export Result %s", result)
-            ss_order_id = result.get('orderId', False)
-            ss_order_key = result.get('orderKey', False)
+            # V2 returns the label id, which Odoo stores on shipstation_label_ref.
+            ss_order_id = result.get('orderId') or picking.shipstation_label_ref
+            ss_order_key = result.get('orderKey') or (picking.sale_id.name if picking.sale_id else picking.name)
             if ss_order_id:
                 picking.update({
                     'shipstation_order_id': ss_order_id,
-                    'shipstation_order_key': ss_order_key
+                    'shipstation_order_key': ss_order_key,
                 })
-            else:
-                # raise UserError("Couldn't place ShipStation Order.")
-                pass
-            res += [{'exact_price': 0.0, 'tracking_number': False}]
         return res
 
     def _generate_services(self, carrier, rates):
@@ -398,9 +289,8 @@ class DeliverCarrier(models.Model):
         sr = False
         delivery_ids = self.search([('delivery_type', '=', 'shipstation')])
         for delivery in delivery_ids:
-            if delivery.shipstation_production_api_key and delivery.shipstation_production_api_secret:
-                sr = ShipStationRequest(delivery.sudo().shipstation_production_api_key,
-                                        delivery.sudo().shipstation_production_api_secret, delivery.log_xml)
+            if delivery.shipstation_production_api_key:
+                sr = ShipStationRequest(delivery, delivery.log_xml)
                 if not sr:
                     _logger.warning("Skip run_product_sync due to no Shipping Methods for ShipStation found")
                     return
@@ -461,13 +351,10 @@ class DeliverCarrier(models.Model):
         return invoice_vals
 
     def _get_shipstation_requester(self):
-        api_key = self.sudo().shipstation_production_api_key
-        api_secret = self.sudo().shipstation_production_api_secret
-
-        if not api_key or not api_secret:
+        if not self.sudo().shipstation_production_api_key:
             _logger.warning("Shipstation api is not configured")
             return
-        return ShipStationRequest(api_key, api_secret, self.log_xml)
+        return ShipStationRequest(self, self.log_xml)
 
     def _get_shipstation_data(self, resource_url):
         shipstation_request = self._get_shipstation_requester()

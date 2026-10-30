@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-from odoo import fields, models, api
+from odoo import _, api, fields, models
 from odoo.exceptions import UserError
-from requests.auth import HTTPBasicAuth
+
 import logging
-import requests
-import json
+
 
 _logger = logging.getLogger("Shipstation")
 

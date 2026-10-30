@@ -291,7 +291,15 @@
                                 <th name="lot_serial">Lot/Serial Number</th>
                             </tr>
                         </thead>
-                        <tbody/>
+                        <tbody>
+                            <!-- Anchors inherited by mrp.stock_report_delivery_document_inherit_mrp; never rendered. -->
+                            <t t-if="False" name="stock_report_delivery_anchors">
+                                <t t-if="False" name="has_packages"/>
+                                <t t-if="False" name="no_package_move_lines">
+                                    <t name="no_package_section"/>
+                                </t>
+                            </t>
+                        </tbody>
                     </table>
                     <div class="oe_structure"></div>
                     <t t-set="backorders"

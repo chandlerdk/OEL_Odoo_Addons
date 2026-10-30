@@ -5,9 +5,10 @@
     'description': "ShipStation Odoo Integrations",
     'category': 'Operations/Inventory/Delivery',
     'license': 'LGPL-3',
+    'author': 'Bista Solutions',
     'version': '20.0.0.0.0',
     'application': True,
-    'depends': ['delivery','stock_delivery','mail', 'sale', 'base','stock'],
+    'depends': ['delivery','delivery_shipstation','stock_delivery','mail', 'sale', 'base','stock'],
     'data': [
         'security/ir.access.csv',
         'views/delivery_carrier_views.xml',

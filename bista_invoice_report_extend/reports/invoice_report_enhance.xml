@@ -82,11 +82,9 @@
         </xpath>
 
         <!-- Hide the "on this account" bank line -->
-        <xpath expr="//p[@name='payment_communication']" position="replace">
-            <p name="payment_communication">
-                Payment Communication:
-                <span class="fw-bold" t-field="o.payment_reference">INV/2023/00001</span>
-            </p>
+        <!-- Keep the empty node: account.report_invoice_document_preview inherits it. -->
+        <xpath expr="//p[@name='payment_communication']//t[@t-if='o.partner_bank_id']" position="replace">
+            <t t-if="o.partner_bank_id"/>
         </xpath>
 
         <xpath expr="//div[@name='qr_code_placeholder']" position="before">
