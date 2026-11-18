@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data noupdate="1">
+        <!--
+            Periodic garbage collection of spent OAuth credentials. The logic
+            lives in mcp.oauth.token._gc_oauth(); the cron only schedules it. Marked
+            noupdate so admins can adjust the schedule without a module upgrade
+            resetting it.
+        -->
+        <record id="ir_cron_oauth_gc" model="ir.cron">
+            <field name="name">MCP: OAuth Credential Garbage Collection</field>
+            <field name="model_id" ref="model_mcp_oauth_token" />
+            <field name="state">code</field>
+            <field name="code">model._gc_oauth()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False" />
+            <field name="active" eval="True" />
+        </record>
+    </data>
+</odoo>
