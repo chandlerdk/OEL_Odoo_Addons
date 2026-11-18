@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="mcp_log_view_list" model="ir.ui.view">
+        <field name="name">mcp.log.list</field>
+        <field name="model">mcp.log</field>
+        <field name="arch" type="xml">
+            <tree create="false" edit="false" delete="false">
+                <field name="create_date"/>
+                <field name="event_type"/>
+                <field name="user_id"/>
+                <field name="auth_method"/>
+                <field name="model_name"/>
+                <field name="operation"/>
+                <field name="tool_name"/>
+                <field name="endpoint"/>
+                <field name="ip_address"/>
+                <field name="duration_ms"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="mcp_log_view_form" model="ir.ui.view">
+        <field name="name">mcp.log.form</field>
+        <field name="model">mcp.log</field>
+        <field name="arch" type="xml">
+            <form create="false" edit="false" delete="false">
+                <sheet>
+                    <group>
+                        <group string="Event Information">
+                            <field name="event_type"/>
+                            <field name="create_date"/>
+                            <field name="user_id"/>
+                            <field name="api_key_used"/>
+                            <field name="auth_method"/>
+                            <field name="oauth_client_id"/>
+                            <field name="oauth_scope"/>
+                            <field name="ip_address"/>
+                        </group>
+                        <group string="Request Details">
+                            <field name="endpoint"/>
+                            <field name="http_method"/>
+                            <field name="model_name"/>
+                            <field name="operation"/>
+                            <field name="tool_name"/>
+                            <field name="record_ids"/>
+                            <field name="duration_ms"/>
+                        </group>
+                    </group>
+                    <group string="Additional Information">
+                        <field name="session_id"/>
+                        <field name="user_agent"/>
+                        <field name="error_code"/>
+                        <field name="error_message"/>
+                    </group>
+                    <notebook>
+                        <page string="Request Data">
+                            <field name="request_data"/>
+                        </page>
+                        <page string="Response Data">
+                            <field name="response_data"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="mcp_log_view_search" model="ir.ui.view">
+        <field name="name">mcp.log.search</field>
+        <field name="model">mcp.log</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="event_type"/>
+                <field name="user_id"/>
+                <field name="auth_method"/>
+                <field name="model_name"/>
+                <field name="operation"/>
+                <field name="tool_name"/>
+                <field name="endpoint"/>
+                <filter string="Today" name="today" domain="[('create_date', '&gt;=', datetime.datetime.now().strftime('%Y-%m-%d'))]"/>
+                <filter string="Errors" name="errors" domain="[('event_type', 'in', ['auth_failure', 'error', 'rate_limit', 'permission_denied'])]"/>
+                <filter string="Authentication" name="auth" domain="[('event_type', 'in', ['auth_success', 'auth_failure'])]"/>
+                <separator string="Group By"/>
+                <group>
+                    <filter string="Event Type" name="group_event_type" context="{'group_by': 'event_type'}"/>
+                    <filter string="User" name="group_user" context="{'group_by': 'user_id'}"/>
+                    <filter string="Auth Method" name="group_auth_method" context="{'group_by': 'auth_method'}"/>
+                    <filter string="Date" name="group_date" context="{'group_by': 'create_date:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_mcp_logs" model="ir.actions.act_window">
+        <field name="name">MCP Logs</field>
+        <field name="res_model">mcp.log</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_today': 1, 'create': False, 'edit': False, 'delete': False}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No MCP logs found
+            </p>
+            <p>
+                MCP logs will appear here once logging is enabled and API requests are made.
+                You can configure logging in Settings > MCP Server.
+            </p>
+        </field>
+    </record>
+</odoo>

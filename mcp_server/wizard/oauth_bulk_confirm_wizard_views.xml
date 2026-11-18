@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="mcp_oauth_bulk_confirm_wizard_view_form" model="ir.ui.view">
+        <field name="name">mcp.oauth.bulk.confirm.wizard.form</field>
+        <field name="model">mcp.oauth.bulk.confirm.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Confirmation">
+                <field name="operation" invisible="1" />
+                <div invisible="operation != 'revoke'">
+                    Revoke the selected tokens? Each client will have to
+                    re-authenticate.
+                </div>
+                <div invisible="operation != 'deactivate'">
+                    Deactivate the selected clients? Every access token they
+                    issued stops working immediately.
+                </div>
+                <footer>
+                    <button
+                        name="action_confirm"
+                        string="Ok"
+                        type="object"
+                        class="btn-primary"
+                        data-hotkey="q"
+                    />
+                    <button
+                        string="Cancel"
+                        class="btn-secondary"
+                        special="cancel"
+                        data-hotkey="z"
+                    />
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

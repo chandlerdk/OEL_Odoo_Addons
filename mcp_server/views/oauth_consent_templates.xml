@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- Consent + error pages for the OAuth authorization endpoint. -->
+
+    <!-- Self-contained layout on web.layout + web.assets_frontend, NOT
+         web.login_layout / web.frontend_layout: the website module extends that
+         chain with a website-only request context, so it 500s
+         ("KeyError: 'website'") on website-installed instances. web.layout is
+         safe with or without website. -->
+    <template id="oauth_layout" name="MCP OAuth Layout">
+        <t t-call="web.layout">
+            <t t-set="title">Authorize access</t>
+            <t t-set="html_data" t-value="{'style': 'height: 100%;'}" />
+            <t t-set="body_classname" t-value="'bg-100'" />
+            <t t-set="head">
+                <meta name="viewport" content="width=device-width, initial-scale=1" />
+                <t t-call-assets="web.assets_frontend" t-js="false" />
+            </t>
+            <!-- min-vh-100 fills the viewport; inline gradient keeps it portable
+                 and website-safe. (Not the Enterprise login's
+                 .o_home_menu_background: that's web_enterprise-only and rides the
+                 frontend_layout chain we avoid.) -->
+            <div
+                class="min-vh-100"
+                style="background: linear-gradient(135deg, #f0eff6 0%, #e7e6f0 55%, #f2f1f7 100%);"
+            >
+                <div class="container py-5">
+                    <!-- max-width in em, not px: 21.43em = 300px at the 14px
+                         frontend font base, so it matches the login card with no
+                         website installed and scales with the type when a website
+                         theme enlarges the font. -->
+                    <div
+                        class="card border-0 mx-auto bg-100 o_database_list"
+                        style="max-width: 21.43em;"
+                    >
+                        <div class="card-body">
+                            <div class="text-center pb-3 border-bottom mb-3">
+                                <img
+                                    src="/web/binary/company_logo"
+                                    alt="Logo"
+                                    style="max-height:120px; max-width: 100%; width:auto"
+                                />
+                            </div>
+                            <t t-out="0" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Footer mirroring the Odoo login page.
+    Rendered as content inside oauth_layout. -->
+    <template id="oauth_footer" name="MCP OAuth Footer">
+        <div class="text-center small mt-4 pt-3 border-top">
+            <a
+                class="border-end pe-2 me-1"
+                href="https://muchconsulting.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+            >much. Consulting</a>
+            <a
+                href="https://www.odoo.com?utm_source=db&amp;utm_medium=auth"
+                target="_blank"
+                rel="noopener noreferrer"
+            >Powered by <span>Odoo</span></a>
+        </div>
+    </template>
+
+    <template id="oauth_consent" name="MCP OAuth Consent">
+        <t t-call="mcp_server.oauth_layout">
+            <h1 class="h5 fw-semibold mb-2 text-center">Authorize access</h1>
+            <p class="text-muted mb-4">
+                <strong><t t-out="client_label" /></strong>
+                is requesting access to your Odoo account as
+                <strong><t t-out="user_name" /></strong>.
+            </p>
+            <form method="post" action="/mcp/oauth/authorize">
+                <input type="hidden" name="csrf_token" t-att-value="csrf_token" />
+                <t t-foreach="oauth_params" t-as="param_name">
+                    <input
+                        type="hidden"
+                        t-att-name="param_name"
+                        t-att-value="oauth_params[param_name]"
+                    />
+                </t>
+                <div class="border rounded p-3 mb-4">
+                    <div class="mb-3">
+                        <div class="form-label mb-1">Client</div>
+                        <div class="text-break"><t t-out="client_label" /></div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-label mb-1">Redirects to</div>
+                        <div class="text-break"><t t-out="redirect_origin" /></div>
+                    </div>
+                    <div>
+                        <div class="form-label mb-2">Access</div>
+                        <div class="form-check form-switch mb-2">
+                            <input
+                                type="checkbox"
+                                role="switch"
+                                class="form-check-input"
+                                id="read_access"
+                                checked="checked"
+                                disabled="disabled"
+                            />
+                            <label
+                                class="form-check-label opacity-100"
+                                for="read_access"
+                            >
+                                <span>Read data</span>
+                                <span
+                                    class="text-muted small d-block"
+                                >Read records on your behalf — always allowed</span>
+                            </label>
+                        </div>
+                        <t t-if="show_write_checkbox">
+                            <div class="form-check form-switch mb-0">
+                                <input
+                                    type="checkbox"
+                                    role="switch"
+                                    class="form-check-input"
+                                    id="grant_write"
+                                    name="grant_write"
+                                    checked="checked"
+                                />
+                                <label class="form-check-label" for="grant_write">
+                                    <span>Create and modify data</span>
+                                    <span
+                                        class="text-muted small d-block"
+                                    >Create, update and delete records on your behalf</span>
+                                </label>
+                            </div>
+                        </t>
+                        <t t-if="not show_write_checkbox">
+                            <div class="d-flex align-items-start">
+                                <i
+                                    class="fa fa-lock text-muted me-2 mt-1"
+                                    aria-hidden="true"
+                                />
+                                <div class="text-muted small">
+                                    Read-only — this app cannot create, modify or
+                                    delete data.
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+                <div class="d-flex gap-2 pt-2">
+                    <button
+                        class="btn btn-light border flex-fill"
+                        type="submit"
+                        name="decision"
+                        value="deny"
+                    >Deny</button>
+                    <button
+                        class="btn btn-primary flex-fill"
+                        type="submit"
+                        name="decision"
+                        value="allow"
+                    >Allow</button>
+                </div>
+            </form>
+            <div class="text-center text-muted small mt-4">
+                Signed in as <t t-out="user_name" />.
+                <a t-att-href="switch_user_url">Not you?</a>
+            </div>
+            <t t-call="mcp_server.oauth_footer" />
+        </t>
+    </template>
+
+    <template id="oauth_authorize_error" name="MCP OAuth Authorize Error">
+        <t t-call="mcp_server.oauth_layout">
+            <h1 class="h5 mb-3 text-center">Authorization request rejected</h1>
+            <p class="text-muted text-center mb-0">
+                <t t-out="error_description" />
+            </p>
+            <t t-call="mcp_server.oauth_footer" />
+        </t>
+    </template>
+</odoo>

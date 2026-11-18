@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="mcp_custom_tool_view_list" model="ir.ui.view">
+        <field name="name">mcp.custom.tool.list</field>
+        <field name="model">mcp.custom.tool</field>
+        <field name="arch" type="xml">
+            <tree string="MCP Custom Tools">
+                <field name="name" />
+                <field name="action_id" />
+                <field name="is_readonly" widget="boolean_toggle" />
+                <field name="active" widget="boolean_toggle" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="mcp_custom_tool_view_form" model="ir.ui.view">
+        <field name="name">mcp.custom.tool.form</field>
+        <field name="model">mcp.custom.tool</field>
+        <field name="arch" type="xml">
+            <form string="MCP Custom Tool">
+                <sheet>
+                    <div class="alert alert-info" role="alert">
+                        <p>
+                            The tool runs as the <strong>calling user</strong>,
+                            so their access rights (ACLs) apply to whatever the
+                            server action does.
+                        </p>
+                        <p>
+                            Who may call it is decided by the server action's
+                            <strong>Allowed Groups</strong>. If the action has no
+                            groups, access falls back to <strong>write</strong>
+                            access on the action's model (core rule) — so even a
+                            read-only tool then requires model write access. It is
+                            recommended to set Allowed Groups explicitly on the
+                            action.
+                        </p>
+                        <p>
+                            The action's model does <strong>not</strong> need to
+                            be listed under MCP Available Models.
+                        </p>
+                        <p>
+                            The <strong>Description</strong> and
+                            <strong>Input Schema</strong> are the tool's contract
+                            with the LLM: they tell the model what the tool does
+                            and which arguments to send.
+                        </p>
+                        <p>
+                            A custom tool must wrap a <strong>Python Code</strong>
+                            server action: read <code>mcp['args']</code> and assign
+                            <code>mcp['result']</code> (returned to the client,
+                            serialized as JSON). Other action types run per-record
+                            and would not execute for a tool call, so they are not
+                            allowed.
+                        </p>
+                        <p class="mb-1">
+                            <strong>Complete example</strong> — a tool that confirms
+                            a quotation. Description:
+                            <em>"Confirm a sale quotation. Call this when the user asks
+                                to confirm or validate a quotation. Arguments:
+                                order_id (integer) — the ID of the sale order to
+                                confirm."</em>
+                        </p>
+                        <p class="mb-1">Input Schema:</p>
+                        <pre class="mb-1"><code>{
+    "type": "object",
+    "properties": {
+        "order_id": {"type": "integer", "description": "sale.order ID"}
+    },
+    "required": ["order_id"]
+}</code></pre>
+                        <p class="mb-1">Server action (Python Code):</p>
+                        <pre class="mb-0"><code
+                            >order = env["sale.order"].browse(int(mcp["args"]["order_id"]))
+order.action_confirm()
+mcp["result"] = {"order": order.name, "state": order.state}</code></pre>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only" />
+                        <h1>
+                            <field name="name" placeholder="e.g. confirm_sale_order" />
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field
+                                name="action_id"
+                                domain="[('state', '=', 'code')]"
+                                options="{'no_quick_create': True}"
+                            />
+                            <field name="is_readonly" />
+                            <field name="active" />
+                        </group>
+                    </group>
+                    <separator string="Description (LLM contract)" />
+                    <field
+                        name="description"
+                        nolabel="1"
+                        placeholder='Say what the tool does, when the model should call it, and what each argument means. E.g.: "Confirm a sale quotation. Call this when the user asks to confirm a quotation. Arguments: order_id (integer) — the ID of the sale order to confirm."'
+                    />
+                    <separator string="Input Schema (JSON)" />
+                    <field
+                        name="input_schema"
+                        nolabel="1"
+                        widget="code"
+                        options="{'mode': 'js'}"
+                    />
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_mcp_custom_tool" model="ir.actions.act_window">
+        <field name="name">Custom Tools</field>
+        <field name="res_model">mcp.custom.tool</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No custom tools defined yet
+            </p>
+            <p>
+                Expose a curated verb to MCP clients by wrapping a server action,
+                instead of enabling generic create/write on a model.
+            </p>
+        </field>
+    </record>
+</odoo>

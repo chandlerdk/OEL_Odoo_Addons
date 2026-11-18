@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <menuitem
+        id="mcp_menu_technical"
+        name="MCP"
+        parent="base.menu_custom"
+        groups="mcp_server.group_mcp_admin"
+    />
+
+    <menuitem
+        id="menu_mcp_available_models"
+        name="MCP Available Models"
+        parent="mcp_menu_technical"
+        action="action_mcp_enabled_models"
+        sequence="10"
+        groups="mcp_server.group_mcp_admin"
+    />
+
+    <menuitem
+        id="menu_mcp_logs"
+        name="MCP Logs"
+        parent="mcp_menu_technical"
+        action="action_mcp_logs"
+        sequence="20"
+        groups="mcp_server.group_mcp_admin"
+    />
+
+    <menuitem
+        id="menu_mcp_oauth_clients"
+        name="OAuth Clients"
+        parent="mcp_menu_technical"
+        action="action_mcp_oauth_clients"
+        sequence="30"
+        groups="mcp_server.group_mcp_admin"
+    />
+
+    <menuitem
+        id="menu_mcp_oauth_tokens"
+        name="OAuth Tokens"
+        parent="mcp_menu_technical"
+        action="action_mcp_oauth_tokens"
+        sequence="40"
+        groups="mcp_server.group_mcp_admin"
+    />
+
+    <menuitem
+        id="menu_mcp_custom_tools"
+        name="Custom Tools"
+        parent="mcp_menu_technical"
+        action="action_mcp_custom_tool"
+        sequence="50"
+        groups="mcp_server.group_mcp_admin"
+    />
+</odoo>
