@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="mcp_model_selection_wizard_view_form" model="ir.ui.view">
+        <field name="name">mcp.model.selection.wizard.form</field>
+        <field name="model">mcp.model.selection.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Enable Models for MCP">
+                <sheet>
+                    <div class="alert alert-info" role="alert">
+                        <strong
+                        >Tip:</strong> Select multiple models to enable them for MCP
+                        access at once. Models that are already enabled will not appear in the
+                        list. </div>
+                    <group>
+                        <field name="model_ids" widget="many2many" />
+                    </group>
+                    <group string="Access Settings">
+                        <field name="allow_read" />
+                        <field name="allow_create" />
+                        <field name="allow_write" />
+                        <field name="allow_unlink" />
+                        <field name="allow_method_calls" />
+                    </group>
+                </sheet>
+                <footer>
+                    <button
+                        name="action_enable_models"
+                        string="Enable Selected Models"
+                        type="object"
+                        class="btn-primary"
+                        data-hotkey="q"
+                    />
+                    <button
+                        string="Cancel"
+                        class="btn-secondary"
+                        special="cancel"
+                        data-hotkey="z"
+                    />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_mcp_model_selection_wizard" model="ir.actions.act_window">
+        <field name="name">Enable Models for MCP</field>
+        <field name="res_model">mcp.model.selection.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="base.model_ir_model" />
+    </record>
+</odoo>

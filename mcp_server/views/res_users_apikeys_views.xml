@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="form_res_users_key_description_inherit_mcp" model="ir.ui.view">
+        <field name="name">res.users.apikeys.description.form.inherit.mcp</field>
+        <field name="model">res.users.apikeys.description</field>
+        <field name="inherit_id" ref="base.form_res_users_key_description" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <group>
+                    <field name="scope_mode" />
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

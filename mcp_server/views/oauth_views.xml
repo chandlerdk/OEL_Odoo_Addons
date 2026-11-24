@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- OAuth Clients -->
+    <record id="mcp_oauth_client_view_list" model="ir.ui.view">
+        <field name="name">mcp.oauth.client.list</field>
+        <field name="model">mcp.oauth.client</field>
+        <field name="arch" type="xml">
+            <tree string="OAuth Clients" create="false" decoration-muted="not active">
+                <header>
+                    <button
+                        name="%(action_mcp_oauth_client_secret_wizard)d"
+                        type="action"
+                        string="New Confidential Client"
+                        class="btn-primary"
+                        display="always"
+                        groups="mcp_server.group_mcp_admin"
+                    />
+                </header>
+                <field name="client_name" />
+                <field name="client_id" optional="show" />
+                <field name="redirect_uris" />
+                <field name="grant_types" />
+                <field name="response_types" />
+                <field name="token_endpoint_auth_method" />
+                <field name="is_confidential" />
+                <field name="scope" />
+                <field name="created_via" />
+                <field name="last_token_at" />
+                <field name="active" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="mcp_oauth_client_view_form" model="ir.ui.view">
+        <field name="name">mcp.oauth.client.form</field>
+        <field name="model">mcp.oauth.client</field>
+        <field name="arch" type="xml">
+            <form string="OAuth Client" create="false" edit="false">
+                <header>
+                    <button
+                        name="action_deactivate"
+                        type="object"
+                        string="Deactivate"
+                        class="btn-danger"
+                        invisible="not active"
+                        confirm="Deactivate this client? Every access token it issued stops working immediately."
+                    />
+                    <button
+                        name="action_activate"
+                        type="object"
+                        string="Activate"
+                        invisible="active"
+                    />
+                    <button
+                        name="%(action_mcp_oauth_client_secret_wizard)d"
+                        type="action"
+                        string="Regenerate Secret"
+                        invisible="created_via != 'manual'"
+                        context="{'default_client_id': id}"
+                        groups="mcp_server.group_mcp_admin"
+                    />
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field
+                                name="client_name"
+                                readonly="1"
+                                placeholder="(unnamed client)"
+                            />
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Registration">
+                            <field
+                                name="client_id"
+                                readonly="1"
+                                widget="CopyClipboardChar"
+                            />
+                            <field name="created_via" readonly="1" />
+                            <field name="active" readonly="1" />
+                            <field name="create_date" readonly="1" />
+                            <field name="last_token_at" readonly="1" />
+                        </group>
+                        <group string="Capabilities">
+                            <field name="grant_types" readonly="1" />
+                            <field name="response_types" readonly="1" />
+                            <field name="token_endpoint_auth_method" readonly="1" />
+                            <field name="is_confidential" readonly="1" />
+                            <field name="scope" readonly="1" />
+                        </group>
+                    </group>
+                    <group string="Redirect URIs">
+                        <field name="redirect_uris" nolabel="1" readonly="1" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="mcp_oauth_client_view_search" model="ir.ui.view">
+        <field name="name">mcp.oauth.client.search</field>
+        <field name="model">mcp.oauth.client</field>
+        <field name="arch" type="xml">
+            <search string="OAuth Clients">
+                <field name="client_name" />
+                <field name="client_id" />
+            </search>
+        </field>
+    </record>
+
+    <record id="action_mcp_oauth_clients" model="ir.actions.act_window">
+        <field name="name">OAuth Clients</field>
+        <field name="res_model">mcp.oauth.client</field>
+        <field name="search_view_id" ref="mcp_oauth_client_view_search" />
+        <field name="view_mode">tree,form</field>
+        <!-- Show deactivated (archived) clients too, muted by the list's
+             decoration-muted="not active"; otherwise archiving hides them. -->
+        <field name="context">{'active_test': False}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No OAuth clients registered yet
+            </p>
+            <p>
+                Clients register automatically when an MCP application connects
+                through the OAuth authorization flow. For a program that needs a
+                client ID and a client secret, use New Confidential Client.
+            </p>
+        </field>
+    </record>
+
+    <!-- Bulk "Actions" menu entries (appear when rows are selected in the
+         list), restricted to MCP admins. Deactivate opens a confirmation
+         wizard (mirroring the destructive form button); the wizard and Activate
+         both delegate to the same admin-gated, recordset-safe object methods. -->
+    <record id="action_mcp_oauth_client_deactivate" model="ir.actions.server">
+        <field name="name">Deactivate</field>
+        <field name="model_id" ref="model_mcp_oauth_client" />
+        <field name="binding_model_id" ref="model_mcp_oauth_client" />
+        <field name="binding_view_types">list</field>
+        <field name="groups_id" eval="[(4, ref('mcp_server.group_mcp_admin'))]" />
+        <field name="state">code</field>
+        <field name="code">action = {
+    "type": "ir.actions.act_window",
+    "name": "Confirmation",
+    "res_model": "mcp.oauth.bulk.confirm.wizard",
+    "target": "new",
+    "view_mode": "form",
+    "context": {"default_operation": "deactivate", "active_ids": records.ids},
+}</field>
+    </record>
+
+    <record id="action_mcp_oauth_client_activate" model="ir.actions.server">
+        <field name="name">Activate</field>
+        <field name="model_id" ref="model_mcp_oauth_client" />
+        <field name="binding_model_id" ref="model_mcp_oauth_client" />
+        <field name="binding_view_types">list</field>
+        <field name="groups_id" eval="[(4, ref('mcp_server.group_mcp_admin'))]" />
+        <field name="state">code</field>
+        <field name="code">records.action_activate()</field>
+    </record>
+
+    <!-- OAuth Tokens -->
+    <record id="mcp_oauth_token_view_list" model="ir.ui.view">
+        <field name="name">mcp.oauth.token.list</field>
+        <field name="model">mcp.oauth.token</field>
+        <field name="arch" type="xml">
+            <tree
+                string="OAuth Tokens"
+                create="false"
+                edit="false"
+                decoration-muted="revoked"
+            >
+                <field name="create_date" />
+                <field name="client" />
+                <field name="user_id" />
+                <field name="scope" />
+                <field name="audience" />
+                <field name="access_expires_at" />
+                <field name="refresh_expires_at" />
+                <field name="revoked" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="mcp_oauth_token_view_form" model="ir.ui.view">
+        <field name="name">mcp.oauth.token.form</field>
+        <field name="model">mcp.oauth.token</field>
+        <field name="arch" type="xml">
+            <form string="OAuth Token" create="false" edit="false">
+                <header>
+                    <button
+                        name="action_revoke"
+                        type="object"
+                        string="Revoke"
+                        class="btn-danger"
+                        invisible="revoked"
+                        confirm="Revoke this token? The client will have to re-authenticate."
+                    />
+                </header>
+                <sheet>
+                    <group>
+                        <group string="Binding">
+                            <field name="client" />
+                            <field name="user_id" />
+                            <field name="scope" />
+                            <field name="audience" />
+                        </group>
+                        <group string="Validity">
+                            <field name="revoked" />
+                            <field name="access_expires_at" />
+                            <field name="refresh_expires_at" />
+                            <field name="refresh_family_id" />
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_mcp_oauth_tokens" model="ir.actions.act_window">
+        <field name="name">OAuth Tokens</field>
+        <field name="res_model">mcp.oauth.token</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No OAuth tokens issued yet
+            </p>
+            <p>
+                Tokens appear here after MCP clients complete the OAuth
+                authorization flow.
+            </p>
+        </field>
+    </record>
+
+    <!-- Bulk "Actions" menu entry: revoke every selected token at once. Opens
+         a confirmation wizard (mirroring the destructive form button) that then
+         calls the same admin-gated, recordset-safe revoke method. -->
+    <record id="action_mcp_oauth_token_revoke" model="ir.actions.server">
+        <field name="name">Revoke</field>
+        <field name="model_id" ref="model_mcp_oauth_token" />
+        <field name="binding_model_id" ref="model_mcp_oauth_token" />
+        <field name="binding_view_types">list</field>
+        <field name="groups_id" eval="[(4, ref('mcp_server.group_mcp_admin'))]" />
+        <field name="state">code</field>
+        <field name="code">action = {
+    "type": "ir.actions.act_window",
+    "name": "Confirmation",
+    "res_model": "mcp.oauth.bulk.confirm.wizard",
+    "target": "new",
+    "view_mode": "form",
+    "context": {"default_operation": "revoke", "active_ids": records.ids},
+}</field>
+    </record>
+</odoo>
